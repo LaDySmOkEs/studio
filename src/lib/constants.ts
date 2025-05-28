@@ -1,5 +1,5 @@
 // src/lib/constants.ts
-import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, type LucideIcon } from "lucide-react";
+import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, CreditCard, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -38,4 +38,10 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/trauma-log",
     icon: NotebookPen,
   },
+  {
+    title: "Subscription",
+    href: "/subscription",
+    icon: CreditCard,
+  },
 ];
+
