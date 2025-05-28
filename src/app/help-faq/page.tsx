@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -111,7 +111,6 @@ export default function HelpFaqPage() {
               </AccordionContent>
             </AccordionItem>
 
-
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg">
                 <BookOpen className="w-5 h-5 mr-2 text-accent" />
@@ -120,6 +119,40 @@ export default function HelpFaqPage() {
               <AccordionContent className="text-muted-foreground">
                 <p>Navigate to the "Document Generator" page. Select your state, city/county, and court level to tailor the document to your jurisdiction. Then, choose a document type (e.g., Motion, Affidavit, Complaint) from the dropdown. A template will be generated in the text area below. You can edit this template directly and then copy it to your clipboard.</p>
                 <p>It's crucial to replace all placeholders like "[Your Name]" or "[Case Details]" with your specific information and review the document carefully. The templates are general starting points and do not constitute legal advice.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-chain-of-command">
+              <AccordionTrigger className="text-lg">
+                <Route className="w-5 h-5 mr-2 text-accent" />
+                How do I find the right "Chain of Command" to file a complaint?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p>Determining the correct "chain of command" or entity to file a complaint with can be challenging as it varies greatly depending on who or what organization the complaint is about, and your specific location. The AI in this app cannot determine this for your specific case. However, here's some general guidance on how to research this:</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">General Steps for Research:</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Identify the Entity:</strong> Be clear about which specific person, agency, department, or company your complaint concerns.</li>
+                    <li><strong>Check Official Websites:</strong> Most government agencies, police departments, and larger companies have websites. Look for sections like "Contact Us," "File a Complaint," "Internal Affairs," "Professional Standards," "Ethics Office," or "Ombudsman."</li>
+                    <li><strong>Look for Complaint Policies/Procedures:</strong> Some organizations publish their complaint procedures online. These documents can outline the steps to take and the appropriate office to contact.</li>
+                    <li><strong>Professional Licensing Boards:</strong> If your complaint is about a licensed professional (e.g., doctor, lawyer, contractor, therapist), search for the relevant state licensing board. They usually handle complaints regarding professional misconduct.</li>
+                    <li><strong>Inspector General (IG) Offices:</strong> Many federal and some state government agencies have an Inspector General's office responsible for investigating waste, fraud, and abuse within that agency.</li>
+                    <li><strong>City/County Clerk or Manager's Office:</strong> For issues with local government services or employees, the city or county clerk's office, or the city/county manager's office, may be able to direct you to the appropriate complaint channel.</li>
+                    <li><strong>Keep Records:</strong> When you do make contact, keep detailed records of who you spoke to, when, and what was said or advised.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Specific Examples (General):</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Police Misconduct:</strong> Typically, the first step is the Internal Affairs Division (IAD) or Professional Standards Bureau of the specific police department. Some cities also have independent Civilian Complaint Review Boards (CCRB).</li>
+                    <li><strong>Judicial Misconduct:</strong> Each state has a commission or board responsible for judicial conduct and discipline. For federal judges, complaints are handled through the judicial councils of the federal circuits.</li>
+                    <li><strong>Consumer Complaints:</strong> Against a business, you might start with the Better Business Bureau (BBB), your state's Attorney General's office (Consumer Protection Division), or relevant federal agencies like the Federal Trade Commission (FTC) or Consumer Financial Protection Bureau (CFPB).</li>
+                  </ul>
+                </div>
+                
+                <p><strong>Disclaimer:</strong> This information is general guidance only and not legal advice. Procedures and appropriate authorities vary greatly by jurisdiction and the nature of the complaint. Always try to find the official, local procedures for your specific situation. If you are unsure, consulting with an attorney can help you identify the correct avenues for your complaint.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -357,5 +390,7 @@ export default function HelpFaqPage() {
   );
 }
 
+
+    
 
     
