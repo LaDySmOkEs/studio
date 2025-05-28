@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -69,6 +69,48 @@ export default function HelpFaqPage() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="item-pattern-recognition">
+              <AccordionTrigger className="text-lg">
+                <Siren className="w-5 h-5 mr-2 text-accent" />
+                Conceptual: Pattern Recognition &amp; Systemic Issue Alerts
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p>One of the long-term visions for a tool like DUE PROCESS AI involves leveraging the power of collective information to identify broader patterns of potential systemic issues.</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">How It Could Work (Conceptual):</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Aggregated Data Analysis:</strong> In a highly secure and privacy-preserving manner, the system could analyze anonymized data from many users who voluntarily opt-in to share generalized information about their issues (e.g., type of problem, involved agency/jurisdiction, nature of potential due process violation, but without specific personal case facts).</li>
+                    <li><strong>Identifying Patterns:</strong> AI algorithms could be trained to detect recurring patterns—for instance, a high number of similar due process concerns (like consistent lack of proper notice) reported against a specific county's agency, or a particular type of procedural irregularity becoming common in a certain type of case across a state.</li>
+                    <li><strong>Systemic Issue Flags:</strong> If significant patterns emerge that suggest a potential systemic problem rather than isolated incidents, the system could flag this.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Potential Benefits (Conceptual):</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Early Warning System:</strong> Could act as an early warning for civil rights organizations, legal aid societies, or oversight bodies about potential systemic abuses.</li>
+                    <li><strong>Informing Advocacy:</strong> Data-driven insights could help advocacy groups target their efforts more effectively.</li>
+                    <li><strong>Supporting Broader Action:</strong> In some cases, identifying widespread, similar issues is a precursor to class action lawsuits or calls for investigation by bodies like the Department of Justice (DOJ) Civil Rights Division. The app could (conceptually) provide information on how users with similar concerns might connect with relevant organizations or understand options for group complaints, always with the strong guidance to seek independent legal advice.</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Important Considerations:</h4>
+                  <p>Implementing such a feature would require overcoming significant technical, ethical, and legal challenges, including:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                     <li>Ensuring robust data anonymization and user privacy.</li>
+                     <li>Preventing misuse of the platform for unverified claims.</li>
+                     <li>Clearly defining the app's role and avoiding any actions that could be construed as organizing legal action or providing legal advice.</li>
+                     <li>Developing highly accurate AI models for pattern detection.</li>
+                  </ul>
+                </div>
+
+                <p><strong>Disclaimer: This Pattern Recognition &amp; Systemic Issue Alerts feature is purely conceptual and is NOT implemented in the current version of DUE PROCESS AI.</strong> It represents a potential future direction for advanced legal tech tools, contingent on responsible development and addressing the complexities involved.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+
             <AccordionItem value="item-2">
               <AccordionTrigger className="text-lg">
                 <BookOpen className="w-5 h-5 mr-2 text-accent" />
@@ -125,7 +167,7 @@ export default function HelpFaqPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground/90">Overlapping & Special Jurisdictions:</h4>
+                  <h4 className="font-semibold text-foreground/90">Overlapping &amp; Special Jurisdictions:</h4>
                   <p>Jurisdictional issues can become complex, especially with:</p>
                   <ul className="list-disc pl-5 space-y-1 mt-1">
                     <li><strong>Concurrent Jurisdiction:</strong> Situations where both federal and state courts might have the authority to hear a case. The plaintiff may choose where to file, or a defendant might seek to "remove" a case from state to federal court if certain conditions are met.</li>
