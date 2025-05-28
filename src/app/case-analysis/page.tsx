@@ -1,4 +1,3 @@
-
 // src/app/case-analysis/page.tsx
 "use client";
 
@@ -121,8 +120,8 @@ export default function CaseAnalysisPage() {
   const handlePlaceholderSubmit = (phaseName: string) => {
     toast({
       title: `Conceptual: ${phaseName}`,
-      description: "This feature is a placeholder. In a full version, this action would trigger further AI processing.",
-      duration: 4000,
+      description: "This feature is a placeholder. In a full version, this action would trigger further AI processing and potentially refine analysis or learn from feedback.",
+      duration: 5000,
     });
   };
   
@@ -306,7 +305,7 @@ export default function CaseAnalysisPage() {
                 Conceptual Phase 2: Guided Clarification
               </CardTitle>
               <CardDescription>
-                In a more advanced system, the AI might ask follow-up questions to refine its understanding.
+                In a more advanced system, the AI might ask follow-up questions to refine its understanding. Your responses here would help improve accuracy.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -339,17 +338,17 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <UploadCloud className="w-5 h-5 text-accent" />
-                Conceptual Phase 3: Document Upload
+                Conceptual Phase 3: Document Upload & Analysis
               </CardTitle>
               <CardDescription>
-                You could upload relevant documents (e.g., police reports, contracts) for AI analysis.
+                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">Document Analysis:</AlertTitle>
+                <AlertTitle className="font-semibold text-accent">How Document Analysis Would Work:</AlertTitle>
                 <AlertDescription>
-                  In a full version, uploaded documents would be analyzed using OCR and content analysis to extract key information, confirm details, and further refine the case assessment.
+                  In a full version, uploaded documents would be analyzed using techniques like OCR (Optical Character Recognition) and content analysis. This helps extract key information, confirm details from your narrative, and further refine the case assessment and confidence score.
                 </AlertDescription>
               </Alert>
               <Input
@@ -376,14 +375,14 @@ export default function CaseAnalysisPage() {
                  Conceptual Phase 4: Structured Verification & Refinement
               </CardTitle>
               <CardDescription>
-                Review the AI's understanding and provide corrections or additional details.
+                Review the AI's current understanding and provide corrections or additional details. In a full system, this feedback would help the AI learn and improve.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">Verification Step:</AlertTitle>
+                <AlertTitle className="font-semibold text-accent">Verification & System Improvement:</AlertTitle>
                 <AlertDescription>
-                  The AI would present its current understanding for your review. You could then correct any misinterpretations or add missing information.
+                  The AI would present its summarized understanding of your case based on all information provided. You could then correct any misinterpretations or add crucial missing information. This iterative feedback loop is essential for refining the AI's accuracy and, in a production system, would contribute to its ongoing learning and improvement for future analyses.
                 </AlertDescription>
               </Alert>
               <Textarea
@@ -405,4 +404,3 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
-

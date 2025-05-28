@@ -1,5 +1,5 @@
 // src/lib/constants.ts
-import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, CreditCard, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -48,5 +48,9 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/admin-dashboard",
     icon: LayoutDashboard,
   },
+  {
+    title: "Help / FAQ",
+    href: "/help-faq",
+    icon: HelpCircle,
+  },
 ];
-

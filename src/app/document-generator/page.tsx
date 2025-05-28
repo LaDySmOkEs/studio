@@ -367,7 +367,7 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select jurisdiction and document type to generate a template. You can customize it to fit your needs. Remember, these templates are for guidance only and may not be suitable for all jurisdictions or situations. Always consult with a legal professional.
+            Select your state, city/county, and court level to ensure documents are tailored for the correct jurisdiction. Then, choose a document type to generate a template. You can customize it to fit your specific needs. Remember, these templates are for guidance and may require legal review.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
