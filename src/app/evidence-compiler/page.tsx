@@ -1,3 +1,4 @@
+
 // src/app/evidence-compiler/page.tsx
 "use client";
 
@@ -9,10 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
+import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface ConceptualAnalysis {
+  transcriptionHighlights?: string;
+  flaggedIrregularities?: string[];
+  linkedPrinciples?: string[];
+}
 
 interface EvidenceItem {
   id: string;
@@ -24,6 +30,12 @@ interface EvidenceItem {
   previewUrl?: string; // Data URL for images, or icon identifier
   addedDate: string;
   fileObject?: File; // To store the actual file if needed later & for preview
+}
+
+interface AnalysisDisplayState {
+  itemId: string;
+  label: string;
+  analysis: ConceptualAnalysis;
 }
 
 const getFileIcon = (type: EvidenceItem['type']) => {
@@ -45,12 +57,15 @@ export default function EvidenceCompilerPage() {
   const [currentUrl, setCurrentUrl] = useState("");
   const [inputType, setInputType] = useState<'file' | 'url'>('file');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [analysisLoadingItemId, setAnalysisLoadingItemId] = useState<string | null>(null);
+  const [currentAnalysisDisplay, setCurrentAnalysisDisplay] = useState<AnalysisDisplayState | null>(null);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Clean up preview URLs when component unmounts or items are removed
     return () => {
       evidenceItems.forEach(item => {
         if (item.previewUrl && item.previewUrl.startsWith('blob:')) {
@@ -63,7 +78,7 @@ export default function EvidenceCompilerPage() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setCurrentFile(event.target.files[0]);
-      setCurrentUrl(""); // Clear URL if a file is selected
+      setCurrentUrl(""); 
     }
   };
 
@@ -88,16 +103,17 @@ export default function EvidenceCompilerPage() {
     }
 
     setIsSubmitting(true);
+    setCurrentAnalysisDisplay(null); // Clear previous analysis display
 
-    let newEvidenceItem: Omit<EvidenceItem, 'id' | 'addedDate'>;
+    let newEvidenceItemBase: Omit<EvidenceItem, 'id' | 'addedDate'>;
     let previewUrl: string | undefined = undefined;
 
     if (inputType === 'file' && currentFile) {
       const fileType = determineFileType(currentFile);
-      if (fileType === 'photo' || fileType === 'video') { // Create blob URLs for image/video previews
+      if (fileType === 'photo' || fileType === 'video') {
         previewUrl = URL.createObjectURL(currentFile);
       }
-      newEvidenceItem = {
+      newEvidenceItemBase = {
         type: fileType,
         fileName: currentFile.name,
         label: currentLabel,
@@ -111,7 +127,7 @@ export default function EvidenceCompilerPage() {
          setIsSubmitting(false);
          return;
       }
-      newEvidenceItem = {
+      newEvidenceItemBase = {
         type: 'youtube',
         url: currentUrl,
         label: currentLabel,
@@ -125,7 +141,7 @@ export default function EvidenceCompilerPage() {
 
     setEvidenceItems(prevItems => [
       ...prevItems,
-      { ...newEvidenceItem, id: Date.now().toString(), addedDate: new Date().toLocaleString() }
+      { ...newEvidenceItemBase, id: Date.now().toString(), addedDate: new Date().toLocaleString() }
     ]);
 
     toast({ title: "Evidence Added", description: `"${currentLabel}" has been added to your collection.`, variant: "default" });
@@ -134,7 +150,7 @@ export default function EvidenceCompilerPage() {
     setCurrentFile(null);
     setCurrentUrl("");
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Reset file input
+      fileInputRef.current.value = "";
     }
     setIsSubmitting(false);
   };
@@ -145,7 +161,53 @@ export default function EvidenceCompilerPage() {
       URL.revokeObjectURL(itemToDelete.previewUrl);
     }
     setEvidenceItems(prevItems => prevItems.filter(item => item.id !== id));
+    if (currentAnalysisDisplay?.itemId === id) {
+      setCurrentAnalysisDisplay(null); // Clear analysis if the analyzed item is deleted
+    }
     toast({ title: "Evidence Removed", description: "The item has been removed from your collection.", variant: "default" });
+  };
+
+  const handleConceptualAnalyze = async (item: EvidenceItem) => {
+    setAnalysisLoadingItemId(item.id);
+    setCurrentAnalysisDisplay(null); // Clear previous analysis
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate analysis delay
+
+    let mockAnalysis: ConceptualAnalysis = {};
+    if (item.type === 'audio' || item.type === 'video') {
+      mockAnalysis = {
+        transcriptionHighlights: "Officer: 'Step out of the car.'\nUser: 'Am I being detained?'\nOfficer: 'I said step out of the car now!' (0:32)\nUser: 'I would like to speak to my lawyer.' (1:05)",
+        flaggedIrregularities: [
+          "Officer did not state reason for stop initially.",
+          "User's question 'Am I being detained?' not directly answered.",
+          "Escalation in officer's tone at 0:32.",
+          "User's request for a lawyer at 1:05 - note if this was acknowledged or ignored."
+        ],
+        linkedPrinciples: [
+          "Right to know why you are being stopped/detained (often part of lawful procedure).",
+          "Right to counsel (6th Amendment, if custodial interrogation).",
+          "Right to remain silent (5th Amendment)."
+        ]
+      };
+    } else if (item.type === 'youtube') {
+      mockAnalysis = {
+        transcriptionHighlights: "Speaker 1: '...the footage clearly shows the individual was not read their rights.'\nSpeaker 2: 'This is a classic Miranda violation, textbook case.' (3:15)",
+        flaggedIrregularities: [
+          "Allegation of Miranda violation explicitly stated by speaker at 3:15.",
+          "Context suggests a discussion of a recorded incident."
+        ],
+        linkedPrinciples: [
+          "Miranda Rights (Right to remain silent, Right to an attorney).",
+          "Exclusionary rule (evidence obtained via rights violation may be inadmissible)."
+        ]
+      };
+    }
+
+    setCurrentAnalysisDisplay({ itemId: item.id, label: item.label, analysis: mockAnalysis });
+    setAnalysisLoadingItemId(null);
+    toast({
+      title: "Conceptual Analysis Complete",
+      description: `Showing conceptual analysis for "${item.label}".`,
+    });
   };
 
   const handleAssembleBundle = () => {
@@ -168,10 +230,10 @@ export default function EvidenceCompilerPage() {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <UploadCloud className="w-7 h-7 text-primary" /> Evidence Compiler
+              <UploadCloud className="w-7 h-7 text-primary" /> Evidence Compiler & Analyzer
             </CardTitle>
             <CardDescription>
-              Upload or link evidence (photos, videos, documents, YouTube URLs). Label and organize them for your case.
+              Upload or link evidence (photos, videos, documents, YouTube URLs). Label and organize them. You can also perform a conceptual analysis on audio/video files.
               Uploaded files are handled locally in your browser.
             </CardDescription>
           </CardHeader>
@@ -198,6 +260,7 @@ export default function EvidenceCompilerPage() {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
+                    accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                   />
                   {currentFile && <p className="text-xs text-muted-foreground mt-1">Selected: {currentFile.name}</p>}
@@ -240,7 +303,7 @@ export default function EvidenceCompilerPage() {
             </CardContent>
             <CardFooter className="flex justify-between items-center">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? <><CheckCircle className="mr-2 h-4 w-4 animate-spin" />Adding...</> : "Add Evidence to Collection"}
+                {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Adding...</> : "Add Evidence to Collection"}
               </Button>
               <Button type="button" variant="outline" onClick={handleAssembleBundle}>
                 Assemble Bundle (Placeholder)
@@ -253,7 +316,7 @@ export default function EvidenceCompilerPage() {
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle>Collected Evidence</CardTitle>
-              <CardDescription>Review and manage your compiled evidence items below.</CardDescription>
+              <CardDescription>Review and manage your compiled evidence items below. Audio/video items can be conceptually analyzed.</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px] pr-3">
@@ -261,26 +324,38 @@ export default function EvidenceCompilerPage() {
                   {evidenceItems.map(item => (
                     <li key={item.id} className="border p-4 rounded-lg shadow-sm bg-card hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 flex-grow min-w-0">
                            {item.previewUrl && (item.type === 'photo' || item.type === 'video') ? (
                             item.type === 'photo' ?
-                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded" /> :
-                              <video src={item.previewUrl} className="w-16 h-16 object-cover rounded" controls={false} muted loop playsInline />
+                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded flex-shrink-0" /> :
+                              <video src={item.previewUrl} className="w-16 h-16 object-cover rounded flex-shrink-0" controls={false} muted loop playsInline />
                           ) : (
-                            <div className="w-16 h-16 flex items-center justify-center bg-muted rounded">
+                            <div className="w-16 h-16 flex items-center justify-center bg-muted rounded flex-shrink-0">
                               {getFileIcon(item.type)}
                             </div>
                           )}
-                          <div>
-                            <h4 className="font-semibold text-md">{item.label}</h4>
+                          <div className="flex-grow min-w-0">
+                            <h4 className="font-semibold text-md truncate" title={item.label}>{item.label}</h4>
                             <p className="text-xs text-muted-foreground">
                               Type: <span className="capitalize">{item.type}</span> | Added: {item.addedDate}
                             </p>
-                            {item.fileName && <p className="text-xs text-muted-foreground">File: {item.fileName}</p>}
-                            {item.url && <p className="text-xs text-muted-foreground">URL: <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{item.url}</a></p>}
+                            {item.fileName && <p className="text-xs text-muted-foreground truncate">File: {item.fileName}</p>}
+                            {item.url && <p className="text-xs text-muted-foreground truncate">URL: <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{item.url}</a></p>}
+                             {(item.type === 'audio' || item.type === 'video' || item.type === 'youtube') && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="mt-2 text-xs"
+                                  onClick={() => handleConceptualAnalyze(item)}
+                                  disabled={analysisLoadingItemId === item.id}
+                                >
+                                  {analysisLoadingItemId === item.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <SearchCheck className="mr-1 h-3 w-3" />}
+                                  Analyze (Conceptual)
+                                </Button>
+                              )}
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80" onClick={() => handleDeleteEvidence(item.id)} aria-label="Delete evidence">
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 flex-shrink-0" onClick={() => handleDeleteEvidence(item.id)} aria-label="Delete evidence">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -290,6 +365,62 @@ export default function EvidenceCompilerPage() {
                 </ul>
               </ScrollArea>
             </CardContent>
+          </Card>
+        )}
+
+        {currentAnalysisDisplay && (
+          <Card className="shadow-lg mt-6 border-primary">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <SearchCheck className="w-6 h-6 text-primary" /> Conceptual Analysis for: <span className="font-normal">{currentAnalysisDisplay.label}</span>
+              </CardTitle>
+              <CardDescription>
+                This is a conceptual AI analysis. It does not constitute legal advice and is for demonstration purposes only.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {currentAnalysisDisplay.analysis.transcriptionHighlights && (
+                <div>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Transcription Highlights (Conceptual)</h4>
+                  <Textarea
+                    value={currentAnalysisDisplay.analysis.transcriptionHighlights}
+                    readOnly
+                    rows={4}
+                    className="bg-muted/50 text-sm font-mono"
+                  />
+                </div>
+              )}
+              {currentAnalysisDisplay.analysis.flaggedIrregularities && currentAnalysisDisplay.analysis.flaggedIrregularities.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Flagged Procedural Irregularities (Conceptual)</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                    {currentAnalysisDisplay.analysis.flaggedIrregularities.map((irregularity, index) => (
+                      <li key={index}>{irregularity}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {currentAnalysisDisplay.analysis.linkedPrinciples && currentAnalysisDisplay.analysis.linkedPrinciples.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><ShieldCheck className="w-4 h-4 text-muted-foreground"/>Linked Constitutional Principles (Conceptual)</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                    {currentAnalysisDisplay.analysis.linkedPrinciples.map((principle, index) => (
+                      <li key={index}>{principle}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <Alert variant="default" className="border-accent bg-accent/10 mt-3">
+                <AlertTriangle className="h-4 w-4 text-accent" />
+                <AlertTitle className="font-semibold text-accent">Not Legal Advice</AlertTitle>
+                <AlertDescription>
+                  The analysis presented is illustrative. Always consult with a qualified legal professional for advice specific to your situation and to review any evidence.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+            <CardFooter>
+                <Button variant="outline" onClick={() => setCurrentAnalysisDisplay(null)}>Close Analysis</Button>
+            </CardFooter>
           </Card>
         )}
       </div>
@@ -334,3 +465,4 @@ export default function EvidenceCompilerPage() {
     </div>
   );
 }
+
