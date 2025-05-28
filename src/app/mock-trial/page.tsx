@@ -16,6 +16,7 @@ const MOCK_SCENARIOS = [
   { value: "small_claims", label: "Small Claims Hearing (Plaintiff)" },
   { value: "eviction_defense", label: "Eviction Defense Hearing (Tenant)" },
   { value: "traffic_ticket", label: "Traffic Ticket Challenge" },
+  { value: "civil_litigation_plaintiff", label: "Civil Litigation (e.g., Contract Dispute - Plaintiff)" },
 ];
 
 const MOCK_SCRIPT_STEPS = {
@@ -57,6 +58,23 @@ const MOCK_SCRIPT_STEPS = {
     { role: "Judge", line: "Defendant, do you have a closing statement? Briefly summarize why you believe the citation should be dismissed." },
     { role: "User", prompt: "Your closing statement:" },
     { role: "Judge", line: "The court will make a decision. (End of Simulation)" },
+  ],
+  civil_litigation_plaintiff: [
+    { role: "Judge", line: "Court is in session. This is case number [Case Number], [Your Name] versus [Defendant Name]. Plaintiff, are you ready to proceed with your opening statement regarding your claim for [e.g., breach of contract]?" },
+    { role: "User", prompt: "Your opening statement (briefly explain your claim, what happened, and what you are seeking):" },
+    { role: "Judge", line: "Thank you. Plaintiff, you may now call your first witness or present your first piece of evidence." },
+    { role: "User", prompt: "How you call your first witness (e.g., 'I call [Witness Name] to the stand.') or present evidence (e.g., 'I would like to submit Plaintiff's Exhibit 1, the contract.'):" },
+    { role: "Judge", line: "Defendant, you may cross-examine the witness after direct examination, or object to evidence presented." },
+    { role: "User", prompt: "(Conceptual turn: Witness testifies, then opponent cross-examines or responds to evidence)" },
+    { role: "Judge", line: "Plaintiff, do you have further witnesses or evidence to present at this time?" },
+    { role: "User", prompt: "Your response (e.g., 'Yes, Your Honor, I call [Next Witness].' or 'No further evidence at this time, Your Honor.'):" },
+    { role: "Judge", line: "Very well. After the plaintiff rests their case, the defendant will have an opportunity to present their case." },
+    { role: "User", prompt: "(Conceptual turn: Opponent presents their case - witnesses, evidence)" },
+    { role: "Judge", line: "Plaintiff, you may now present your closing argument. Please summarize the key points of your case and why the court should find in your favor." },
+    { role: "User", prompt: "Your closing argument:" },
+    { role: "Judge", line: "Thank you. Defendant, your closing argument." },
+    { role: "User", prompt: "(Conceptual turn: Opponent gives closing argument)" },
+    { role: "Judge", line: "The court has heard all arguments and evidence. I will take this matter under advisement and issue a written ruling. (End of Simulation)" },
   ],
 };
 
@@ -175,3 +193,4 @@ export default function MockTrialPage() {
     </div>
   );
 }
+
