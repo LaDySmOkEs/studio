@@ -1,4 +1,3 @@
-
 // src/app/document-generator/page.tsx
 "use client";
 
@@ -14,7 +13,7 @@ import { FileText, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
-type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "";
+type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "foiaRequest" | "";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData"; // Same key as in CaseAnalysisPage
 
@@ -257,6 +256,44 @@ ____________________________
 
 (Notary Public section may be required depending on jurisdiction)
 `,
+  foiaRequest: `[Your Full Name/Organization Name]
+[Your Street Address]
+[Your City, State, Zip Code]
+[Your Phone Number]
+[Your Email Address]
+
+[Date]
+
+FOIA Officer
+[Name of Federal Agency]
+[Agency Address - Find specific FOIA office address on agency's website]
+[City, State, Zip Code]
+
+Re: Freedom of Information Act Request
+
+Dear FOIA Officer:
+
+Pursuant to the Freedom of Information Act (FOIA), 5 U.S.C. § 552, I am requesting access to the following records:
+
+(Clearly and specifically describe the records you are seeking. Be as specific as possible regarding names, dates, subject matter, record types, etc. For example:
+- "All emails between [Official's Name/Title] and [Another Person/Entity] regarding [Subject] from [Start Date] to [End Date]."
+- "Copies of all final reports, studies, or analyses concerning [Topic] conducted or commissioned by your agency in the past [Number] years."
+- "The complete case file for [Case Name/Number], if applicable and publicly releasable under FOIA.")
+
+I would prefer to receive the information in [Specify format, e.g., electronic format (PDF if possible), paper copies].
+
+Regarding fees, I am willing to pay reasonable duplication fees up to $[Specify amount, e.g., $25.00]. If the anticipated fees will exceed this amount, please contact me before processing my request.
+(Optional: If you believe you are eligible for a fee waiver or reduction, state that here and explain why. Common reasons include being a representative of the news media, an educational or noncommercial scientific institution, or if disclosure is in the public interest.)
+
+If any part of this request is denied, please provide a detailed statement of the grounds for withholding each document or portion thereof, citing the specific FOIA exemption(s) claimed. Also, please inform me of FOIA appeal procedures.
+
+Thank you for your time and attention to this matter. I look forward to your response within the 20 working days mandated by the statute.
+
+Sincerely,
+
+____________________________
+[Your Typed Full Name/Signature]
+`,
 };
 
 const US_STATES = [
@@ -347,45 +384,46 @@ export default function DocumentGeneratorPage() {
     if (docType && DOCUMENT_TEMPLATES[docType]) {
       let template = DOCUMENT_TEMPLATES[docType];
 
-      let effectiveCourtName = "[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]"; // Default for complaint
-      if (docType !== "complaint") {
-        effectiveCourtName = "[Court Name]"; // Default for other docs
+      if (docType !== "foiaRequest") { // FOIA requests are typically not court-specific in the same way
+        let effectiveCourtName = "[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]"; // Default for complaint
+        if (docType !== "complaint") {
+          effectiveCourtName = "[Court Name]"; // Default for other docs
+        }
+
+
+        if (selectedCourtLevel && selectedState) {
+           if (docType === "complaint") {
+              const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
+              if (selectedCourtLevel.toLowerCase().includes("federal")) {
+                   effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity} DIVISION` : `DISTRICT OF ${stateLabel}` }`;
+              } else {
+                   effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` OF ${selectedCity}, ${stateLabel}` : `, ${stateLabel}` }`;
+              }
+           } else {
+              effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
+           }
+        } else if (selectedCourtLevel) {
+          effectiveCourtName = docType === "complaint" ? selectedCourtLevel.toUpperCase() : selectedCourtLevel;
+        } else if (selectedState) {
+          const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
+          effectiveCourtName = docType === "complaint" ? `[SPECIFY COURT LEVEL] IN ${stateLabel.toUpperCase()}` : `[Specify Court Level] in ${stateLabel}`;
+        } else if (selectedCity && docType === "complaint") {
+           effectiveCourtName = `[SPECIFY COURT LEVEL AND STATE] FOR ${selectedCity.toUpperCase()} DIVISION`;
+        } else if (selectedCity) {
+           effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
+        }
+
+
+        template = template.replace(/\[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF \[Your District\]\]/g, effectiveCourtName);
+        template = template.replace(/\[Court Name\]/g, effectiveCourtName); // General for other docs
+
+        template = template.replace(/\[State\/Commonwealth\/People\] v. \[Defendant Name\]/g, selectedState ? `${US_STATES.find(s => s.value === selectedState)?.label || '[State/Commonwealth/People]'} v. [Defendant Name]` : `[State/Commonwealth/People] v. [Defendant Name]`);
+        template = template.replace(/State of \[State\]/g, `State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"}`);
+        template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`);
+        template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]");
+        template = template.replace(/under the laws of the State of \[Your State\]/g, `under the laws of the State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[Your State]' : "[Your State]"}`);
+        template = template.replace(/\[State\]/g, selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"); // General placeholder for state
       }
-
-
-      if (selectedCourtLevel && selectedState) {
-         if (docType === "complaint") {
-            const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
-            if (selectedCourtLevel.toLowerCase().includes("federal")) {
-                 effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity} DIVISION` : `DISTRICT OF ${stateLabel}` }`;
-            } else {
-                 effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` OF ${selectedCity}, ${stateLabel}` : `, ${stateLabel}` }`;
-            }
-         } else {
-            effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
-         }
-      } else if (selectedCourtLevel) {
-        effectiveCourtName = docType === "complaint" ? selectedCourtLevel.toUpperCase() : selectedCourtLevel;
-      } else if (selectedState) {
-        const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
-        effectiveCourtName = docType === "complaint" ? `[SPECIFY COURT LEVEL] IN ${stateLabel.toUpperCase()}` : `[Specify Court Level] in ${stateLabel}`;
-      } else if (selectedCity && docType === "complaint") {
-         effectiveCourtName = `[SPECIFY COURT LEVEL AND STATE] FOR ${selectedCity.toUpperCase()} DIVISION`;
-      } else if (selectedCity) {
-         effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
-      }
-
-
-      template = template.replace(/\[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF \[Your District\]\]/g, effectiveCourtName);
-      template = template.replace(/\[Court Name\]/g, effectiveCourtName); // General for other docs
-
-      template = template.replace(/\[State\/Commonwealth\/People\] v. \[Defendant Name\]/g, selectedState ? `${US_STATES.find(s => s.value === selectedState)?.label || '[State/Commonwealth/People]'} v. [Defendant Name]` : `[State/Commonwealth/People] v. [Defendant Name]`);
-      template = template.replace(/State of \[State\]/g, `State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"}`);
-      template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`);
-      template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]");
-      template = template.replace(/under the laws of the State of \[Your State\]/g, `under the laws of the State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[Your State]' : "[Your State]"}`);
-      template = template.replace(/\[State\]/g, selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"); // General placeholder for state
-
 
       setGeneratedDocument(template);
     } else if (!selectedDocument) {
@@ -411,6 +449,7 @@ export default function DocumentGeneratorPage() {
   
   const getDocumentDisplayName = (docType: DocumentType) => {
     if (!docType) return "Choose a document...";
+    if (docType === 'foiaRequest') return "Freedom of Information Act (FOIA) Request";
     // Add spaces before capital letters and capitalize first letter
     return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
   };
@@ -422,7 +461,7 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction. Then, choose a document type to generate a template. 
+            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA requests). Then, choose a document type to generate a template. 
             Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
           </CardDescription>
         </CardHeader>
@@ -510,6 +549,7 @@ export default function DocumentGeneratorPage() {
                 <SelectItem value="motionForBailReduction">Motion for Bail Reduction</SelectItem>
                 <SelectItem value="discoveryRequest">Discovery Request (Brady/Witness)</SelectItem>
                 <SelectItem value="petitionForExpungement">Petition for Expungement</SelectItem>
+                <SelectItem value="foiaRequest">Freedom of Information Act (FOIA) Request</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -545,13 +585,15 @@ export default function DocumentGeneratorPage() {
           <CardContent>
             <p className="text-sm text-muted-foreground space-y-2">
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
-              The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable. Check these carefully.
+              The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable (except for FOIA requests). Check these carefully.
               <br />
               For the "Complaint (Detailed Pre-Filing)" template, this is a comprehensive starting point often used for civil rights claims (like those under 42 U.S.C. § 1983). It includes sections for jurisdiction, parties (with "Next Friend" guidance), detailed factual allegations, specific causes of action, prayer for relief, and a jury demand. It requires substantial customization for your specific facts and legal claims.
               <br />
               For "Petition for Expungement", legal requirements vary significantly by state; this template is a very general starting point and requires careful review of your specific state's laws.
               <br />
-              <strong>Disclaimer:</strong> These templates are for informational purposes only and do not constitute legal advice. Always verify requirements with your local court rules and consult a qualified legal professional before using or submitting any legal document.
+              The "Freedom of Information Act (FOIA) Request" template is for requesting records from U.S. federal government agencies. State-level public records laws (often called "Sunshine Laws" or similar) have different procedures and request formats.
+              <br />
+              <strong>Disclaimer:</strong> These templates are for informational purposes only and do not constitute legal advice. Always verify requirements with your local court rules (or relevant agency for FOIA) and consult a qualified legal professional before using or submitting any legal document.
             </p>
           </CardContent>
         </Card>
@@ -559,4 +601,5 @@ export default function DocumentGeneratorPage() {
     </div>
   );
 }
+
     

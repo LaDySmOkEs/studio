@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, Balance } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -208,6 +208,29 @@ export default function HelpFaqPage() {
               </AccordionContent>
             </AccordionItem>
 
+             <AccordionItem value="item-mock-trials">
+              <AccordionTrigger className="text-lg">
+                <Balance className="w-5 h-5 mr-2 text-accent" />
+                Understanding Mock Trials (Conceptual)
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>A "mock trial" is a simulated trial proceeding. It's a way to practice and prepare for a real trial, or to understand how a case might unfold in court.</p>
+                <h4 className="font-semibold text-foreground/90 mt-2">Purpose of Mock Trials:</h4>
+                <ul className="list-disc pl-5">
+                  <li><strong>Preparation:</strong> Attorneys use them to test legal theories, practice arguments, prepare witnesses, and get a feel for how a jury might react to evidence.</li>
+                  <li><strong>Education:</strong> Law students participate in mock trials to learn litigation skills and courtroom procedure.</li>
+                  <li><strong>Case Evaluation:</strong> They can help assess the strengths and weaknesses of a case.</li>
+                </ul>
+                <h4 className="font-semibold text-foreground/90 mt-2">How It Relates to You:</h4>
+                <p>While DUE PROCESS AI doesn't currently offer an interactive mock trial feature, understanding the concept can still be helpful:</p>
+                <ul className="list-disc pl-5">
+                    <li><strong>Thinking Through Your Case:</strong> Consider how you would present your facts, what questions might be asked, and what the other side might argue. This can help you organize your thoughts and identify areas where you need more information or evidence.</li>
+                    <li><strong>Understanding Courtroom Dynamics:</strong> Learning about mock trials can demystify some aspects of real court proceedings.</li>
+                </ul>
+                <p><strong>Note:</strong> This app does not currently offer a mock trial simulation feature. This information is for general understanding. If you are facing a real legal proceeding, professional legal advice is crucial.</p>
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="item-citation-mode">
               <AccordionTrigger className="text-lg">
                 <ExternalLinkIcon className="w-5 h-5 mr-2 text-accent" />
@@ -288,3 +311,5 @@ export default function HelpFaqPage() {
     </div>
   );
 }
+
+    
