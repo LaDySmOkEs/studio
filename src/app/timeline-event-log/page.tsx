@@ -10,7 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarClock, Trash2, AlertTriangle, Info } from "lucide-react";
+import { 
+  CalendarClock, Trash2, AlertTriangle, Info, FileText, Gavel, Handcuffs, 
+  DollarSign, Mail, Clock, Shield, Paperclip, Landmark, ClipboardList, type LucideIcon
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -28,30 +31,36 @@ import {
 interface LoggedEvent {
   id: string;
   date: string;
-  type: string;
+  type: string; // This will store the label of the event type
+  typeValue: string; // This will store the value of the event type for mapping to icon
   description: string;
   loggedAt: string;
 }
 
 const EVENT_TYPES = [
-  { value: "arrest", label: "Arrest" },
-  { value: "initial_appearance", label: "Initial Court Appearance / Arraignment" },
-  { value: "bail_hearing", label: "Bail / Bond Hearing" },
-  { value: "discovery_received", label: "Received Discovery" },
-  { value: "motion_filed", label: "Filed Motion" },
-  { value: "hearing_notice_received", label: "Received Hearing Notice" },
-  { value: "court_hearing", label: "Court Hearing" },
-  { value: "order_judgment_received", label: "Received Court Order / Judgment" },
-  { value: "deadline", label: "Deadline" },
-  { value: "interaction_le", label: "Interaction with Law Enforcement" },
-  { value: "evidence_collected", label: "Evidence Collected/Noted" },
-  { value: "other", label: "Other Event" },
+  { value: "arrest", label: "Arrest", icon: Handcuffs },
+  { value: "initial_appearance", label: "Initial Court Appearance / Arraignment", icon: Gavel },
+  { value: "bail_hearing", label: "Bail / Bond Hearing", icon: DollarSign },
+  { value: "discovery_received", label: "Received Discovery", icon: FileText },
+  { value: "motion_filed", label: "Filed Motion", icon: FileText },
+  { value: "hearing_notice_received", label: "Received Hearing Notice", icon: Mail },
+  { value: "court_hearing", label: "Court Hearing", icon: Landmark },
+  { value: "order_judgment_received", label: "Received Court Order / Judgment", icon: ClipboardList },
+  { value: "deadline", label: "Deadline", icon: Clock },
+  { value: "interaction_le", label: "Interaction with Law Enforcement", icon: Shield },
+  { value: "evidence_collected", label: "Evidence Collected/Noted", icon: Paperclip },
+  { value: "other", label: "Other Event", icon: Info },
 ];
+
+const getEventTypeIcon = (typeValue: string): LucideIcon => {
+  const eventType = EVENT_TYPES.find(et => et.value === typeValue);
+  return eventType ? eventType.icon : Info;
+};
 
 export default function TimelineEventLogPage() {
   const [events, setEvents] = useState<LoggedEvent[]>([]);
   const [currentEventDate, setCurrentEventDate] = useState("");
-  const [currentEventType, setCurrentEventType] = useState("");
+  const [currentEventTypeValue, setCurrentEventTypeValue] = useState(""); // Store the value
   const [currentEventDescription, setCurrentEventDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,7 +68,7 @@ export default function TimelineEventLogPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!currentEventDate || !currentEventType || !currentEventDescription.trim()) {
+    if (!currentEventDate || !currentEventTypeValue || !currentEventDescription.trim()) {
       toast({
         title: "All Fields Required",
         description: "Please fill in the date, type, and description for the event.",
@@ -69,21 +78,24 @@ export default function TimelineEventLogPage() {
     }
     setIsSubmitting(true);
 
+    const selectedEventType = EVENT_TYPES.find(et => et.value === currentEventTypeValue);
+
     const newEvent: LoggedEvent = {
       id: Date.now().toString(),
       date: currentEventDate,
-      type: EVENT_TYPES.find(et => et.value === currentEventType)?.label || currentEventType,
+      type: selectedEventType?.label || currentEventTypeValue,
+      typeValue: currentEventTypeValue,
       description: currentEventDescription,
       loggedAt: new Date().toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     };
 
     setEvents(prevEvents => [...prevEvents, newEvent].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
     setCurrentEventDate("");
-    setCurrentEventType("");
+    setCurrentEventTypeValue("");
     setCurrentEventDescription("");
     toast({
       title: "Event Logged",
-      description: `"${newEvent.type}" on ${new Date(newEvent.date).toLocaleDateString()} has been added to your timeline.`,
+      description: `"${newEvent.type}" on ${new Date(newEvent.date).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' })} has been added to your timeline.`,
     });
     setIsSubmitting(false);
   };
@@ -103,11 +115,11 @@ export default function TimelineEventLogPage() {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <CalendarClock className="w-7 h-7 text-primary" /> Timeline & Event Log
+              <CalendarClock className="w-7 h-7 text-primary" /> Due Process Timeline Visualization
             </CardTitle>
             <CardDescription>
-              Chronicle important dates, events, and procedural steps related to your case. This log helps organize your case timeline.
-              Entries are stored locally in your browser and are cleared when you refresh or close the page. No data is sent to any server.
+              Graphically log and visualize important dates, events, and procedural steps related to your case. 
+              This tool helps organize your case timeline. Entries are stored locally in your browser for this prototype.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -124,13 +136,18 @@ export default function TimelineEventLogPage() {
               </div>
               <div>
                 <Label htmlFor="eventType">Event Type*</Label>
-                <Select onValueChange={setCurrentEventType} value={currentEventType}>
+                <Select onValueChange={setCurrentEventTypeValue} value={currentEventTypeValue}>
                   <SelectTrigger id="eventType">
                     <SelectValue placeholder="Select event type..." />
                   </SelectTrigger>
                   <SelectContent>
                     {EVENT_TYPES.map(et => (
-                      <SelectItem key={et.value} value={et.value}>{et.label}</SelectItem>
+                      <SelectItem key={et.value} value={et.value}>
+                        <div className="flex items-center gap-2">
+                          <et.icon className="w-4 h-4 text-muted-foreground" />
+                          {et.label}
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -150,7 +167,7 @@ export default function TimelineEventLogPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Logging..." : "Log Event"}
+                {isSubmitting ? "Logging..." : "Log Event to Timeline"}
               </Button>
             </CardFooter>
           </form>
@@ -159,48 +176,57 @@ export default function TimelineEventLogPage() {
         {events.length > 0 && (
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>Logged Events Timeline</CardTitle>
-              <CardDescription>Review and manage your logged events below, sorted by event date (most recent first).</CardDescription>
+              <CardTitle>Case Timeline Visualization</CardTitle>
+              <CardDescription>Review your logged events below, sorted by event date (most recent first). Each event is shown with its type and an icon.</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px] pr-3">
                 <ul className="space-y-4">
-                  {events.map(event => (
-                    <li key={event.id} className="border p-4 rounded-lg shadow-sm bg-card hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold text-md">{event.type} - {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            Logged on: {event.loggedAt}
-                          </p>
+                  {events.map(event => {
+                    const EventIcon = getEventTypeIcon(event.typeValue);
+                    return (
+                      <li key={event.id} className="border p-4 rounded-lg shadow-sm bg-card hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-3">
+                             <EventIcon className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                            <div>
+                              <h4 className="font-semibold text-md">{event.type}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Date: {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Logged on: {event.loggedAt}
+                              </p>
+                            </div>
+                          </div>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete this event from your timeline.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteEvent(event.id)} className="bg-destructive hover:bg-destructive/90">
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete this event from your log.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteEvent(event.id)} className="bg-destructive hover:bg-destructive/90">
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                      <p className="text-sm mt-2 pt-2 border-t text-foreground/80 whitespace-pre-line">
-                        {event.description}
-                      </p>
-                    </li>
-                  ))}
+                        <p className="text-sm mt-2 pt-2 border-t text-foreground/80 whitespace-pre-line">
+                          {event.description}
+                        </p>
+                      </li>
+                    );
+                  })}
                 </ul>
               </ScrollArea>
             </CardContent>
@@ -208,9 +234,9 @@ export default function TimelineEventLogPage() {
                 <CardFooter>
                     <Button variant="outline" size="sm" className="w-full" onClick={() => {
                         setEvents([]);
-                        toast({ title: "All Events Cleared", description: "All logged events have been cleared.", variant: "destructive" });
+                        toast({ title: "All Events Cleared", description: "All logged events have been cleared from the timeline.", variant: "destructive" });
                     }}>
-                        <Trash2 className="mr-2 h-4 w-4" /> Clear All Events
+                        <Trash2 className="mr-2 h-4 w-4" /> Clear Entire Timeline
                     </Button>
                 </CardFooter>
             )}
@@ -227,24 +253,25 @@ export default function TimelineEventLogPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="text-muted-foreground">
-              This log helps you organize key dates and events in your case. Keeping a detailed and accurate timeline is crucial for understanding case progression and preparing for legal proceedings.
+              This log helps you organize and visualize key dates and events in your case. Keeping a detailed and accurate timeline is crucial for understanding case progression and preparing for legal proceedings.
             </p>
             <div>
-              <h4 className="font-semibold text-primary">How AI Could Help (Conceptual)</h4>
+              <h4 className="font-semibold text-primary">How AI Could Enhance This Timeline (Conceptual)</h4>
               <p className="text-muted-foreground">
                 In a more advanced system, AI could analyze this timeline to:
               </p>
               <ul className="list-disc pl-5 mt-1 text-muted-foreground space-y-1">
                 <li>Identify potential procedural issues, such as missed deadlines or unusually long delays between critical events (e.g., for speedy trial considerations).</li>
-                <li>Flag missing common procedural steps based on the type of case and logged events. For example, if you log an 'Arrest' and then a 'Court Hearing' significantly later without an 'Initial Appearance' in between, the system might highlight this for review.</li>
+                <li>Flag missing common procedural steps based on the type of case and logged events.</li>
                 <li>Cross-reference events with jurisdictional rules (e.g., typical timeframes for responses, statutory limitations).</li>
+                <li><strong>Visually highlight</strong> potential irregularities or important deadlines directly on the timeline display for easier identification.</li>
               </ul>
             </div>
              <Alert variant="default" className="border-accent bg-accent/10">
                 <AlertTriangle className="h-4 w-4 text-accent" />
                 <AlertTitle className="font-semibold">Important Note & Disclaimer</AlertTitle>
                 <AlertDescription>
-                  The AI analysis described above is conceptual for this prototype. This tool currently only helps you log events.
+                  The AI analysis described above is conceptual for this prototype. This tool currently only helps you log and visualize events with icons.
                   Always verify procedural requirements, timelines, and any potential violations with a qualified legal professional. This log is for personal organization and does not constitute legal advice.
                 </AlertDescription>
             </Alert>
@@ -254,3 +281,6 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
+
+
+    
