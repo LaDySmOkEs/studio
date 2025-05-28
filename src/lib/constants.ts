@@ -1,0 +1,31 @@
+// src/lib/constants.ts
+import { Scale, FileText, Mic, Building2, type LucideIcon } from "lucide-react";
+
+export interface NavItem {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+export const NAV_ITEMS: NavItem[] = [
+  {
+    title: "Case Analysis",
+    href: "/case-analysis",
+    icon: Scale,
+  },
+  {
+    title: "Document Generator",
+    href: "/document-generator",
+    icon: FileText,
+  },
+  {
+    title: "Rights Recorder",
+    href: "/rights-recorder",
+    icon: Mic,
+  },
+  {
+    title: "Court Directory",
+    href: "/court-directory",
+    icon: Building2,
+  },
+];
