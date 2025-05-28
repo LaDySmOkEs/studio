@@ -12,7 +12,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { SuggestRelevantLawsOutput } from './suggest-relevant-laws'; // Re-using the output structure
 
 const CivilLawSuggestionsInputSchema = z.object({
   caseDetails: z
@@ -28,7 +27,7 @@ const CivilLawSuggestionsOutputSchema = z.object({
     .describe('A list of relevant civil case laws and precedents suggested by the AI.'),
   confidenceScore: z.number().describe('The confidence score of the suggestion for civil laws (0-1).'),
   suggestedDocumentTypes: z
-    .array(z.enum(["motion", "affidavit", "complaint"]))
+    .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
     .describe('A list of document types relevant to this civil case.'),
 });
 export type CivilLawSuggestionsOutput = z.infer<typeof CivilLawSuggestionsOutputSchema>;
@@ -57,7 +56,7 @@ Provide a confidence score (a number between 0 and 1, where 1 is highest confide
 Case Details:
 {{{caseDetails}}}
 
-Ensure your output strictly adheres to the defined schema, including specific document types and a numeric confidence score.
+Ensure your output strictly adheres to the defined schema, including specific document types ('motion', 'affidavit', 'complaint') and a numeric confidence score.
 If no specific documents seem immediately relevant from the allowed list, return an empty list for suggestedDocumentTypes.
 `,
 });

@@ -12,7 +12,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { SuggestRelevantLawsOutput } from './suggest-relevant-laws'; // Re-using the output structure
 
 const CriminalLawSuggestionsInputSchema = z.object({
   caseDetails: z
@@ -28,7 +27,7 @@ const CriminalLawSuggestionsOutputSchema = z.object({
     .describe('A list of relevant criminal case laws and precedents suggested by the AI.'),
   confidenceScore: z.number().describe('The confidence score of the suggestion for criminal laws (0-1).'),
   suggestedDocumentTypes: z
-    .array(z.enum(["motion", "affidavit", "complaint"]))
+    .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
     .describe('A list of document types relevant to this criminal case.'),
 });
 export type CriminalLawSuggestionsOutput = z.infer<typeof CriminalLawSuggestionsOutputSchema>;
@@ -49,8 +48,10 @@ Focus on:
 - State criminal code interpretations (assume a generic US state jurisdiction if not specified, or ask for clarification if critical)
 - Sentencing guidelines and relevant case law
 - Landmark cases related to Miranda rights, search and seizure, right to counsel, etc.
+- Issues related to bail, discovery (including Brady material and witness lists), and post-conviction relief like expungement.
 
-Also, suggest types of legal documents (from the allowed list: 'motion', 'affidavit', 'complaint') that might be appropriate to generate for this case.
+Also, suggest types of legal documents (from the allowed list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement') that might be appropriate to generate for this case.
+For example, if bail is an issue, suggest 'motionForBailReduction'. If the case is in early stages, 'discoveryRequest' might be relevant. If it's post-conviction and eligible, 'petitionForExpungement' could be suggested.
 Provide a confidence score (a number between 0 and 1, where 1 is highest confidence) for your legal suggestions.
 
 Case Details:

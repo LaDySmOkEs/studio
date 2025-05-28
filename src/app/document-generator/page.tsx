@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input"; // Added Input
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Added Alert
-import { FileText } from "lucide-react"; // Added FileText for Alert icon
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type DocumentType = "motion" | "affidavit" | "complaint" | "";
+type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "";
 
 const DOCUMENT_TEMPLATES: Record<Exclude<DocumentType, "">, string> = {
   motion: `[MOTION TITLE]
@@ -131,6 +131,109 @@ ____________________________
 [Email Address]
 [Pro Se or Attorney for Plaintiff(s)]
 `,
+  motionForBailReduction: `[MOTION FOR BAIL REDUCTION]
+
+Case Name: [State/Commonwealth/People] v. [Defendant Name]
+Case Number: [Case Number]
+Court: [Court Name]
+
+Defendant, [Defendant Name], by and through undersigned counsel (or Pro Se), respectfully moves this Honorable Court to reduce the bail previously set in this case. In support of this motion, Defendant states as follows:
+
+1. Current Bail Status: [Describe current bail amount and conditions, e.g., "Bail is currently set at $X cash or $Y bond."]
+2. Defendant's Ties to the Community: [Describe defendant's local residence, family, employment, etc., to show they are not a flight risk.]
+3. Inability to Post Current Bail: [Explain why the defendant cannot afford the current bail amount.]
+4. Lack of Danger to the Community: [Argue why the defendant does not pose a danger to the community if released on reduced bail or personal recognizance.]
+5. Proposed Bail: [Suggest a specific reduced bail amount or conditions, e.g., "Defendant requests bail be reduced to $Z or release on personal recognizance with conditions such as..."]
+6. Legal Argument: [Cite any relevant statutes or case law supporting bail reduction for similar circumstances or for defendants with these characteristics.]
+
+WHEREFORE, Defendant respectfully requests that this Court grant this motion and reduce bail to an amount and upon conditions that are reasonable and just.
+
+Dated: [Date]
+
+Respectfully submitted,
+[Your Name/Law Firm Name]
+[Your Address]
+[Your Phone Number]
+[Your Email Address]
+`,
+  discoveryRequest: `[DEFENDANT'S REQUEST FOR DISCOVERY AND BRADY MATERIAL]
+
+Case Name: [State/Commonwealth/People] v. [Defendant Name]
+Case Number: [Case Number]
+Court: [Court Name]
+
+TO: Prosecuting Attorney
+[Prosecutor's Name and Address]
+
+Defendant, [Defendant Name], by and through undersigned counsel (or Pro Se), hereby requests discovery and inspection of all materials to which the Defendant is entitled pursuant to [State's Rules of Criminal Procedure, e.g., Rule X], the United States Constitution, including Brady v. Maryland, 373 U.S. 83 (1963), Giglio v. United States, 405 U.S. 150 (1972), and their progeny.
+
+This request includes, but is not limited to, the following:
+
+1. All statements of the Defendant, oral, written, or recorded.
+2. All statements of any co-defendants or alleged co-conspirators.
+3. All reports, notes, or statements of law enforcement officers or other government agents related to this case.
+4. All results or reports of physical or mental examinations, scientific tests, or experiments.
+5. A list of all tangible objects, documents, photographs, or other items obtained from or belonging to the Defendant, or obtained from others, which the prosecution intends to use at trial or which are material to the preparation of the defense.
+6. A list of names and addresses of all persons whom the prosecution intends to call as witnesses at trial, together with their relevant written or recorded statements (Witness Lists).
+7. All evidence favorable to the Defendant on the issue of guilt or punishment (Brady Material), including but not limited to:
+    a. Evidence that could impeach the credibility of prosecution witnesses.
+    b. Evidence that points to the innocence of the Defendant or suggests another party may be guilty.
+    c. Evidence that could mitigate the sentence if the Defendant is convicted.
+8. Any deals, promises, or inducements made to any prosecution witness.
+
+This request is ongoing, and Defendant requests that the prosecution supplement its discovery responses as additional information or materials become available.
+
+Dated: [Date]
+
+Respectfully submitted,
+[Your Name/Law Firm Name]
+[Your Address]
+[Your Phone Number]
+[Your Email Address]
+`,
+  petitionForExpungement: `[PETITION FOR EXPUNGEMENT/SEALING OF CRIMINAL RECORD]
+
+Case Name (if applicable): [Original Case Name, e.g., State v. Your Name]
+Case Number (if applicable): [Original Case Number]
+Court: [Court Name where conviction/arrest occurred]
+
+Petitioner: [Your Full Name]
+Date of Birth: [Your DOB]
+Address: [Your Current Address]
+Phone: [Your Phone]
+Email: [Your Email]
+
+I, [Your Full Name], the Petitioner, respectfully request this Honorable Court to order the expungement (or sealing) of my criminal record(s) pertaining to the arrest(s) and/or conviction(s) detailed below, pursuant to [Cite Specific State Statute, e.g., State Statute § XX-XXX].
+
+1. Details of Arrest/Conviction to be Expunged/Sealed:
+   a. Date of Arrest/Conviction: [Date]
+   b. Offense(s): [List specific charges]
+   c. Arresting Agency/Jurisdiction: [Name of Police Department/County]
+   d. Disposition (if applicable): [e.g., Dismissed, Nolle Prosequi, Acquitted, Convicted - specify if conviction]
+   e. Sentence (if convicted): [Details of sentence]
+
+2. Eligibility for Expungement/Sealing:
+   a. [Explain why you are eligible under the cited statute. This often includes factors like: time elapsed since conviction/sentence completion, nature of the offense, no subsequent convictions, completion of all sentence terms, etc. BE VERY SPECIFIC TO YOUR JURISDICTION'S LAW.]
+   b. [Example: "More than X years have passed since the completion of my sentence for the above-referenced misdemeanor offense, as required by {Statute}."]
+   c. [Example: "I have no other pending criminal charges and have not been convicted of any other crimes since this incident."]
+
+3. Reasons for Request:
+   [Briefly explain why you are seeking expungement/sealing, e.g., to improve employment prospects, housing opportunities, restore civil rights, personal peace of mind. This section may or may not be required by your state.]
+
+4. Supporting Documentation (if any, attach as exhibits):
+   [e.g., Certificate of Disposition, proof of sentence completion, character references (if allowed/helpful)]
+
+WHEREFORE, Petitioner prays for an Order from this Court directing all relevant law enforcement agencies, courts, and other state entities to expunge (or seal) all records related to the arrest(s) and/or conviction(s) described herein.
+
+I declare under penalty of perjury under the laws of the State of [Your State] that the foregoing is true and correct.
+
+Dated: [Date]
+
+____________________________
+[Your Full Name] - Petitioner (Pro Se)
+
+(Notary Public section may be required depending on jurisdiction)
+`,
 };
 
 const US_STATES = [
@@ -177,7 +280,7 @@ export default function DocumentGeneratorPage() {
   const [suggestedByAI, setSuggestedByAI] = useState<string[]>([]);
 
   const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>(""); // Represents County or City as per template
   const [selectedCourtLevel, setSelectedCourtLevel] = useState<string>("");
 
   const searchParams = useSearchParams();
@@ -194,11 +297,10 @@ export default function DocumentGeneratorPage() {
       if (validSuggestedTypes.length > 0) {
         setSuggestedByAI(validSuggestedTypes);
         const firstValidType = validSuggestedTypes[0] as Exclude<DocumentType, "">;
-        // setSelectedDocument will trigger the other useEffect to populate the template
         setSelectedDocument(firstValidType);
         toast({
           title: "AI Suggestion Applied",
-          description: `Pre-selected '${firstValidType}' based on your case analysis. You can change this selection.`,
+          description: `Pre-selected '${firstValidType.replace(/([A-Z])/g, ' $1').trim()}' based on your case analysis. You can change this selection.`,
         });
       }
     }
@@ -211,21 +313,24 @@ export default function DocumentGeneratorPage() {
 
       let effectiveCourtName = "[Court Name]";
       if (selectedCourtLevel && selectedState) {
-        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` of ${selectedCity}` : ''}, ${selectedState}`;
+        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${selectedState}`;
       } else if (selectedCourtLevel) {
         effectiveCourtName = selectedCourtLevel;
       } else if (selectedState) {
         effectiveCourtName = `[Specify Court Level] in ${selectedState}`;
       } else if (selectedCity) {
-         effectiveCourtName = `[Specify Court Level & State] of ${selectedCity}`;
+         effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
       }
 
 
       template = template.replace(/\[Court Name\]/g, effectiveCourtName);
-      template = template.replace(/State of \[State\]/g, `State of ${selectedState || "[State]"}`);
-      template = template.replace(/\[State\]/g, selectedState || "[State]"); // General placeholder for state
-      template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`); // Using city as a proxy
-      template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]"); // Using city as a proxy
+      template = template.replace(/\[State\/Commonwealth\/People\] v. \[Defendant Name\]/g, selectedState ? `${US_STATES.find(s => s.value === selectedState)?.label || '[State/Commonwealth/People]'} v. [Defendant Name]` : `[State/Commonwealth/People] v. [Defendant Name]`);
+      template = template.replace(/State of \[State\]/g, `State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"}`);
+      template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`);
+      template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]");
+      template = template.replace(/under the laws of the State of \[Your State\]/g, `under the laws of the State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[Your State]' : "[Your State]"}`);
+      template = template.replace(/\[State\]/g, selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"); // General placeholder for state
+
 
       setGeneratedDocument(template);
     } else if (!selectedDocument) {
@@ -248,6 +353,13 @@ export default function DocumentGeneratorPage() {
       });
     }
   };
+  
+  const getDocumentDisplayName = (docType: DocumentType) => {
+    if (!docType) return "Choose a document...";
+    // Add spaces before capital letters and capitalize first letter
+    return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+  };
+
 
   return (
     <div className="space-y-6">
@@ -264,7 +376,7 @@ export default function DocumentGeneratorPage() {
               <FileText className="h-4 w-4 text-accent" />
               <AlertTitle className="text-accent">AI Suggestions</AlertTitle>
               <AlertDescription>
-                Based on your case analysis, we suggested: {suggestedByAI.join(', ')}.
+                Based on your case analysis, we suggested: {suggestedByAI.map(getDocumentDisplayName).join(', ')}.
                 The first valid suggestion has been pre-selected.
               </AlertDescription>
             </Alert>
@@ -285,14 +397,14 @@ export default function DocumentGeneratorPage() {
               </Select>
             </div>
             <div>
-              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City</label>
+              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City / County</label>
               <Input
                 id="city-input"
                 type="text"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                placeholder="Enter City"
-                aria-label="Enter city"
+                placeholder="Enter City or County"
+                aria-label="Enter city or county"
               />
             </div>
             <div>
@@ -313,24 +425,27 @@ export default function DocumentGeneratorPage() {
           <div>
             <label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1 pt-4">Select Document Type</label>
             <Select onValueChange={handleSelectDocument} value={selectedDocument}>
-              <SelectTrigger id="doc-type-select" className="w-full sm:w-[280px]" aria-label="Select document type">
+              <SelectTrigger id="doc-type-select" className="w-full sm:w-[320px]" aria-label="Select document type">
                 <SelectValue placeholder="Choose a document..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="motion">Motion</SelectItem>
+                <SelectItem value="motion">Motion (General)</SelectItem>
                 <SelectItem value="affidavit">Affidavit</SelectItem>
                 <SelectItem value="complaint">Complaint</SelectItem>
+                <SelectItem value="motionForBailReduction">Motion for Bail Reduction</SelectItem>
+                <SelectItem value="discoveryRequest">Discovery Request (Brady/Witness)</SelectItem>
+                <SelectItem value="petitionForExpungement">Petition for Expungement</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {selectedDocument && (
             <div className="space-y-4 pt-4">
-              <h3 className="text-xl font-semibold">Template: {selectedDocument.charAt(0).toUpperCase() + selectedDocument.slice(1)}</h3>
+              <h3 className="text-xl font-semibold">Template: {getDocumentDisplayName(selectedDocument)}</h3>
               <Textarea
                 value={generatedDocument}
                 onChange={(e) => setGeneratedDocument(e.target.value)}
-                rows={15}
+                rows={20}
                 className="font-mono text-sm"
                 aria-label="Editable document template"
                 placeholder="Fill in jurisdiction details and select a document type to see the template. Then, edit as needed."
@@ -348,12 +463,13 @@ export default function DocumentGeneratorPage() {
       {selectedDocument && (
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Guidance for {selectedDocument.charAt(0).toUpperCase() + selectedDocument.slice(1)}</CardTitle>
+            <CardTitle>Guidance for {getDocumentDisplayName(selectedDocument)}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
-              The jurisdictional details (State, City, Court Level) you selected have been pre-filled where applicable.
+              The jurisdictional details (State, City/County, Court Level) you selected have been pre-filled where applicable.
+              For "Petition for Expungement", legal requirements vary significantly by state; this template is a very general starting point and requires careful review of your specific state's laws.
               Always verify requirements with your local court rules and consult a legal professional.
             </p>
           </CardContent>

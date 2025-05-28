@@ -25,7 +25,7 @@ const SuggestRelevantLawsOutputSchema = z.object({
     .describe('A list of relevant case laws suggested by the AI, based on the case details.'),
   confidenceScore: z.number().describe('The confidence score of the suggestion for laws (0-1).'),
   suggestedDocumentTypes: z
-    .array(z.enum(["motion", "affidavit", "complaint"]))
+    .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
     .describe('A list of document types (e.g., motion, affidavit, complaint) that might be relevant to generate for this case. If no specific documents seem immediately relevant, return an empty list.'),
 });
 export type SuggestRelevantLawsOutput = z.infer<typeof SuggestRelevantLawsOutputSchema>;
@@ -38,7 +38,9 @@ const prompt = ai.definePrompt({
   name: 'suggestRelevantLawsPrompt',
   input: {schema: SuggestRelevantLawsInputSchema},
   output: {schema: SuggestRelevantLawsOutputSchema},
-  prompt: `You are an expert legal assistant. Based on the following case details, suggest relevant case laws and also suggest types of legal documents that might be appropriate to generate for this case. The only valid document types you can suggest are 'motion', 'affidavit', or 'complaint'.
+  prompt: `You are an expert legal assistant. Based on the following case details, suggest relevant case laws and also suggest types of legal documents that might be appropriate to generate for this case.
+The primary document types you can suggest are 'motion', 'affidavit', or 'complaint'.
+If the case clearly pertains to criminal matters and details suggest a need for bail reduction, discovery, or expungement, you may also consider suggesting 'motionForBailReduction', 'discoveryRequest', or 'petitionForExpungement'.
 
 Case Details: {{{caseDetails}}}
 
