@@ -1,11 +1,12 @@
 // src/app/rights-recorder/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Square, ListChecks, Trash2, PlayCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Mic, Square, ListChecks, Trash2, PlayCircle, ShieldAlert, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -33,28 +34,36 @@ export default function RightsRecorderPage() {
   const [currentTime, setCurrentTime] = useState<string>("00:00");
   const [recordingTitle, setRecordingTitle] = useState("");
   const { toast } = useToast();
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     // For demo purposes, load mock recordings if no recordings exist (e.g. after a delete all)
-    if (recordings.length === 0 && MOCK_RECORDINGS.length > 0 && !localStorage.getItem("hasLoadedOnce")) {
+    if (recordings.length === 0 && MOCK_RECORDINGS.length > 0 && !localStorage.getItem("hasLoadedOnceRightsRecorder")) {
         setRecordings(MOCK_RECORDINGS);
-        localStorage.setItem("hasLoadedOnce", "true"); // Ensure mock data is loaded only once per session typically
+        localStorage.setItem("hasLoadedOnceRightsRecorder", "true"); // Ensure mock data is loaded only once per session typically
     }
-  }, []); // Empty dependency array to run once on mount.
+  }, []); 
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
     if (isRecording) {
       let seconds = 0;
       setCurrentTime("00:00"); // Reset timer at start
-      interval = setInterval(() => {
+      timerIntervalRef.current = setInterval(() => {
         seconds++;
         const min = Math.floor(seconds / 60).toString().padStart(2, '0');
         const sec = (seconds % 60).toString().padStart(2, '0');
         setCurrentTime(`${min}:${sec}`);
       }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
   }, [isRecording]);
 
   const handleStartRecording = () => {
@@ -64,7 +73,7 @@ export default function RightsRecorderPage() {
     setRecordingTitle(defaultTitle);
     toast({
       title: "Recording Started",
-      description: "Remember to state you are recording if required by law.",
+      description: "Remember to state you are recording if required by law. Review 'Know Your Rights' section.",
     });
     // Placeholder: Actual audio recording logic would start here
   };
@@ -108,6 +117,7 @@ export default function RightsRecorderPage() {
             <CardTitle className="text-2xl flex items-center gap-2"><Mic className="w-6 h-6 text-primary" /> Rights Recorder</CardTitle>
             <CardDescription>
               Securely record interactions and document important details. (Audio recording is a placeholder feature).
+              This tool does not provide legal advice.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -158,9 +168,47 @@ export default function RightsRecorderPage() {
           </CardContent>
           <CardFooter>
             <p className="text-xs text-muted-foreground">
-              Disclaimer: Ensure you are legally permitted to record in your jurisdiction. This tool does not provide legal advice. All recordings and notes are stored locally in your browser and are not uploaded to any server.
+              Disclaimer: Ensure you are legally permitted to record in your jurisdiction. This tool does not provide legal advice. All recordings and notes are stored locally in your browser and are not uploaded to any server for this prototype.
             </p>
           </CardFooter>
+        </Card>
+
+        <Card className="shadow-md border-accent">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-accent">
+                    <ShieldAlert className="w-6 h-6" /> Know Your Rights (U.S. Context)
+                </CardTitle>
+                <CardDescription>
+                    General information about rights during interactions with law enforcement. This is not legal advice.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+                <div>
+                    <h4 className="font-semibold">Right to Remain Silent (Miranda Rights)</h4>
+                    <p className="text-muted-foreground">
+                        If you are taken into custody and questioned, you have the right to remain silent. Anything you say can be used against you in court. You typically must clearly state you are invoking this right.
+                    </p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Right to an Attorney (Miranda Rights)</h4>
+                    <p className="text-muted-foreground">
+                        If you are in custody and being interrogated, you have the right to an attorney. If you cannot afford one, an attorney will be appointed for you before any questioning if you wish. You must clearly state you want an attorney.
+                    </p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Consenting to Searches</h4>
+                    <p className="text-muted-foreground">
+                        You have the right to refuse consent to a search of yourself, your car, or your home if law enforcement does not have a warrant or probable cause.
+                    </p>
+                </div>
+                 <Alert variant="default" className="bg-accent/10 border-accent/50">
+                    <Info className="h-4 w-4 text-accent" />
+                    <AlertTitle className="text-accent">Important Note</AlertTitle>
+                    <AlertDescription>
+                    Laws vary by jurisdiction and situation. The information above is a general overview and not a substitute for legal advice from a qualified attorney. If you are unsure of your rights, you can state that you wish to remain silent and speak to an attorney.
+                    </AlertDescription>
+                </Alert>
+            </CardContent>
         </Card>
       </div>
 

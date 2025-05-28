@@ -28,33 +28,38 @@ interface ConfidenceDetails {
   colorClass: string;
 }
 
-const getConfidenceDetails = (score: number): ConfidenceDetails => {
+const getConfidenceDetails = (score: number, caseCategory: "general" | "criminal" | "civil"): ConfidenceDetails => {
   const roundedScore = Math.round(score * 100);
+  let criminalCaution = "";
+  if (caseCategory === "criminal") {
+    criminalCaution = " For criminal matters, given the potential severity of outcomes, these suggestions require particularly careful review by a legal professional.";
+  }
+
   if (roundedScore >= 90) {
     return {
       level: `High Confidence (${roundedScore}%)`,
-      explanation: "The AI has a high degree of confidence in these suggestions based on the information provided. You have access to all relevant features.",
+      explanation: `The AI has a high degree of confidence in these suggestions based on the information provided. You have access to all relevant features.${criminalCaution}`,
       nextSteps: "Review the suggested laws and documents. Standard disclaimers apply. Always consult with a legal professional for advice specific to your situation.",
       colorClass: "text-green-600",
     };
   } else if (roundedScore >= 70) {
     return {
       level: `Moderate Confidence (${roundedScore}%)`,
-      explanation: "The AI has moderate confidence. The suggestions are likely relevant, but providing more specific information could improve accuracy.",
+      explanation: `The AI has moderate confidence. The suggestions are likely relevant, but providing more specific information could improve accuracy.${criminalCaution}`,
       nextSteps: "Review suggestions carefully. Enhanced disclaimers apply. Consider using the 'Guided Clarification' or 'Document Upload' sections below to provide more details. Consulting a legal professional is strongly advised.",
       colorClass: "text-yellow-600",
     };
   } else if (roundedScore >= 50) {
     return {
       level: `Low Confidence (${roundedScore}%)`,
-      explanation: "The AI has low confidence. The initial information may be too general or lack specific legal keywords. Suggestions provided are broad.",
+      explanation: `The AI has low confidence. The initial information may be too general or lack specific legal keywords. Suggestions provided are broad.${criminalCaution}`,
       nextSteps: "It is highly recommended to provide more details through the 'Guided Clarification', 'Document Upload', or 'Structured Verification' sections. Stronger attorney recommendations apply. Seeking advice from a legal professional is critical.",
       colorClass: "text-orange-600",
     };
   } else {
     return {
       level: `Very Low Confidence (${roundedScore}%)`,
-      explanation: "The AI has very low confidence. The case details may be unclear or fall outside common legal patterns. Feature access might be limited until more clarity is provided.",
+      explanation: `The AI has very low confidence. The case details may be unclear or fall outside common legal patterns. Feature access might be limited until more clarity is provided.${criminalCaution}`,
       nextSteps: "It is essential to provide significantly more detail, possibly through a structured questionnaire (conceptual feature). Limited features may apply. Consulting a legal professional is crucial.",
       colorClass: "text-red-600",
     };
@@ -125,7 +130,7 @@ export default function CaseAnalysisPage() {
     });
   };
   
-  const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore) : null;
+  const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore, form.getValues("caseCategory")) : null;
 
   return (
     <div className="space-y-6">
@@ -136,7 +141,7 @@ export default function CaseAnalysisPage() {
             </CardTitle>
           <CardDescription>
             Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown.
-            This tool is for informational purposes only. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
+            This tool is for informational purposes and to assist with organizing your thoughts. It does not provide legal advice. All AI-generated suggestions should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -213,6 +218,9 @@ export default function CaseAnalysisPage() {
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
+              <CardDescription>
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
@@ -254,14 +262,14 @@ export default function CaseAnalysisPage() {
                             <li>Consistency within your narrative and any (conceptual) follow-up responses.</li>
                             <li>Indicators of case complexity.</li>
                           </ul>
-                          <p className="pt-1">A higher score suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. This score is for informational purposes and not a guarantee of legal outcomes.</p>
+                          <p className="pt-1">A higher score suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. This score is for informational purposes and not a guarantee of legal outcomes or the sole basis for legal decisions.</p>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
                   </CardContent>
                    <CardFooter>
                     <p className="text-xs text-muted-foreground">
-                      Note: Always consult with a legal professional for advice specific to your situation.
+                      <strong>Crucial Note:</strong> Always consult with a qualified legal professional for advice specific to your situation. AI suggestions are not a substitute for professional legal counsel.
                     </p>
                   </CardFooter>
                 </Card>
@@ -275,13 +283,13 @@ export default function CaseAnalysisPage() {
                       Suggested Document Types
                     </CardTitle>
                     <CardDescription>
-                      Based on your case analysis, we suggest considering these document types:
+                      Based on your case analysis, we suggest considering these document types. These are templates and require legal review.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="list-disc pl-5 space-y-1">
                       {analysisResult.suggestedDocumentTypes.map((docType) => (
-                        <li key={docType} className="capitalize text-sm">{docType}</li>
+                        <li key={docType} className="capitalize text-sm">{docType.replace(/([A-Z])/g, ' $1').trim()}</li>
                       ))}
                     </ul>
                   </CardContent>
@@ -306,7 +314,7 @@ export default function CaseAnalysisPage() {
                 Conceptual Phase 2: Guided Clarification
               </CardTitle>
               <CardDescription>
-                In a more advanced system, the AI might ask follow-up questions to refine its understanding. Your responses here would help improve accuracy.
+                In a more advanced system, the AI might ask follow-up questions to refine its understanding. Your responses here would help improve accuracy. This tool does not provide legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -342,7 +350,7 @@ export default function CaseAnalysisPage() {
                 Conceptual Phase 3: Document Upload & Analysis
               </CardTitle>
               <CardDescription>
-                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details.
+                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details. This tool does not provide legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -377,7 +385,7 @@ export default function CaseAnalysisPage() {
               </CardTitle>
               <CardDescription>
                 Review the AI's current understanding and provide corrections or additional details. In a full system, this feedback would help the AI learn and improve.
-                For this prototype, the AI does not learn from feedback.
+                For this prototype, the AI does not learn from feedback. This tool does not provide legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

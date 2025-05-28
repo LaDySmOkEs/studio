@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText } from "lucide-react";
+import { FileText, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "";
@@ -313,11 +313,11 @@ export default function DocumentGeneratorPage() {
 
       let effectiveCourtName = "[Court Name]";
       if (selectedCourtLevel && selectedState) {
-        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${selectedState}`;
+        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
       } else if (selectedCourtLevel) {
         effectiveCourtName = selectedCourtLevel;
       } else if (selectedState) {
-        effectiveCourtName = `[Specify Court Level] in ${selectedState}`;
+        effectiveCourtName = `[Specify Court Level] in ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
       } else if (selectedCity) {
          effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
       }
@@ -367,7 +367,8 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select your state, city/county, and court level to ensure documents are tailored for the correct jurisdiction. Then, choose a document type to generate a template. You can customize it to fit your specific needs. Remember, these templates are for guidance and may require legal review.
+            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction. Then, choose a document type to generate a template. 
+            Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -463,14 +464,16 @@ export default function DocumentGeneratorPage() {
       {selectedDocument && (
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Guidance for {getDocumentDisplayName(selectedDocument)}</CardTitle>
+            <CardTitle className="flex items-center gap-1"><Info className="w-5 h-5 text-accent" /> Guidance for {getDocumentDisplayName(selectedDocument)}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground space-y-2">
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
               The jurisdictional details (State, City/County, Court Level) you selected have been pre-filled where applicable.
+              <br />
               For "Petition for Expungement", legal requirements vary significantly by state; this template is a very general starting point and requires careful review of your specific state's laws.
-              Always verify requirements with your local court rules and consult a legal professional.
+              <br />
+              <strong>Disclaimer:</strong> These templates are for informational purposes only and do not constitute legal advice. Always verify requirements with your local court rules and consult a qualified legal professional before using or submitting any legal document.
             </p>
           </CardContent>
         </Card>

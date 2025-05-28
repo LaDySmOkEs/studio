@@ -28,7 +28,7 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
-                <p><strong>Disclaimer:</strong> DUE PROCESS AI does not provide legal advice. It is a tool for informational and organizational purposes only. Always consult with a qualified legal professional for advice specific to your situation.</p>
+                <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -39,7 +39,7 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>Navigate to the "Document Generator" page. Select your state, city/county, and court level to tailor the document to your jurisdiction. Then, choose a document type (e.g., Motion, Affidavit, Complaint) from the dropdown. A template will be generated in the text area below. You can edit this template directly and then copy it to your clipboard.</p>
-                <p>It's crucial to replace all placeholders like "[Your Name]" or "[Case Details]" with your specific information and review the document carefully. The templates are general starting points.</p>
+                <p>It's crucial to replace all placeholders like "[Your Name]" or "[Case Details]" with your specific information and review the document carefully. The templates are general starting points and do not constitute legal advice.</p>
               </AccordionContent>
             </AccordionItem>
 
