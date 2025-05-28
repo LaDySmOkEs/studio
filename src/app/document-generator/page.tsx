@@ -325,6 +325,7 @@ const COURT_LEVELS = [
   { value: "Superior Court", label: "Superior Court" },
   { value: "District Court", label: "District Court" },
   { value: "County Court", label: "County Court" },
+  { value: "County District Court", label: "County District Court" },
   { value: "Circuit Court", label: "Circuit Court" },
   { value: "Municipal Court", label: "Municipal Court" },
   { value: "Small Claims Court", label: "Small Claims Court" },
@@ -601,5 +602,4 @@ export default function DocumentGeneratorPage() {
     </div>
   );
 }
-
     
