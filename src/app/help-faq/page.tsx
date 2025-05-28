@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -29,6 +29,43 @@ export default function HelpFaqPage() {
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
                 <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+             <AccordionItem value="item-ai-transparency">
+              <AccordionTrigger className="text-lg">
+                <Info className="w-5 h-5 mr-2 text-accent" />
+                AI Transparency and How Suggestions Are Made
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p>DUE PROCESS AI utilizes advanced artificial intelligence (AI) models, specifically Large Language Models (LLMs), to provide suggestions and analyze information related to legal contexts. Here’s a general overview of how it works and our commitment to transparency:</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">How the AI Works (Conceptual):</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Pattern Recognition:</strong> The AI is trained on a vast dataset of legal texts, case law, statutes, and other relevant documents. It learns to identify patterns, correlations, and common structures within this data.</li>
+                    <li><strong>Input Processing:</strong> When you provide information (e.g., case details in the Case Analysis feature), the AI processes this input to extract key terms, facts, and context.</li>
+                    <li><strong>Generating Suggestions:</strong> Based on the patterns it has learned, the AI generates suggestions (e.g., relevant laws, document types, potential due process concerns). This is a probabilistic process; the AI predicts what is most likely to be relevant based on its training.</li>
+                    <li><strong>Not Human Understanding:</strong> It's crucial to understand that the AI does not "understand" law or your specific situation in the way a human lawyer does. It doesn't have personal experiences, consciousness, or the ability to apply nuanced legal judgment to unique factual scenarios. Its outputs are based on the data it was trained on.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Our Commitment to Transparency:</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Confidence Scores:</strong> In features like Case Analysis, we provide a "Confidence Score." This score is an AI-generated estimate of how well the provided information aligns with patterns the AI recognizes. The "How is this score determined?" section within Case Analysis offers more detail on the factors influencing this score.</li>
+                    <li><strong>Clear Disclaimers:</strong> We consistently emphasize that DUE PROCESS AI is an informational tool and not a substitute for professional legal advice. All AI-generated outputs must be reviewed by a qualified legal professional.</li>
+                    <li><strong>Conceptual Features:</strong> Many advanced AI capabilities (like dynamic follow-up questions or OCR analysis) are presented as "conceptual" in this prototype to clearly distinguish current functionality from future possibilities.</li>
+                    <li><strong>No Guarantees:</strong> The AI's suggestions are not infallible and should not be taken as definitive legal conclusions or predictions of case outcomes.</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Continuous Improvement (Conceptual):</h4>
+                  <p>In a production system, features allowing user feedback on AI suggestions (like the "Structured Verification" phase in Case Analysis) would ideally contribute to the ongoing refinement and improvement of the AI models. However, this learning mechanism is not active in the current prototype.</p>
+                </div>
+
+                <p>We believe in responsible AI development. Providing transparency about how our AI works and its limitations is key to ensuring users can leverage DUE PROCESS AI effectively and safely as a supportive tool.</p>
               </AccordionContent>
             </AccordionItem>
 

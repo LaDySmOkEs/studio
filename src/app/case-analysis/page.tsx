@@ -219,7 +219,7 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
               <CardDescription>
-                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional.
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" section below.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -254,15 +254,17 @@ export default function CaseAnalysisPage() {
                         <AccordionTrigger className="text-sm py-2">
                           <Info className="w-4 h-4 mr-2 text-muted-foreground" /> How is this score determined?
                         </AccordionTrigger>
-                        <AccordionContent className="text-xs text-muted-foreground space-y-1 pl-2">
-                          <p>The confidence score is an estimate based on several factors from your input, including:</p>
-                          <ul className="list-disc pl-5">
-                            <li>Keyword density and specificity of legal terminology used.</li>
-                            <li>Presence and relevance of document evidence (conceptual feature - would be analyzed if uploaded).</li>
-                            <li>Consistency within your narrative and any (conceptual) follow-up responses.</li>
-                            <li>Indicators of case complexity.</li>
+                        <AccordionContent className="text-xs text-muted-foreground space-y-2 pl-2">
+                          <p>The confidence score is an AI-generated estimate based on several factors from your input. The AI processes your narrative and (conceptually, if uploaded) documents to identify patterns and relevant information that match its training data, which consists of a vast amount of legal text and case information. It's a probabilistic process, not a deterministic legal judgment.</p>
+                          <p>Key factors that typically influence this score include:</p>
+                          <ul className="list-disc pl-5 space-y-1">
+                            <li><strong>Clarity and Specificity:</strong> How clearly and specifically you describe your situation, including the use of relevant legal terms.</li>
+                            <li><strong>Information Completeness:</strong> The amount of detail provided about key facts, parties, dates, and actions.</li>
+                            <li><strong>Evidence Indication:</strong> Mention or (conceptual) presence of supporting documents (e.g., contracts, notices, police reports).</li>
+                            <li><strong>Consistency:</strong> The internal consistency of your narrative and (conceptual) follow-up information.</li>
+                            <li><strong>Case Complexity Indicators:</strong> Factors that might suggest a straightforward or a more complex legal issue.</li>
                           </ul>
-                          <p className="pt-1">A higher score suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. This score is for informational purposes and not a guarantee of legal outcomes or the sole basis for legal decisions.</p>
+                          <p className="pt-1">A higher score generally suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. A lower score may indicate that the information is too general, ambiguous, or falls outside common patterns the AI is trained on. This score is for informational purposes and not a guarantee of legal outcomes or the sole basis for legal decisions. Its primary aim is to provide transparency into the AI's initial assessment.</p>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
