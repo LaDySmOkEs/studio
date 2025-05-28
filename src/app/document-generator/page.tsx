@@ -3,13 +3,14 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText, Info } from "lucide-react";
+import { FileText, Info, LibrarySquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
@@ -372,10 +373,12 @@ export default function DocumentGeneratorPage() {
         setSuggestedByAI(validSuggestedTypes);
         const firstValidType = validSuggestedTypes[0] as Exclude<DocumentType, "">;
         setSelectedDocument(firstValidType);
-        toast({
-          title: "AI Suggestion Applied",
-          description: `Pre-selected '${firstValidType.replace(/([A-Z])/g, ' $1').trim()}' based on your case analysis. You can change this selection.`,
-        });
+        if (DOCUMENT_TEMPLATES[firstValidType]) { // Check if it's a valid key
+          toast({
+            title: "AI Suggestion Applied",
+            description: `Pre-selected '${getDocumentDisplayName(firstValidType)}' based on your case analysis. You can change this selection.`,
+          });
+        }
       }
     }
   }, [searchParams, toast]);
@@ -396,7 +399,7 @@ export default function DocumentGeneratorPage() {
            if (docType === "complaint") {
               const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
               if (selectedCourtLevel.toLowerCase().includes("federal")) {
-                   effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity} DIVISION` : `DISTRICT OF ${stateLabel}` }`;
+                   effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity.toUpperCase()} DIVISION` : `DISTRICT OF ${stateLabel.toUpperCase()}` }`;
               } else {
                    effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` OF ${selectedCity}, ${stateLabel}` : `, ${stateLabel}` }`;
               }
@@ -448,7 +451,7 @@ export default function DocumentGeneratorPage() {
     }
   };
   
-  const getDocumentDisplayName = (docType: DocumentType) => {
+  const getDocumentDisplayName = (docType: DocumentType | string): string => {
     if (!docType) return "Choose a document...";
     if (docType === 'foiaRequest') return "Freedom of Information Act (FOIA) Request";
     // Add spaces before capital letters and capitalize first letter
@@ -472,7 +475,7 @@ export default function DocumentGeneratorPage() {
               <FileText className="h-4 w-4 text-accent" />
               <AlertTitle className="text-accent">AI Suggestions</AlertTitle>
               <AlertDescription>
-                Based on your case analysis, we suggested: {suggestedByAI.map(getDocumentDisplayName).join(', ')}.
+                Based on your case analysis, we suggested: {suggestedByAI.map(docType => getDocumentDisplayName(docType as DocumentType)).join(', ')}.
                 The first valid suggestion has been pre-selected.
               </AlertDescription>
             </Alert>
@@ -572,8 +575,14 @@ export default function DocumentGeneratorPage() {
           )}
         </CardContent>
         {selectedDocument && generatedDocument && (
-          <CardFooter className="flex justify-end">
+          <CardFooter className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <Button onClick={handleCopyToClipboard}>Copy to Clipboard</Button>
+            <div className="text-sm text-muted-foreground">
+                Need help filing? 
+                <Link href="/filing-assistant" className="ml-1 text-primary hover:underline flex-nowrap items-center gap-1 inline-flex">
+                    Go to Filing Assistant <LibrarySquare className="w-4 h-4" />
+                </Link>
+            </div>
           </CardFooter>
         )}
       </Card>

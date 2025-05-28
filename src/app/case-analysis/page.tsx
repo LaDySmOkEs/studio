@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArchiveRestore } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -73,6 +73,12 @@ const getConfidenceDetails = (score: number, caseCategory: "general" | "criminal
       colorClass: "text-red-600",
     };
   }
+};
+
+const getDocumentDisplayName = (docType: string): string => {
+    if (!docType) return "";
+    // Add spaces before capital letters and capitalize first letter
+    return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
 };
 
 
@@ -365,7 +371,7 @@ export default function CaseAnalysisPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive dark:text-destructive-foreground">
+                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive-foreground/90">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
                     <div className="text-xs text-muted-foreground mt-3">
@@ -394,24 +400,21 @@ export default function CaseAnalysisPage() {
                       Suggested Document Types
                     </CardTitle>
                     <CardDescription>
-                      Based on your case analysis, we suggest considering these document types. These are templates and require legal review.
+                      Based on your case analysis, we suggest considering these document types. Click on a type to go to the Document Generator with it pre-selected. These are templates and require legal review.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="list-disc pl-5 space-y-1">
+                    <ul className="list-disc pl-5 space-y-2">
                       {analysisResult.suggestedDocumentTypes.map((docType) => (
-                        <li key={docType} className="capitalize text-sm">{docType.replace(/([A-Z])/g, ' $1').trim()}</li>
+                        <li key={docType} className="text-sm">
+                          <Link href={`/document-generator?suggested=${docType}`} className="text-primary hover:underline flex items-center gap-1">
+                            {getDocumentDisplayName(docType)}
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter>
-                    <Link href={`/document-generator?suggested=${analysisResult.suggestedDocumentTypes.join(',')}`}>
-                      <Button variant="outline">
-                        Go to Document Generator
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </CardFooter>
                 </Card>
               )}
             </CardContent>
@@ -426,6 +429,7 @@ export default function CaseAnalysisPage() {
               </CardTitle>
               <CardDescription>
                 In a more advanced system, the AI might ask follow-up questions to refine its understanding. Your responses here would help improve accuracy. This tool does not provide legal advice.
+                If you've logged events in the <Link href="/timeline-event-log" className="text-primary hover:underline">Timeline & Event Log</Link>, you can use that information to answer these clarifying questions.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -464,7 +468,7 @@ export default function CaseAnalysisPage() {
                 Conceptual Phase 3: Document Upload & Analysis
               </CardTitle>
               <CardDescription>
-                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details. This tool does not provide legal advice.
+                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details. If you've organized items in the <Link href="/evidence-compiler" className="text-primary hover:underline">Evidence Compiler</Link>, you might conceptually upload relevant ones here. This tool does not provide legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
