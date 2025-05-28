@@ -51,21 +51,19 @@ export default function InteractiveAssistantPage() {
     // Simulate AI response delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    let aiResponseText = "I am a prototype AI assistant. ";
+    let aiResponseText = "";
 
     if (trimmedInput.toLowerCase().includes("evicted") || trimmedInput.toLowerCase().includes("eviction")) {
-      aiResponseText += "Regarding eviction, it's important to know that tenants typically have rights, such as receiving proper notice and the opportunity for a hearing before an eviction can legally occur. If you believe these rights were not respected, that could potentially be a due process violation. ";
+      aiResponseText = `If you're facing eviction, it's important to understand your rights. Generally, landlords must follow specific legal procedures. This usually includes providing you with a formal written notice stating the reasons for eviction and the time you have to respond or vacate. You also typically have the right to a court hearing where you can present your side of the story before a judge can order an eviction. If these steps weren't followed, it might be a point to discuss with legal counsel. What specific concerns do you have about your eviction process?`;
     } else if (trimmedInput.toLowerCase().includes("hearing")) {
-      aiResponseText += "The right to a hearing is a fundamental part of due process in many legal situations, whether criminal, civil, or administrative. This means you should generally have an opportunity to present your case before a neutral decision-maker before a judgment or significant action is taken against you. ";
+      aiResponseText = `The right to a hearing is a cornerstone of due process. It means that before a significant decision is made that affects your rights (like in a court case, an administrative action such as a license revocation, or sometimes even employment termination in public jobs), you should have a chance to present your case, evidence, and arguments to a neutral decision-maker. The specifics can vary widely depending on the context (criminal, civil, administrative), but the core idea is a fair opportunity to be heard. Can you tell me more about the hearing you're asking about?`;
     } else if (trimmedInput.toLowerCase().includes("notice")) {
-      aiResponseText += "Proper notice is a key component of due process. This means you should be formally informed of legal actions against you or decisions affecting your rights, with enough time and information to prepare a response or defense. Lack of adequate notice can be a significant issue. ";
+      aiResponseText = `Proper legal notice is crucial in many legal proceedings. It means you should be officially informed about any legal action being taken against you, or any government decision that could significantly impact your rights or property. This notice should be timely, clear, and provide enough information for you to understand what's happening and how to respond. For example, a summons for a lawsuit or a notice of a proposed administrative action should clearly state the allegations and any deadlines. What kind of notice are you referring to?`;
     }
     else {
-      aiResponseText += `I have received your query: "${trimmedInput}". For specific legal questions, especially those involving potential rights violations, it's crucial to consult with a qualified legal professional. They can provide advice tailored to your specific situation.`;
+      aiResponseText = `I've received your query: "${trimmedInput}". As a prototype assistant, my ability to answer complex or very specific questions is limited. For a detailed understanding or advice on your situation, consulting a legal professional is always the best approach. However, I can try to provide some general information if you can rephrase or specify your question.`;
     }
     
-    aiResponseText += "\n\nThis information is for educational purposes only and is not legal advice. Please consult a lawyer for advice on your specific situation."
-
     const aiMessage: Message = {
       id: (Date.now() + 1).toString(),
       sender: "ai",
@@ -82,7 +80,7 @@ export default function InteractiveAssistantPage() {
       {
         id: "initial-ai-greeting",
         sender: "ai",
-        text: "Hello! I am a prototype Legal Assistant. You can ask me general questions about legal processes or rights. Please remember, I cannot provide legal advice, and you should always consult with a qualified attorney for your specific situation. How can I conceptually help you today?",
+        text: "Hello! I am a prototype Legal Assistant. You can ask me general questions about legal processes or rights. How can I conceptually help you today?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);
