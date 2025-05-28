@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck, Info } from "lucide-react";
+import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck, Info, Lightbulb } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -92,7 +92,7 @@ export default function EvidenceCompilerPage() {
         }
       });
     };
-  }, [evidenceItems]); // evidenceItems dependency for cleanup
+  }, []); // Removed evidenceItems dependency for cleanup to avoid loop, cleanup now on unmount
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -473,34 +473,63 @@ export default function EvidenceCompilerPage() {
         <Card className="shadow-md sticky top-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-6 h-6 text-accent" /> Criminal Evidence Guidance
+              <Lightbulb className="w-6 h-6 text-accent" /> Evidence Gathering & Relevance Guide
             </CardTitle>
-            <CardDescription>Key considerations for evidence in criminal cases. (Informational Only)</CardDescription>
+            <CardDescription>Understanding what evidence might be relevant and general ways to obtain it. (Informational Only)</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-4 text-sm">
             <div>
-              <h4 className="font-semibold text-primary">Chain of Custody</h4>
+              <h4 className="font-semibold text-primary">Identifying Relevant Evidence</h4>
               <p className="text-muted-foreground">
-                This refers to the chronological documentation or paper trail, showing the seizure, custody, control, transfer, analysis, and disposition of physical or electronic evidence. Maintaining a clear chain of custody is crucial for evidence admissibility. Document who handled the evidence, when, where, and why.
+                The type of evidence you need depends heavily on your case. Consider:
               </p>
+              <ul className="list-disc pl-5 mt-1 text-muted-foreground space-y-1">
+                <li><strong>Contract Disputes:</strong> The contract itself, amendments, emails or letters about the agreement, invoices, proof of payment or non-payment, records of communication.</li>
+                <li><strong>Personal Injury (e.g., car accident):</strong> Photos/videos of the scene and injuries, police reports, medical records and bills, witness contact information, insurance details.</li>
+                <li><strong>Employment Issues:</strong> Employment contract, offer letter, pay stubs, performance reviews, emails or messages related to the issue (e.g., harassment, discrimination), company policies.</li>
+                <li><strong>Family Law (e.g., divorce, custody):</strong> Marriage certificate, birth certificates, financial statements, property deeds, communication records between parties, school records.</li>
+                <li><strong>Criminal Cases:</strong> While law enforcement and attorneys primarily handle evidence collection, understanding what's relevant is key (e.g., witness statements, physical evidence, alibis, surveillance footage, police reports). Your attorney will guide this.</li>
+              </ul>
             </div>
+
             <div>
-              <h4 className="font-semibold text-primary">Hearsay Exceptions</h4>
+              <h4 className="font-semibold text-primary">General Methods for Obtaining Evidence (Legally & Ethically)</h4>
               <p className="text-muted-foreground">
-                Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. It's generally inadmissible, but many exceptions exist (e.g., excited utterance, business records, statements against interest). Understand these exceptions if dealing with statements made by others.
+                Always prioritize lawful and ethical means:
               </p>
+              <ul className="list-disc pl-5 mt-1 text-muted-foreground space-y-1">
+                <li><strong>Your Own Records:</strong> Gather all documents, photos, videos, emails, messages, and any other information you already possess that relates to your case.</li>
+                <li><strong>Requests for Information:</strong> You can formally request your own records from various entities (e.g., medical records from your doctor, employment records from HR). Sometimes specific forms or procedures are required.</li>
+                <li><strong>Public Records:</strong> Some information is publicly accessible. This can include certain court dockets, property ownership records, business registration details, or government reports available through Freedom of Information Act (FOIA) requests (or state equivalents).</li>
+                <li><strong>Witness Information:</strong> If there are people who witnessed relevant events, you (or ideally your attorney) might speak with them. If you do, be truthful, don't pressure them, and accurately note what they say. Formal statements or depositions are typically handled by legal professionals.</li>
+                <li><strong>The Discovery Process:</strong> In formal litigation (a lawsuit), there's a legal process called "discovery" where parties can demand evidence from each other. This is usually managed by attorneys and involves tools like interrogatories (written questions), requests for documents, and depositions (sworn out-of-court testimony).</li>
+              </ul>
+               <Alert variant="default" className="mt-3 border-destructive bg-destructive/10">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                  <AlertTitle className="font-semibold text-destructive">Important Cautions</AlertTitle>
+                  <AlertDescription className="text-destructive/90">
+                    Never attempt to obtain evidence illegally or unethically (e.g., unauthorized recording where not permitted by law, trespassing, hacking, misrepresentation). Such actions can harm your case and lead to legal penalties. If unsure, always consult an attorney.
+                  </AlertDescription>
+              </Alert>
             </div>
+            
             <div>
-              <h4 className="font-semibold text-primary">Constitutional Admissibility</h4>
-              <p className="text-muted-foreground">
-                Evidence must be obtained legally. The Fourth Amendment protects against unreasonable searches and seizures. The Fifth Amendment protects against self-incrimination. The Sixth Amendment guarantees the right to counsel. Evidence obtained in violation of these rights may be suppressed (excluded from trial).
+              <h4 className="font-semibold text-primary mt-3">Specific Considerations for Criminal Cases</h4>
+               <p className="text-muted-foreground">
+                While your attorney will primarily handle evidence in a criminal case, understanding these concepts is useful:
               </p>
+              <ul className="list-disc pl-5 mt-1 text-muted-foreground space-y-1">
+                <li><strong>Chain of Custody:</strong> This refers to the chronological documentation showing the seizure, custody, control, transfer, analysis, and disposition of physical or electronic evidence. Essential for admissibility.</li>
+                <li><strong>Hearsay Exceptions:</strong> Hearsay (an out-of-court statement offered to prove its truth) is generally inadmissible, but many exceptions exist (e.g., excited utterance, business records).</li>
+                <li><strong>Constitutional Admissibility (Fourth, Fifth, Sixth Amendments):</strong> Evidence must be obtained legally. Violations of rights against unreasonable searches/seizures, self-incrimination, or the right to counsel can lead to evidence being suppressed.</li>
+              </ul>
             </div>
-             <Alert variant="default" className="border-accent">
-                <AlertTriangle className="h-4 w-4 text-accent" />
-                <AlertTitle>Disclaimer</AlertTitle>
+
+             <Alert variant="default" className="border-accent mt-4">
+                <Info className="h-4 w-4 text-accent" />
+                <AlertTitle>Disclaimer: General Information Only</AlertTitle>
                 <AlertDescription>
-                  This information is for educational purposes only and is not legal advice. Evidence rules are complex and vary by jurisdiction. Always consult with a qualified attorney for advice specific to your situation.
+                  This information is for educational purposes and is not legal advice. Evidence rules are complex and vary by jurisdiction and case type. How to best identify and obtain evidence for your specific situation should always be discussed with a qualified attorney.
                 </AlertDescription>
             </Alert>
           </CardContent>
