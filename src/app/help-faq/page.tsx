@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck, ScrollText } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -311,6 +311,42 @@ export default function HelpFaqPage() {
                 <p><strong>Disclaimer:</strong> This is a very simplified overview of complex legal concepts. Determining whether common law or maritime law applies, and which court has jurisdiction, is a critical legal determination that often requires specialized knowledge. Misunderstanding these aspects can have significant consequences for a case. <strong>Always consult with a qualified attorney, particularly one with experience in maritime law if your situation involves activities on or related to navigable waters, for advice specific to your situation.</strong></p>
               </AccordionContent>
             </AccordionItem>
+            
+            <AccordionItem value="exclusive-equity-jurisprudence">
+              <AccordionTrigger className="text-lg">
+                <ScrollText className="w-5 h-5 mr-2 text-accent" />
+                Understanding Exclusive Equity Jurisprudence
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p><strong>What is Equity?</strong> Historically, "equity" developed as a separate system of justice alongside "common law" courts in England. Common law courts primarily offered monetary damages as a remedy. Courts of Equity (like the Court of Chancery) could provide other types of remedies when monetary damages were inadequate or unavailable.</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Exclusive Equity Jurisprudence:</h4>
+                  <p>This refers to matters where *only* a court of equity had the authority to provide a remedy. Common law courts offered no solution for these types of issues. Examples traditionally include:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Trusts:</strong> Creating and enforcing trusts (where one person holds property for the benefit of another).</li>
+                    <li><strong>Specific Performance of Contracts:</strong> Ordering a party to actually perform their obligations under a contract (e.g., to sell a unique piece of land), rather than just paying damages for breach.</li>
+                    <li><strong>Injunctions:</strong> Court orders requiring a party to do or refrain from doing a specific act.</li>
+                    <li><strong>Accounting:</strong> Requiring a party (like a fiduciary) to provide a detailed accounting of funds or property they managed.</li>
+                    <li><strong>Rescission and Reformation of Contracts:</strong> Cancelling or correcting a contract due to fraud, mistake, or duress.</li>
+                    <li><strong>Fiduciary Duties:</strong> Enforcing the duties of loyalty and care owed by fiduciaries (e.g., trustees, guardians, agents).</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Concurrent and Auxiliary Jurisdiction:</h4>
+                   <p>Equity also had "concurrent jurisdiction" (where both equity and law courts could offer a remedy, but equity's might be more suitable) and "auxiliary jurisdiction" (where equity assisted common law courts, e.g., by compelling discovery of documents).</p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Modern Systems:</h4>
+                  <p>In most U.S. jurisdictions today, the separate courts of law and equity have been merged. This means a single court system can typically grant both legal (damages) and equitable (non-monetary) remedies. However, the underlying principles of equity and the distinction between legal and equitable claims and remedies remain crucial. A party seeking an equitable remedy usually still needs to show that a legal remedy (like money damages) would be inadequate.</p>
+                </div>
+                
+                <p><strong>Disclaimer:</strong> This is a simplified explanation of a complex area of law with a rich history. The specific application of equitable principles and the availability of equitable remedies depend heavily on the facts of a case and the laws of the particular jurisdiction. <strong>Always consult with a qualified legal professional for advice on matters involving equity or any other legal issue.</strong></p>
+              </AccordionContent>
+            </AccordionItem>
+
 
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg">
@@ -445,3 +481,4 @@ export default function HelpFaqPage() {
     
 
     
+
