@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileText, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "";
 
@@ -419,7 +420,7 @@ export default function DocumentGeneratorPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
-              <label htmlFor="state-select" className="block text-sm font-medium text-foreground mb-1">State</label>
+              <Label htmlFor="state-select" className="block text-sm font-medium text-foreground mb-1">State</Label>
               <Select onValueChange={setSelectedState} value={selectedState}>
                 <SelectTrigger id="state-select" aria-label="Select state">
                   <SelectValue placeholder="Select State..." />
@@ -432,7 +433,7 @@ export default function DocumentGeneratorPage() {
               </Select>
             </div>
             <div>
-              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City / County / Federal District Division</label>
+              <Label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City / County / Federal District Division</Label>
               <Input
                 id="city-input"
                 type="text"
@@ -443,7 +444,7 @@ export default function DocumentGeneratorPage() {
               />
             </div>
             <div>
-              <label htmlFor="court-level-select" className="block text-sm font-medium text-foreground mb-1">Court Level</label>
+              <Label htmlFor="court-level-select" className="block text-sm font-medium text-foreground mb-1">Court Level</Label>
               <Select onValueChange={setSelectedCourtLevel} value={selectedCourtLevel}>
                 <SelectTrigger id="court-level-select" aria-label="Select court level">
                   <SelectValue placeholder="Select Court Level..." />
@@ -458,7 +459,7 @@ export default function DocumentGeneratorPage() {
           </div>
 
           <div>
-            <label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1 pt-4">Select Document Type</label>
+            <Label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1 pt-4">Select Document Type</Label>
             <Select onValueChange={handleSelectDocument} value={selectedDocument}>
               <SelectTrigger id="doc-type-select" className="w-full sm:w-[320px]" aria-label="Select document type">
                 <SelectValue placeholder="Choose a document..." />
