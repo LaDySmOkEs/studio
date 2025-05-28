@@ -92,7 +92,7 @@ export default function EvidenceCompilerPage() {
         }
       });
     };
-  }, []); // Removed evidenceItems dependency for cleanup to avoid loop, cleanup now on unmount
+  }, []); 
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -188,44 +188,46 @@ export default function EvidenceCompilerPage() {
 
   const handleConceptualAnalyze = async (item: EvidenceItem) => {
     setAnalysisLoadingItemId(item.id);
-    setCurrentAnalysisDisplay(null); // Clear previous analysis
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate analysis delay
+    setCurrentAnalysisDisplay(null); 
+    await new Promise(resolve => setTimeout(resolve, 1500)); 
 
     let mockAnalysis: ConceptualAnalysis = {};
-    if (item.type === 'audio' || item.type === 'video') {
-      mockAnalysis = {
-        transcriptionHighlights: "Officer: 'Step out of the car.'\nUser: 'Am I being detained?'\nOfficer: 'I said step out of the car now!' (0:32)\nUser: 'I would like to speak to my lawyer.' (1:05)",
-        flaggedIrregularities: [
-          "Officer did not state reason for stop initially.",
-          "User's question 'Am I being detained?' not directly answered.",
-          "Escalation in officer's tone at 0:32.",
-          "User's request for a lawyer at 1:05 - note if this was acknowledged or ignored."
-        ],
-        linkedPrinciples: [
-          "Right to know why you are being stopped/detained (often part of lawful procedure).",
-          "Right to counsel (6th Amendment, if custodial interrogation).",
-          "Right to remain silent (5th Amendment)."
-        ]
-      };
-    } else if (item.type === 'youtube') {
-      mockAnalysis = {
-        transcriptionHighlights: "Speaker 1: '...the footage clearly shows the individual was not read their rights.'\nSpeaker 2: 'This is a classic Miranda violation, textbook case.' (3:15)",
-        flaggedIrregularities: [
-          "Allegation of Miranda violation explicitly stated by speaker at 3:15.",
-          "Context suggests a discussion of a recorded incident."
-        ],
-        linkedPrinciples: [
-          "Miranda Rights (Right to remain silent, Right to an attorney).",
-          "Exclusionary rule (evidence obtained via rights violation may be inadmissible)."
-        ]
-      };
+    let conceptualTranscription = `Conceptual transcription placeholder for "${item.label}":\n\n`;
+
+    if (item.description) {
+        conceptualTranscription += `This recording appears to concern: "${item.description.substring(0, 70)}${item.description.length > 70 ? '...' : ''}".\n\n`;
+    } else {
+        conceptualTranscription += `No specific description was provided for this item.\n\n`;
     }
+    
+    conceptualTranscription += `In a real system, the full audio/video content would be transcribed here by an AI. Key phrases, speaker identification, and timestamps would be extracted for detailed analysis against legal and procedural standards.`;
+
+    mockAnalysis.transcriptionHighlights = conceptualTranscription;
+
+    // These are examples of what an AI might identify after analyzing a real transcription
+    if (item.type === 'audio' || item.type === 'video' || item.type === 'youtube') {
+        mockAnalysis.flaggedIrregularities = [
+            "Example Irregularity: The reason for the interaction was not clearly stated at the outset (if applicable).",
+            "Example Irregularity: Questions regarding rights or legal status (e.g., 'Am I free to go?', 'Do I need a lawyer?') were potentially ignored or deflected.",
+            "Example Irregularity: A notable escalation in tone or language by one party without clear proportionate response from the other.",
+            "Example Irregularity: Statements made that might contradict official reports or other provided evidence.",
+            "Example Irregularity: Lack of explicit consent for a search, if one occurred and was recorded."
+        ],
+        mockAnalysis.linkedPrinciples = [
+            "Example Principle: Right to understand the nature of an official interaction (e.g., consensual encounter vs. detention).",
+            "Example Principle: Right to counsel (Sixth Amendment, attaches at certain critical stages of criminal proceedings, particularly custodial interrogation).",
+            "Example Principle: Right to remain silent (Fifth Amendment, protects against self-incrimination).",
+            "Example Principle: Fourth Amendment protections against unreasonable searches and seizures (relevant if a search is discussed or occurs).",
+            "Example Principle: General due process considerations regarding fair procedure and opportunity to be heard."
+        ]
+    }
+
 
     setCurrentAnalysisDisplay({ itemId: item.id, label: item.label, analysis: mockAnalysis });
     setAnalysisLoadingItemId(null);
     toast({
       title: "Conceptual Analysis Complete",
-      description: `Showing conceptual analysis for "${item.label}".`,
+      description: `Showing conceptual analysis for "${item.label}". The transcription is a placeholder.`,
     });
   };
 
@@ -416,27 +418,27 @@ export default function EvidenceCompilerPage() {
                 <SearchCheck className="w-6 h-6 text-primary" /> Conceptual Analysis for: <span className="font-normal">{currentAnalysisDisplay.label}</span>
               </CardTitle>
               <CardDescription>
-                This is a conceptual AI analysis. It does not constitute legal advice and is for demonstration purposes only.
+                This is a conceptual AI analysis. The "Transcription Highlights" section below is a placeholder representing what a full AI system would transcribe from the audio/video before further analysis. The flagged irregularities and principles are examples of what an AI might identify. This is for demonstration purposes only and is not legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {currentAnalysisDisplay.analysis.transcriptionHighlights && (
                 <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Transcription Highlights (Conceptual)</h4>
-                  <Label htmlFor="transcriptionHighlightsTextarea" className="sr-only">Conceptual Transcription Highlights</Label>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Transcription Highlights (Conceptual Placeholder)</h4>
+                  <Label htmlFor="transcriptionHighlightsTextarea" className="sr-only">Conceptual Transcription Placeholder</Label>
                   <Textarea
                     id="transcriptionHighlightsTextarea"
                     value={currentAnalysisDisplay.analysis.transcriptionHighlights}
                     readOnly
-                    rows={4}
+                    rows={6}
                     className="bg-muted/50 text-sm font-mono"
-                    aria-label="Conceptual Transcription Highlights"
+                    aria-label="Conceptual Transcription Placeholder"
                   />
                 </div>
               )}
               {currentAnalysisDisplay.analysis.flaggedIrregularities && currentAnalysisDisplay.analysis.flaggedIrregularities.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Flagged Procedural Irregularities (Conceptual)</h4>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Example Flagged Irregularities (Conceptual)</h4>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                     {currentAnalysisDisplay.analysis.flaggedIrregularities.map((irregularity, index) => (
                       <li key={index}>{irregularity}</li>
@@ -446,7 +448,7 @@ export default function EvidenceCompilerPage() {
               )}
               {currentAnalysisDisplay.analysis.linkedPrinciples && currentAnalysisDisplay.analysis.linkedPrinciples.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><ShieldCheck className="w-4 h-4 text-muted-foreground"/>Linked Constitutional Principles (Conceptual)</h4>
+                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><ShieldCheck className="w-4 h-4 text-muted-foreground"/>Example Linked Constitutional Principles (Conceptual)</h4>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                     {currentAnalysisDisplay.analysis.linkedPrinciples.map((principle, index) => (
                       <li key={index}>{principle}</li>
