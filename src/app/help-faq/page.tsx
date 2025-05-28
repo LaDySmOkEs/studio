@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -195,7 +195,7 @@ export default function HelpFaqPage() {
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p><strong>Prototype Data Handling:</strong></p>
                 <ul className="list-disc pl-5">
-                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser</strong>. This data is not uploaded to any server, meaning it's private to your current browser session but will be cleared if you close the browser window or clear your browser's data.</li>
+                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser's current session</strong>. This data is not uploaded to any server, meaning it's private to your current browser window but may be cleared if you close the browser window or clear your browser's data for this site. Case details entered for Case Analysis are saved to browser `localStorage` to be reused across different app features. This data persists until explicitly cleared by you or if you clear all browser data for this site.</li>
                     <li>Case details submitted for "Case Analysis" are processed by an AI model to provide suggestions. Please be mindful and avoid submitting highly sensitive personal identifiable information that you do not want processed by an external AI service.</li>
                 </ul>
                 <p className="mt-2"><strong>Production System Considerations:</strong></p>
@@ -206,6 +206,32 @@ export default function HelpFaqPage() {
                     <li><strong>Scalability:</strong> The application's backend and infrastructure would be designed to accommodate a growing user base and increasing data load, ensuring performance and reliability. The frontend is built using Next.js, a modern framework capable of handling scalable web applications.</li>
                 </ul>
                 <p className="mt-2">We are committed to user privacy and data security. These principles would guide the development of a production-ready application.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="strawman-sovereign">
+              <AccordionTrigger className="text-lg">
+                <AlertTriangleIcon className="w-5 h-5 mr-2 text-destructive" /> {/* Changed icon for emphasis */}
+                What about "Strawman" or "Sovereign Citizen" theories?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  You may encounter discussions about concepts like the "strawman" theory or "sovereign citizen" arguments. These often suggest that individuals have a secret legal personality (the "strawman") created by the government, or that individuals can declare themselves "sovereign" and therefore not subject to governmental laws or courts.
+                </p>
+                <p>
+                  <strong>It is crucial to understand that these theories are not recognized as valid legal arguments by courts in the United States or most other established legal systems.</strong>
+                </p>
+                <ul className="list-disc pl-5 mt-1">
+                  <li>Judges consistently reject arguments based on these theories.</li>
+                  <li>Attempting to use them in court can seriously harm your case, lead to sanctions, or even result in criminal charges for contempt of court or filing frivolous lawsuits.</li>
+                  <li>These theories often involve complex and misapplied interpretations of legal terms and historical documents.</li>
+                </ul>
+                <p>
+                  While DUE PROCESS AI aims to provide information about the legal system, it focuses on established legal principles and procedures. Relying on unrecognized theories can prevent you from effectively addressing your legal situation.
+                </p>
+                <p>
+                  <strong>If you are facing a legal issue, it is highly recommended to seek advice from a qualified attorney who operates within the established legal framework.</strong> They can help you understand your rights and obligations under the actual laws that apply to your situation.
+                </p>
               </AccordionContent>
             </AccordionItem>
 
@@ -289,3 +315,6 @@ export default function HelpFaqPage() {
     </div>
   );
 }
+
+
+    
