@@ -2,13 +2,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { Input } from "@/components/ui/input"; // Added Input
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Added Alert
+import { FileText } from "lucide-react"; // Added FileText for Alert icon
+import { useToast } from "@/hooks/use-toast";
 
 type DocumentType = "motion" | "affidavit" | "complaint" | "";
 
@@ -112,7 +114,7 @@ WHEREFORE, Plaintiff(s) respectfully request(s) that this Court enter judgment i
 A. [Specific relief sought, e.g., Monetary damages in an amount to be determined at trial];
 B. [Other specific relief, e.g., Injunctive relief ordering defendant to...];
 C. Costs of this action;
-D. Pre-judgment and post-judgment interest as allowed by law; and
+D. Pre-judgment and post-judgment interest as allowed by law;
 E. Such other and further relief as this Court deems just and proper.
 
 DEMAND FOR JURY TRIAL (If applicable)
@@ -131,13 +133,55 @@ ____________________________
 `,
 };
 
+const US_STATES = [
+  { value: "AL", label: "Alabama" }, { value: "AK", label: "Alaska" }, { value: "AZ", label: "Arizona" },
+  { value: "AR", label: "Arkansas" }, { value: "CA", label: "California" }, { value: "CO", label: "Colorado" },
+  { value: "CT", label: "Connecticut" }, { value: "DE", label: "Delaware" }, { value: "FL", label: "Florida" },
+  { value: "GA", label: "Georgia" }, { value: "HI", label: "Hawaii" }, { value: "ID", label: "Idaho" },
+  { value: "IL", label: "Illinois" }, { value: "IN", label: "Indiana" }, { value: "IA", label: "Iowa" },
+  { value: "KS", label: "Kansas" }, { value: "KY", label: "Kentucky" }, { value: "LA", label: "Louisiana" },
+  { value: "ME", label: "Maine" }, { value: "MD", label: "Maryland" }, { value: "MA", label: "Massachusetts" },
+  { value: "MI", label: "Michigan" }, { value: "MN", label: "Minnesota" }, { value: "MS", label: "Mississippi" },
+  { value: "MO", label: "Missouri" }, { value: "MT", label: "Montana" }, { value: "NE", label: "Nebraska" },
+  { value: "NV", label: "Nevada" }, { value: "NH", label: "New Hampshire" }, { value: "NJ", label: "New Jersey" },
+  { value: "NM", label: "New Mexico" }, { value: "NY", label: "New York" }, { value: "NC", label: "North Carolina" },
+  { value: "ND", label: "North Dakota" }, { value: "OH", label: "Ohio" }, { value: "OK", label: "Oklahoma" },
+  { value: "OR", label: "Oregon" }, { value: "PA", label: "Pennsylvania" }, { value: "RI", label: "Rhode Island" },
+  { value: "SC", label: "South Carolina" }, { value: "SD", label: "South Dakota" }, { value: "TN", label: "Tennessee" },
+  { value: "TX", label: "Texas" }, { value: "UT", label: "Utah" }, { value: "VT", label: "Vermont" },
+  { value: "VA", label: "Virginia" }, { value: "WA", label: "Washington" }, { value: "WV", label: "West Virginia" },
+  { value: "WI", label: "Wisconsin" }, { value: "WY", label: "Wyoming" },
+  { value: "DC", label: "District of Columbia"}
+];
+
+const COURT_LEVELS = [
+  { value: "Federal District Court", label: "Federal District Court" },
+  { value: "Federal Court of Appeals", label: "Federal Court of Appeals" },
+  { value: "State Supreme Court", label: "State Supreme Court" },
+  { value: "State Appellate Court", label: "State Appellate Court" },
+  { value: "Superior Court", label: "Superior Court" },
+  { value: "District Court", label: "District Court" },
+  { value: "County Court", label: "County Court" },
+  { value: "Circuit Court", label: "Circuit Court" },
+  { value: "Municipal Court", label: "Municipal Court" },
+  { value: "Small Claims Court", label: "Small Claims Court" },
+  { value: "Family Court", label: "Family Court" },
+  { value: "Probate Court", label: "Probate Court" },
+  { value: "Justice Court", label: "Justice Court" }
+];
+
+
 export default function DocumentGeneratorPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>("");
   const [generatedDocument, setGeneratedDocument] = useState<string>("");
-  const [suggestedByAI, setSuggestedByAI] = useState<string[]>([]); // Store AI suggestions
+  const [suggestedByAI, setSuggestedByAI] = useState<string[]>([]);
+
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedCourtLevel, setSelectedCourtLevel] = useState<string>("");
 
   const searchParams = useSearchParams();
-  const { toast } = useToast(); // Initialize useToast
+  const { toast } = useToast();
 
   useEffect(() => {
     const suggestedTypesParam = searchParams.get('suggested');
@@ -149,10 +193,9 @@ export default function DocumentGeneratorPage() {
 
       if (validSuggestedTypes.length > 0) {
         setSuggestedByAI(validSuggestedTypes);
-        // Pre-select the first valid suggestion
         const firstValidType = validSuggestedTypes[0] as Exclude<DocumentType, "">;
+        // setSelectedDocument will trigger the other useEffect to populate the template
         setSelectedDocument(firstValidType);
-        setGeneratedDocument(DOCUMENT_TEMPLATES[firstValidType]);
         toast({
           title: "AI Suggestion Applied",
           description: `Pre-selected '${firstValidType}' based on your case analysis. You can change this selection.`,
@@ -161,28 +204,48 @@ export default function DocumentGeneratorPage() {
     }
   }, [searchParams, toast]);
 
+  useEffect(() => {
+    const docType = selectedDocument as Exclude<DocumentType, "">;
+    if (docType && DOCUMENT_TEMPLATES[docType]) {
+      let template = DOCUMENT_TEMPLATES[docType];
+
+      let effectiveCourtName = "[Court Name]";
+      if (selectedCourtLevel && selectedState) {
+        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` of ${selectedCity}` : ''}, ${selectedState}`;
+      } else if (selectedCourtLevel) {
+        effectiveCourtName = selectedCourtLevel;
+      } else if (selectedState) {
+        effectiveCourtName = `[Specify Court Level] in ${selectedState}`;
+      } else if (selectedCity) {
+         effectiveCourtName = `[Specify Court Level & State] of ${selectedCity}`;
+      }
+
+
+      template = template.replace(/\[Court Name\]/g, effectiveCourtName);
+      template = template.replace(/State of \[State\]/g, `State of ${selectedState || "[State]"}`);
+      template = template.replace(/\[State\]/g, selectedState || "[State]"); // General placeholder for state
+      template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`); // Using city as a proxy
+      template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]"); // Using city as a proxy
+
+      setGeneratedDocument(template);
+    } else if (!selectedDocument) {
+      setGeneratedDocument("");
+    }
+  }, [selectedDocument, selectedState, selectedCity, selectedCourtLevel]);
+
 
   const handleSelectDocument = (value: string) => {
-    const docType = value as Exclude<DocumentType, "">; // Can be empty string from placeholder
-    if (value === "") {
-        setSelectedDocument("");
-        setGeneratedDocument("");
-    } else if (docType && DOCUMENT_TEMPLATES[docType]) {
-        setSelectedDocument(docType);
-        setGeneratedDocument(DOCUMENT_TEMPLATES[docType]);
-    } else {
-        setSelectedDocument("");
-        setGeneratedDocument("");
-    }
+    const docType = value as DocumentType;
+    setSelectedDocument(docType);
   };
 
   const handleCopyToClipboard = () => {
     if (generatedDocument) {
-        navigator.clipboard.writeText(generatedDocument);
-        toast({
-            title: "Copied to Clipboard",
-            description: "The document template has been copied.",
-        });
+      navigator.clipboard.writeText(generatedDocument);
+      toast({
+        title: "Copied to Clipboard",
+        description: "The document template has been copied.",
+      });
     }
   };
 
@@ -192,22 +255,63 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select a document type to view a template. You can customize it to fit your needs. Remember, these templates are for guidance only and may not be suitable for all jurisdictions or situations. Always consult with a legal professional.
+            Select jurisdiction and document type to generate a template. You can customize it to fit your needs. Remember, these templates are for guidance only and may not be suitable for all jurisdictions or situations. Always consult with a legal professional.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           {suggestedByAI.length > 0 && (
             <Alert variant="default" className="bg-accent/10 border-accent/50">
-                <FileText className="h-4 w-4 text-accent" />
-                <AlertTitle className="text-accent">AI Suggestions</AlertTitle>
-                <AlertDescription>
-                    Based on your case analysis, we suggested: {suggestedByAI.join(', ')}.
-                    The first valid suggestion has been pre-selected.
-                </AlertDescription>
+              <FileText className="h-4 w-4 text-accent" />
+              <AlertTitle className="text-accent">AI Suggestions</AlertTitle>
+              <AlertDescription>
+                Based on your case analysis, we suggested: {suggestedByAI.join(', ')}.
+                The first valid suggestion has been pre-selected.
+              </AlertDescription>
             </Alert>
           )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <label htmlFor="state-select" className="block text-sm font-medium text-foreground mb-1">State</label>
+              <Select onValueChange={setSelectedState} value={selectedState}>
+                <SelectTrigger id="state-select" aria-label="Select state">
+                  <SelectValue placeholder="Select State..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map(state => (
+                    <SelectItem key={state.value} value={state.value}>{state.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City</label>
+              <Input
+                id="city-input"
+                type="text"
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                placeholder="Enter City"
+                aria-label="Enter city"
+              />
+            </div>
+            <div>
+              <label htmlFor="court-level-select" className="block text-sm font-medium text-foreground mb-1">Court Level</label>
+              <Select onValueChange={setSelectedCourtLevel} value={selectedCourtLevel}>
+                <SelectTrigger id="court-level-select" aria-label="Select court level">
+                  <SelectValue placeholder="Select Court Level..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {COURT_LEVELS.map(level => (
+                    <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div>
-            <label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1">Select Document Type</label>
+            <label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1 pt-4">Select Document Type</label>
             <Select onValueChange={handleSelectDocument} value={selectedDocument}>
               <SelectTrigger id="doc-type-select" className="w-full sm:w-[280px]" aria-label="Select document type">
                 <SelectValue placeholder="Choose a document..." />
@@ -220,24 +324,22 @@ export default function DocumentGeneratorPage() {
             </Select>
           </div>
 
-          {selectedDocument && generatedDocument && (
+          {selectedDocument && (
             <div className="space-y-4 pt-4">
               <h3 className="text-xl font-semibold">Template: {selectedDocument.charAt(0).toUpperCase() + selectedDocument.slice(1)}</h3>
-               <ScrollArea className="h-[400px] w-full rounded-md border p-4 bg-muted/20">
-                <pre className="text-sm whitespace-pre-wrap font-mono">{generatedDocument}</pre>
-              </ScrollArea>
               <Textarea
                 value={generatedDocument}
                 onChange={(e) => setGeneratedDocument(e.target.value)}
                 rows={15}
                 className="font-mono text-sm"
                 aria-label="Editable document template"
+                placeholder="Fill in jurisdiction details and select a document type to see the template. Then, edit as needed."
               />
             </div>
           )}
         </CardContent>
         {selectedDocument && generatedDocument && (
-           <CardFooter className="flex justify-end">
+          <CardFooter className="flex justify-end">
             <Button onClick={handleCopyToClipboard}>Copy to Clipboard</Button>
           </CardFooter>
         )}
@@ -250,9 +352,9 @@ export default function DocumentGeneratorPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Step-by-step guidance for filling out this document will appear here. 
-              For now, ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
-              Always verify requirements with your local court rules.
+              Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
+              The jurisdictional details (State, City, Court Level) you selected have been pre-filled where applicable.
+              Always verify requirements with your local court rules and consult a legal professional.
             </p>
           </CardContent>
         </Card>
