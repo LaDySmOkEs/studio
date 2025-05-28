@@ -12,14 +12,55 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit } from "lucide-react";
+import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 
 import { handleCaseAnalysisAction } from "./actions";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
+
+interface ConfidenceDetails {
+  level: string;
+  explanation: string;
+  nextSteps: string;
+  colorClass: string;
+}
+
+const getConfidenceDetails = (score: number): ConfidenceDetails => {
+  const roundedScore = Math.round(score * 100);
+  if (roundedScore >= 90) {
+    return {
+      level: `High Confidence (${roundedScore}%)`,
+      explanation: "The AI has a high degree of confidence in these suggestions based on the information provided. You have access to all relevant features.",
+      nextSteps: "Review the suggested laws and documents. Standard disclaimers apply. Always consult with a legal professional for advice specific to your situation.",
+      colorClass: "text-green-600",
+    };
+  } else if (roundedScore >= 70) {
+    return {
+      level: `Moderate Confidence (${roundedScore}%)`,
+      explanation: "The AI has moderate confidence. The suggestions are likely relevant, but providing more specific information could improve accuracy.",
+      nextSteps: "Review suggestions carefully. Enhanced disclaimers apply. Consider using the 'Guided Clarification' or 'Document Upload' sections below to provide more details. Consulting a legal professional is strongly advised.",
+      colorClass: "text-yellow-600",
+    };
+  } else if (roundedScore >= 50) {
+    return {
+      level: `Low Confidence (${roundedScore}%)`,
+      explanation: "The AI has low confidence. The initial information may be too general or lack specific legal keywords. Suggestions provided are broad.",
+      nextSteps: "It is highly recommended to provide more details through the 'Guided Clarification', 'Document Upload', or 'Structured Verification' sections. Stronger attorney recommendations apply. Seeking advice from a legal professional is critical.",
+      colorClass: "text-orange-600",
+    };
+  } else {
+    return {
+      level: `Very Low Confidence (${roundedScore}%)`,
+      explanation: "The AI has very low confidence. The case details may be unclear or fall outside common legal patterns. Feature access might be limited until more clarity is provided.",
+      nextSteps: "It is essential to provide significantly more detail, possibly through a structured questionnaire (conceptual feature). Limited features may apply. Consulting a legal professional is crucial.",
+      colorClass: "text-red-600",
+    };
+  }
+};
 
 
 export default function CaseAnalysisPage() {
@@ -84,6 +125,8 @@ export default function CaseAnalysisPage() {
       duration: 4000,
     });
   };
+  
+  const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore) : null;
 
   return (
     <div className="space-y-6">
@@ -165,7 +208,7 @@ export default function CaseAnalysisPage() {
         </Alert>
       )}
 
-      {analysisResult && (
+      {analysisResult && confidenceDetails && (
         <div className="space-y-6 mt-6">
           <Card className="shadow-md">
             <CardHeader>
@@ -187,19 +230,38 @@ export default function CaseAnalysisPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Confidence Score</CardTitle>
-                    <CardDescription>
-                      Our confidence in the relevance of the suggested laws based on the initial details.
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Progress value={analysisResult.confidenceScore * 100} className="w-full" aria-label={`Confidence score: ${Math.round(analysisResult.confidenceScore * 100)}%`}/>
-                    <p className="text-2xl font-bold text-center text-primary">
-                      {Math.round(analysisResult.confidenceScore * 100)}%
+                  <CardContent className="space-y-3">
+                    <Progress value={analysisResult.confidenceScore * 100} className="w-full" aria-label={`Confidence score: ${confidenceDetails.level}`}/>
+                    <p className={`text-xl font-bold text-center ${confidenceDetails.colorClass}`}>
+                      {confidenceDetails.level}
                     </p>
+                    <p className="text-sm text-muted-foreground">{confidenceDetails.explanation}</p>
+                    <div>
+                        <h4 className="font-semibold text-sm mb-1">Recommended Next Steps:</h4>
+                        <p className="text-sm text-muted-foreground">{confidenceDetails.nextSteps}</p>
+                    </div>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="item-1">
+                        <AccordionTrigger className="text-sm py-2">
+                          <Info className="w-4 h-4 mr-2 text-muted-foreground" /> How is this score determined?
+                        </AccordionTrigger>
+                        <AccordionContent className="text-xs text-muted-foreground space-y-1 pl-2">
+                          <p>The confidence score is an estimate based on several factors from your input, including:</p>
+                          <ul className="list-disc pl-5">
+                            <li>Keyword density and specificity of legal terminology used.</li>
+                            <li>Presence and relevance of document evidence (conceptual feature - would be analyzed if uploaded).</li>
+                            <li>Consistency within your narrative and any (conceptual) follow-up responses.</li>
+                            <li>Indicators of case complexity.</li>
+                          </ul>
+                          <p className="pt-1">A higher score suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. This score is for informational purposes and not a guarantee of legal outcomes.</p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </CardContent>
-                  <CardFooter>
+                   <CardFooter>
                     <p className="text-xs text-muted-foreground">
-                      Note: Higher scores indicate greater confidence. Always consult with a legal professional.
+                      Note: Always consult with a legal professional for advice specific to your situation.
                     </p>
                   </CardFooter>
                 </Card>
