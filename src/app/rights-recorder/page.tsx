@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Mic, Square, ListChecks, Trash2, PlayCircle, ShieldAlert, Info } from "lucide-react";
+import { Mic, Square, ListChecks, Trash2, PlayCircle, ShieldAlert, Info, Gavel } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -179,7 +179,7 @@ export default function RightsRecorderPage() {
                     <ShieldAlert className="w-6 h-6" /> Know Your Rights (U.S. Context)
                 </CardTitle>
                 <CardDescription>
-                    General information about rights during interactions with law enforcement. This is not legal advice.
+                    General information about rights during interactions and legal proceedings. This is not legal advice.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
@@ -198,14 +198,47 @@ export default function RightsRecorderPage() {
                 <div>
                     <h4 className="font-semibold">Consenting to Searches</h4>
                     <p className="text-muted-foreground">
-                        You have the right to refuse consent to a search of yourself, your car, or your home if law enforcement does not have a warrant or probable cause.
+                        You have the right to refuse consent to a search of yourself, your car, or your home if law enforcement does not have a warrant or probable cause for a warrantless search.
                     </p>
                 </div>
-                 <Alert variant="default" className="bg-accent/10 border-accent/50">
+
+                <div className="pt-2">
+                  <h3 className="text-md font-semibold mt-2 mb-1 text-primary flex items-center gap-2">
+                    <Gavel className="w-5 h-5"/> Understanding Due Process
+                  </h3>
+                  <p className="text-muted-foreground">
+                    The 5th and 14th Amendments to the U.S. Constitution guarantee "due process of law." This generally means the government must follow fair procedures and respect your legal rights before depriving you of life, liberty, or property.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Due Process in Criminal Proceedings</h4>
+                  <p className="text-muted-foreground">
+                    In criminal cases, due process includes rights like: timely notice of charges, the right to a fair and public trial by an impartial jury, the right to confront and cross-examine witnesses, the right to present evidence, the right to counsel, and protection against self-incrimination. Speedy trial rights also fall under this umbrella, ensuring the government doesn't indefinitely delay prosecution.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Due Process in Civil Proceedings</h4>
+                  <p className="text-muted-foreground">
+                    In civil lawsuits, due process typically ensures adequate notice of the lawsuit and an opportunity to be heard (present your case and evidence) before a neutral decision-maker. This applies to disputes between private parties or between individuals and the government in non-criminal matters.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Due Process in Administrative Proceedings</h4>
+                  <p className="text-muted-foreground">
+                    When government agencies make decisions that affect individual rights (e.g., revoking a license, denying benefits), due process usually requires notice of the proposed action and some form of hearing or opportunity to present your side before a final decision. The formality of these proceedings can vary.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mt-2">Jurisdictional Differences & Professional Advice</h4>
+                  <p className="text-muted-foreground">
+                    The specific application and interpretation of due process rights can vary significantly between federal law and different state laws, and depend heavily on the specific circumstances of a case. The information provided here is general in nature and for educational purposes.
+                  </p>
+                </div>
+                 <Alert variant="default" className="bg-accent/10 border-accent/50 mt-4">
                     <Info className="h-4 w-4 text-accent" />
-                    <AlertTitle className="text-accent">Important Note</AlertTitle>
+                    <AlertTitle className="text-accent">Crucial Note</AlertTitle>
                     <AlertDescription>
-                    Laws vary by jurisdiction and situation. The information above is a general overview and not a substitute for legal advice from a qualified attorney. If you are unsure of your rights, you can state that you wish to remain silent and speak to an attorney.
+                    Laws are complex and vary by jurisdiction and the specifics of your situation. This information is not a substitute for legal advice from a qualified attorney. If you are unsure of your rights or facing a legal issue, always consult with a lawyer.
                     </AlertDescription>
                 </Alert>
             </CardContent>
@@ -263,3 +296,5 @@ export default function RightsRecorderPage() {
     </div>
   );
 }
+
+    
