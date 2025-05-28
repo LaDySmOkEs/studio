@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ListChecks, AlertTriangle } from "lucide-react";
+import { ListChecks, AlertTriangle, ShieldCheck } from "lucide-react";
 
 interface ChecklistItemProps {
   id: string;
@@ -60,6 +60,17 @@ const cpsInvolvementItems: ChecklistItemProps[] = [
   { id: "cps-placement", label: "If children are removed, were you informed about placement, visitation rights, and the steps required for reunification?" },
 ];
 
+const section1983ClaimItems: ChecklistItemProps[] = [
+  { id: "s1983-state-actor", label: "Identify the 'State Actor': Was the person or entity that violated your rights acting under 'color of state law'?", details: "This means they were using authority given to them by a state, county, or local government (e.g., police officer, prison guard, public school official)." },
+  { id: "s1983-constitutional-right", label: "Identify the Specific Constitutional Right Violated: Which of your U.S. Constitutional rights was infringed?", details: "E.g., First Amendment (free speech), Fourth Amendment (unreasonable search/seizure), Eighth Amendment (cruel and unusual punishment), Fourteenth Amendment (due process, equal protection)." },
+  { id: "s1983-how-violated", label: "Describe How the Right Was Violated: What specific actions did the state actor take (or fail to take) that resulted in the violation of your constitutional right?" },
+  { id: "s1983-causation", label: "Establish Causation: Was the state actor's conduct the direct cause of the violation of your rights and any resulting harm?" },
+  { id: "s1983-damages-harm", label: "Identify Damages or Harm Suffered: What specific injuries or losses did you experience as a result of the violation?", details: "This can include physical injury, emotional distress, financial loss, or deprivation of liberty." },
+  { id: "s1983-relief-sought", label: "Determine the Relief Sought: What do you want the court to do?", details: "E.g., compensatory damages (money for harm), punitive damages (to punish the wrongdoer), injunctive relief (an order to stop or start an action)." },
+  { id: "s1983-statute-limitations", label: "Consider Statute of Limitations: Are you within the time limit to file this type of claim?", details: "This varies by state and is a critical deadline. Consult your state's law or an attorney." },
+  { id: "s1983-immunities", label: "Be Aware of Potential Immunities: Some state actors may have certain legal immunities (e.g., qualified immunity for police officers).", details: "Understanding these defenses is complex and usually requires legal analysis." },
+];
+
 export default function DueProcessChecklistPage() {
   return (
     <div className="space-y-8">
@@ -70,7 +81,7 @@ export default function DueProcessChecklistPage() {
             Due Process Checklist Builder (Conceptual)
           </CardTitle>
           <CardDescription>
-            This tool provides general checklists to help you think about common due process elements in various legal scenarios.
+            This tool provides general checklists to help you think about common due process elements and legal claims.
             These are for informational purposes only, not exhaustive, and not legal advice. Procedures vary greatly by jurisdiction and the specific facts of your case.
           </CardDescription>
         </CardHeader>
@@ -114,9 +125,31 @@ export default function DueProcessChecklistPage() {
                 {cpsInvolvementItems.map(item => <ChecklistItem key={item.id} {...item} />)}
               </AccordionContent>
             </AccordionItem>
+
+            <AccordionItem value="section-1983-claim">
+              <AccordionTrigger className="text-lg hover:no-underline">
+                 <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-destructive" /> {/* Conceptual icon for civil rights */}
+                    Considerations for a 42 U.S.C. § 1983 Claim
+                 </div>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2 pt-2">
+                <p className="text-sm mb-2">A claim under 42 U.S.C. § 1983 is a way to sue state or local government officials in federal court for violations of your constitutional rights. These are complex cases.</p>
+                {section1983ClaimItems.map(item => <ChecklistItem key={item.id} {...item} />)}
+                <Alert variant="destructive" className="mt-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Legal Expertise Crucial</AlertTitle>
+                  <AlertDescription>
+                    Claims under 42 U.S.C. § 1983 involve complex legal doctrines like "state action," "color of law," and various immunities (e.g., qualified immunity). Successfully pursuing such a claim almost always requires the assistance of an experienced civil rights attorney. This checklist is for general understanding only.
+                  </AlertDescription>
+                </Alert>
+              </AccordionContent>
+            </AccordionItem>
+
           </Accordion>
         </CardContent>
       </Card>
     </div>
   );
 }
+
