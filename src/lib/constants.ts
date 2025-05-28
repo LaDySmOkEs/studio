@@ -1,6 +1,6 @@
 
 // src/lib/constants.ts
-import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LifeBuoy, LibrarySquare, type LucideIcon } from "lucide-react";
+import { Scale, FileText, Mic, Building2, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LifeBuoy, LibrarySquare, Gavel, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -40,11 +40,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: CalendarClock,
   },
   {
-    title: "Court Directory",
-    href: "/court-directory",
-    icon: Building2,
-  },
-  {
     title: "Evidence Compiler",
     href: "/evidence-compiler",
     icon: Paperclip,
@@ -53,6 +48,11 @@ export const NAV_ITEMS: NavItem[] = [
     title: "Trauma Log",
     href: "/trauma-log",
     icon: NotebookPen,
+  },
+  {
+    title: "Court Directory",
+    href: "/court-directory",
+    icon: Building2,
   },
   {
     title: "Due Process Checklist",
@@ -70,6 +70,11 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LifeBuoy,
   },
   {
+    title: "Mock Trial Simulator",
+    href: "/mock-trial",
+    icon: Gavel, // Changed from Balance to Gavel
+  },
+  {
     title: "Subscription",
     href: "/subscription",
     icon: CreditCard,
@@ -85,4 +90,3 @@ export const NAV_ITEMS: NavItem[] = [
     icon: HelpCircle,
   },
 ];
-
