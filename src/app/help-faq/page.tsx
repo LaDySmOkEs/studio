@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -187,6 +187,47 @@ export default function HelpFaqPage() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="common-maritime-law">
+              <AccordionTrigger className="text-lg">
+                <Anchor className="w-5 h-5 mr-2 text-accent" />
+                Understanding Common Law, Maritime Law, and Jurisdictional Differences
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p>The legal world is vast, with different systems of law applying to different situations. Two foundational systems often discussed are Common Law and Maritime Law (also known as Admiralty Law).</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Common Law:</h4>
+                  <p>Common Law is the system of law primarily derived from judicial decisions (case law or precedent) rather than from statutes passed by a legislature. It originated in England and forms the basis of the legal systems in many English-speaking countries, including the United States (for most state and federal matters not governed by specific statutes).</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li>Applies to a wide range of civil and criminal matters, such as contracts, torts (personal injuries), property disputes, and most crimes.</li>
+                    <li>Relies heavily on the principle of "stare decisis," where past court decisions guide current ones.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Maritime Law (Admiralty Law):</h4>
+                  <p>Maritime Law is a distinct body of law that governs activities, transactions, and disputes occurring on navigable waters. This includes oceans, seas, and often major lakes and rivers connected to interstate or international commerce.</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li>Covers issues such as shipping, navigation, marine commerce, carriage of goods by sea, marine insurance, salvage operations, collisions between vessels, and injuries to seamen or passengers.</li>
+                    <li>Has its own unique historical development and includes both domestic laws and international conventions.</li>
+                    <li>In the United States, federal courts have exclusive jurisdiction over most admiralty and maritime cases (Article III, Section 2 of the U.S. Constitution). This means such cases are typically heard in federal district courts.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Navigating Jurisdictional Differences:</h4>
+                  <p>Understanding which body of law and which court system (jurisdiction) applies is crucial:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li>If your legal issue arises from activities on land and doesn't involve specific federal statutes, it's likely governed by state common law and statutes, and heard in state court (unless federal jurisdiction applies for other reasons, like diversity of citizenship or a federal question).</li>
+                    <li>If your issue is inherently maritime in nature (e.g., a dispute over a shipping contract, an injury on a vessel in navigable waters), then maritime law will likely apply, and the case would typically be filed in a U.S. federal district court.</li>
+                    <li>The distinction can sometimes be complex, for example, an injury occurring on a dock might raise questions about whether maritime or state law applies.</li>
+                  </ul>
+                </div>
+                
+                <p><strong>Disclaimer:</strong> This is a very simplified overview of complex legal concepts. Determining whether common law or maritime law applies, and which court has jurisdiction, is a critical legal determination that often requires specialized knowledge. Misunderstanding these aspects can have significant consequences for a case. <strong>Always consult with a qualified attorney, particularly one with experience in maritime law if your situation involves activities on or related to navigable waters, for advice specific to your situation.</strong></p>
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg">
                 <ShieldCheck className="w-5 h-5 mr-2 text-accent" />
@@ -195,7 +236,7 @@ export default function HelpFaqPage() {
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p><strong>Prototype Data Handling:</strong></p>
                 <ul className="list-disc pl-5">
-                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser's current session</strong>. This data is not uploaded to any server, meaning it's private to your current browser window but may be cleared if you close the browser window or clear your browser's data for this site. Case details entered for Case Analysis are saved to browser `localStorage` to be reused across different app features. This data persists until explicitly cleared by you or if you clear all browser data for this site.</li>
+                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser's current session</strong> for some data (like active recording notes) or in your browser's `localStorage` for persisted lists (like saved recordings, timeline events, trauma log entries after saving). This means the data is generally private to your browser on your device. Case details entered for "Case Analysis" are also saved to browser `localStorage` to be reused across different app features. This data persists until explicitly cleared by you or if you clear all browser data for this site. Uploaded files in "Evidence Compiler" or "Document Analyzer" are handled client-side and are not sent to a server.</li>
                     <li>Case details submitted for "Case Analysis" are processed by an AI model to provide suggestions. Please be mindful and avoid submitting highly sensitive personal identifiable information that you do not want processed by an external AI service.</li>
                 </ul>
                 <p className="mt-2"><strong>Production System Considerations:</strong></p>
