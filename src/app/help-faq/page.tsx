@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -72,7 +72,7 @@ export default function HelpFaqPage() {
             <AccordionItem value="item-pattern-recognition">
               <AccordionTrigger className="text-lg">
                 <Siren className="w-5 h-5 mr-2 text-accent" />
-                Conceptual: Pattern Recognition &amp; Systemic Issue Alerts
+                Conceptual: Pattern Recognition & Systemic Issue Alerts
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-3">
                 <p>One of the long-term visions for a tool like DUE PROCESS AI involves leveraging the power of collective information to identify broader patterns of potential systemic issues.</p>
@@ -106,7 +106,7 @@ export default function HelpFaqPage() {
                   </ul>
                 </div>
 
-                <p><strong>Disclaimer: This Pattern Recognition &amp; Systemic Issue Alerts feature is purely conceptual and is NOT implemented in the current version of DUE PROCESS AI.</strong> It represents a potential future direction for advanced legal tech tools, contingent on responsible development and addressing the complexities involved.</p>
+                <p><strong>Disclaimer: This Pattern Recognition & Systemic Issue Alerts feature is purely conceptual and is NOT implemented in the current version of DUE PROCESS AI.</strong> It represents a potential future direction for advanced legal tech tools, contingent on responsible development and addressing the complexities involved.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -167,7 +167,7 @@ export default function HelpFaqPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground/90">Overlapping &amp; Special Jurisdictions:</h4>
+                  <h4 className="font-semibold text-foreground/90">Overlapping & Special Jurisdictions:</h4>
                   <p>Jurisdictional issues can become complex, especially with:</p>
                   <ul className="list-disc pl-5 space-y-1 mt-1">
                     <li><strong>Concurrent Jurisdiction:</strong> Situations where both federal and state courts might have the authority to hear a case. The plaintiff may choose where to file, or a defendant might seek to "remove" a case from state to federal court if certain conditions are met.</li>
@@ -179,7 +179,7 @@ export default function HelpFaqPage() {
                 
                 <div>
                   <h4 className="font-semibold text-foreground/90">Determining Jurisdiction for Your Case:</h4>
-                  <p>This can be one ofr the most challenging aspects of starting a legal action. Key factors include where the incident occurred, where the parties reside or do business, and the subject matter of the dispute. Incorrectly determining jurisdiction can have serious consequences for your case.</p>
+                  <p>This can be one of the most challenging aspects of starting a legal action. Key factors include where the incident occurred, where the parties reside or do business, and the subject matter of the dispute. Incorrectly determining jurisdiction can have serious consequences for your case.</p>
                 </div>
 
                 <p><strong>Disclaimer:</strong> This information is for general educational purposes only. Determining the correct jurisdiction for a specific legal matter is crucial and often complex. Always consult with a qualified legal professional for advice tailored to your situation.</p>
@@ -205,6 +205,60 @@ export default function HelpFaqPage() {
                     <li><strong>Scalability:</strong> The application's backend and infrastructure would be designed to accommodate a growing user base and increasing data load, ensuring performance and reliability. The frontend is built using Next.js, a modern framework capable of handling scalable web applications.</li>
                 </ul>
                 <p className="mt-2">We are committed to user privacy and data security. These principles would guide the development of a production-ready application.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-citation-mode">
+              <AccordionTrigger className="text-lg">
+                <ExternalLinkIcon className="w-5 h-5 mr-2 text-accent" />
+                Conceptual: Citation Mode
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>A "Citation Mode" is a conceptual feature aimed at enhancing the credibility and utility of AI-generated explanations and suggestions. In this mode, the AI would strive to provide references to relevant case law (e.g., <em>Goldberg v. Kelly</em>, <em>Mathews v. Eldridge</em>), statutes, or legal principles that underpin its responses.</p>
+                <h4 className="font-semibold text-foreground/90 mt-2">Potential Benefits:</h4>
+                <ul className="list-disc pl-5">
+                  <li><strong>Increased Trust:</strong> Citing sources can increase user confidence in the information provided.</li>
+                  <li><strong>Further Research:</strong> Users can look up the cited cases or laws for deeper understanding.</li>
+                  <li><strong>Professional Review:</strong> Makes it easier for legal professionals to verify the basis of AI suggestions.</li>
+                </ul>
+                <h4 className="font-semibold text-foreground/90 mt-2">Challenges:</h4>
+                <p>Implementing this accurately requires sophisticated AI capabilities, including reliable information retrieval and ensuring citations are contextually appropriate and up-to-date. This is a complex task that goes beyond simple pattern matching.</p>
+                <p><strong>Note:</strong> This feature is conceptual and not currently implemented. AI outputs should always be verified by a qualified legal professional, even if citations were provided.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-kyr-library">
+              <AccordionTrigger className="text-lg">
+                <Film className="w-5 h-5 mr-2 text-accent" />
+                Conceptual: "Know Your Rights" Library
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>A "Know Your Rights" Library is envisioned as a dedicated section of the app containing engaging and easily digestible content explaining core legal concepts and rights. This could include:</p>
+                <ul className="list-disc pl-5">
+                  <li>Short, informative videos.</li>
+                  <li>Clear infographics.</li>
+                  <li>Concise articles on fundamental rights in various contexts (e.g., during a police stop, in housing disputes, in employment matters).</li>
+                </ul>
+                <h4 className="font-semibold text-foreground/90 mt-2">Goal:</h4>
+                <p>To make complex legal information more accessible and understandable to a broad audience, empowering users with foundational knowledge.</p>
+                <p><strong>Note:</strong> While the "Rights Recorder" page currently includes some "Know Your Rights" text, a full library with multimedia content is a conceptual future enhancement.</p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-user-roles">
+              <AccordionTrigger className="text-lg">
+                <Users className="w-5 h-5 mr-2 text-accent" />
+                Conceptual: User Role Switching
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>"User Role Switching" is a conceptual feature that would allow different types of users, particularly legal professionals, to interact with the application in ways tailored to their needs. For example:</p>
+                <ul className="list-disc pl-5">
+                  <li><strong>Advocates/Guardians:</strong> Could potentially use the app to organize information or draft initial documents on behalf of a client or ward, with appropriate consents and safeguards.</li>
+                  <li><strong>Attorneys:</strong> Might use the tool for preliminary research, drafting assistance, or to quickly access certain information, understanding its limitations as a non-replacement for professional judgment.</li>
+                </ul>
+                <h4 className="font-semibold text-foreground/90 mt-2">Requirements:</h4>
+                <p>Implementing this would require a robust user authentication system, clear role definitions, and careful consideration of ethical implications, data privacy (especially client confidentiality), and the terms of service.</p>
+                <p><strong>Note:</strong> This is a conceptual feature for future development and is not currently available. The app is presently designed for individual user assistance with the understanding that they will consult legal professionals.</p>
               </AccordionContent>
             </AccordionItem>
 
