@@ -1,4 +1,3 @@
-
 // src/ai/flows/criminalLawSuggestions.ts
 'use server';
 
@@ -29,6 +28,9 @@ const CriminalLawSuggestionsOutputSchema = z.object({
   suggestedDocumentTypes: z
     .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
     .describe('A list of document types relevant to this criminal case.'),
+  dueProcessViolationScore: z
+    .string()
+    .describe('A qualitative assessment of potential due process violation risks specific to criminal law, considering severity and volume of issues like lack of counsel, improper search, coerced statements, Miranda rights, speedy trial issues, etc. e.g., "High Risk: Indication of Miranda violation and lack of timely arraignment.", "Moderate Risk: Concern about effectiveness of counsel mentioned.", "Low Risk: Standard procedures appear followed based on input." If details are sparse, indicate that a more thorough review is needed.'),
 });
 export type CriminalLawSuggestionsOutput = z.infer<typeof CriminalLawSuggestionsOutputSchema>;
 
@@ -41,24 +43,17 @@ const prompt = ai.definePrompt({
   name: 'criminalLawSuggestionsPrompt',
   input: {schema: CriminalLawSuggestionsInputSchema},
   output: {schema: CriminalLawSuggestionsOutputSchema},
-  prompt: `You are an expert AI legal assistant specializing in Criminal Law. Based on the case details provided, suggest relevant state and federal case laws.
-Focus on:
-- Constitutional precedents (e.g., Fourth, Fifth, Sixth Amendments)
-- Supreme Court criminal procedure rules
-- State criminal code interpretations (assume a generic US state jurisdiction if not specified, or ask for clarification if critical)
-- Sentencing guidelines and relevant case law
-- Landmark cases related to Miranda rights, search and seizure, right to counsel, etc.
-- Issues related to bail, discovery (including Brady material and witness lists), and post-conviction relief like expungement.
-
-Also, suggest types of legal documents (from the allowed list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement') that might be appropriate to generate for this case.
-For example, if bail is an issue, suggest 'motionForBailReduction'. If the case is in early stages, 'discoveryRequest' might be relevant. If it's post-conviction and eligible, 'petitionForExpungement' could be suggested.
-Provide a confidence score (a number between 0 and 1, where 1 is highest confidence) for your legal suggestions.
+  prompt: `You are an expert AI legal assistant specializing in Criminal Law. Based on the case details provided:
+1. Suggest relevant state and federal case laws. Focus on constitutional precedents (e.g., Fourth, Fifth, Sixth Amendments), Supreme Court criminal procedure rules, state criminal code interpretations, sentencing guidelines, landmark cases (Miranda, search/seizure, right to counsel), and issues related to bail, discovery (Brady, witness lists), and post-conviction relief (expungement).
+2. Suggest types of legal documents (from 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement') relevant to this case.
+3. Provide a confidence score (0-1) for your legal suggestions.
+4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks specific to criminal law (e.g., "Low Risk", "Moderate Risk: Potential speedy trial issue based on timeline", "High Risk: Multiple constitutional violations indicated e.g. lack of counsel and coerced confession."). Analyze the severity and volume of potential violations hinted at in the case details. Consider issues like Miranda rights, right to counsel, illegal search/seizure, coerced statements, speedy trial, prosecutorial misconduct. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess specific due process risks.").
 
 Case Details:
 {{{caseDetails}}}
 
-Ensure your output strictly adheres to the defined schema, including specific document types and a numeric confidence score.
-If no specific documents seem immediately relevant from the allowed list, return an empty list for suggestedDocumentTypes.
+Ensure your output strictly adheres to the defined schema.
+If no specific documents seem immediately relevant, return an empty list for suggestedDocumentTypes.
 `,
 });
 

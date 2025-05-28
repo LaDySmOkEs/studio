@@ -1,4 +1,3 @@
-
 // src/ai/flows/civilLawSuggestions.ts
 'use server';
 
@@ -29,6 +28,9 @@ const CivilLawSuggestionsOutputSchema = z.object({
   suggestedDocumentTypes: z
     .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
     .describe('A list of document types relevant to this civil case.'),
+  dueProcessViolationScore: z
+    .string()
+    .describe('A qualitative assessment of potential due process violation risks in a civil context, such as issues with service of process, opportunity to be heard, or biased adjudication. e.g., "Moderate Risk: Allegation of improper service of summons.", "Low Risk: Standard civil procedures appear followed based on input." If details are sparse, indicate that a more thorough review is needed.'),
 });
 export type CivilLawSuggestionsOutput = z.infer<typeof CivilLawSuggestionsOutputSchema>;
 
@@ -40,23 +42,16 @@ const prompt = ai.definePrompt({
   name: 'civilLawSuggestionsPrompt',
   input: {schema: CivilLawSuggestionsInputSchema},
   output: {schema: CivilLawSuggestionsOutputSchema},
-  prompt: `You are an expert AI legal assistant specializing in Civil Law. Based on the case details provided, suggest relevant state and federal case laws.
-Focus on areas such as:
-- Contract law (breach, interpretation, formation)
-- Tort law (negligence, intentional torts, product liability)
-- Family law (divorce, custody, support - if applicable from details)
-- Employment law (discrimination, wrongful termination, wage disputes)
-- Civil rights claims (e.g., Section 1983)
-- Administrative law (challenges to agency decisions)
-Consider different burden of proof standards applicable in civil litigation (e.g., preponderance of the evidence).
-
-Also, suggest types of legal documents (from the allowed list: 'motion', 'affidavit', 'complaint') that might be appropriate to generate for this case.
-Provide a confidence score (a number between 0 and 1, where 1 is highest confidence) for your legal suggestions.
+  prompt: `You are an expert AI legal assistant specializing in Civil Law. Based on the case details provided:
+1. Suggest relevant state and federal case laws. Focus on contract law, tort law, family law, employment law, civil rights claims (e.g., Section 1983), administrative law, and different burden of proof standards.
+2. Suggest types of legal documents (from 'motion', 'affidavit', 'complaint') that might be appropriate.
+3. Provide a confidence score (0-1) for your legal suggestions.
+4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks in a civil context (e.g., "Low Risk", "Moderate Risk: Potential issue with notice of hearing", "High Risk: Concerns about biased decision-maker and lack of opportunity to present evidence."). Analyze the severity and volume of potential violations suggested by the case details. Consider elements like proper service of process, adequate notice of hearings, opportunity to be heard, and impartial adjudication. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess specific due process risks.").
 
 Case Details:
 {{{caseDetails}}}
 
-Ensure your output strictly adheres to the defined schema, including specific document types ('motion', 'affidavit', 'complaint') and a numeric confidence score.
+Ensure your output strictly adheres to the defined schema.
 If no specific documents seem immediately relevant from the allowed list, return an empty list for suggestedDocumentTypes.
 `,
 });

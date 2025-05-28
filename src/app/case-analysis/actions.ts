@@ -1,20 +1,21 @@
-
 // src/app/case-analysis/actions.ts
 'use server';
 
 import { z } from "zod";
+// Note: SuggestRelevantLawsOutput is used as the general type because all three flows
+// now have a structurally identical output, including `dueProcessViolationScore`.
 import type { SuggestRelevantLawsInput, SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { suggestRelevantLaws } from "@/ai/flows/suggest-relevant-laws";
 
-import type { CriminalLawSuggestionsInput, CriminalLawSuggestionsOutput } from "@/ai/flows/criminalLawSuggestions";
+import type { CriminalLawSuggestionsInput } from "@/ai/flows/criminalLawSuggestions"; // CriminalLawSuggestionsOutput is structurally same as SuggestRelevantLawsOutput
 import { criminalLawSuggestions } from "@/ai/flows/criminalLawSuggestions";
 
-import type { CivilLawSuggestionsInput, CivilLawSuggestionsOutput } from "@/ai/flows/civilLawSuggestions";
+import type { CivilLawSuggestionsInput } from "@/ai/flows/civilLawSuggestions"; // CivilLawSuggestionsOutput is structurally same as SuggestRelevantLawsOutput
 import { civilLawSuggestions } from "@/ai/flows/civilLawSuggestions";
 
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
-// The output type remains consistent across all flows
+// The output type remains consistent across all flows, now including dueProcessViolationScore
 export async function handleCaseAnalysisAction(data: CaseAnalysisFormValues): Promise<SuggestRelevantLawsOutput | { error: string }> {
   try {
     const validatedData = formSchema.parse(data);

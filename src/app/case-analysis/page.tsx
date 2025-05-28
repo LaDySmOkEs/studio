@@ -11,8 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info } from "lucide-react";
-import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
+import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert } from "lucide-react";
+import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws"; // This type now includes dueProcessViolationScore
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -32,7 +32,7 @@ const getConfidenceDetails = (score: number, caseCategory: "general" | "criminal
   const roundedScore = Math.round(score * 100);
   let criminalCaution = "";
   if (caseCategory === "criminal") {
-    criminalCaution = " For criminal matters, given the potential severity of outcomes, these suggestions require particularly careful review by a legal professional.";
+    criminalCaution = " For criminal matters, given the potential severity of outcomes, these suggestions require particularly careful review by a legal professional. Potential due process violations in criminal cases can have severe consequences.";
   }
 
   if (roundedScore >= 90) {
@@ -108,7 +108,7 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(result);
       toast({
         title: "Initial Analysis Complete",
-        description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, and suggested documents are now available. Conceptual follow-up steps are shown below.`,
+        description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, due process violation assessment, and suggested documents are now available. Conceptual follow-up steps are shown below.`,
       });
     }
     setIsLoading(false);
@@ -141,7 +141,7 @@ export default function CaseAnalysisPage() {
             </CardTitle>
           <CardDescription>
             Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown.
-            This tool is for informational purposes and to assist with organizing your thoughts. It does not provide legal advice. All AI-generated suggestions should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
+            This tool is for informational purposes and to assist with organizing your thoughts. <strong>It does not provide legal advice.</strong> All AI-generated suggestions, including any assessment of due process, should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -178,7 +178,7 @@ export default function CaseAnalysisPage() {
                     <FormControl>
                       <Textarea
                         id="caseDetails"
-                        placeholder="Describe your situation in your own words. Include key facts, parties involved, and legal questions..."
+                        placeholder="Describe your situation in your own words. Include key facts, parties involved, legal questions, and any concerns about how procedures were handled..."
                         rows={10}
                         className="resize-none"
                         {...field}
@@ -223,8 +223,8 @@ export default function CaseAnalysisPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Card className="lg:col-span-1">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Lightbulb className="w-5 h-5 text-accent" />
@@ -235,7 +235,7 @@ export default function CaseAnalysisPage() {
                     <p className="text-sm whitespace-pre-wrap">{analysisResult.relevantLaws}</p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="lg:col-span-1">
                   <CardHeader>
                     <CardTitle>Confidence Score</CardTitle>
                   </CardHeader>
@@ -270,6 +270,36 @@ export default function CaseAnalysisPage() {
                    <CardFooter>
                     <p className="text-xs text-muted-foreground">
                       <strong>Crucial Note:</strong> Always consult with a qualified legal professional for advice specific to your situation. AI suggestions are not a substitute for professional legal counsel.
+                    </p>
+                  </CardFooter>
+                </Card>
+                 <Card className="lg:col-span-1">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ShieldAlert className="w-5 h-5 text-destructive" />
+                      Due Process Violation Assessment
+                    </CardTitle>
+                     <CardDescription>
+                      This is a conceptual AI assessment of potential due process concerns based on your input. It is <strong>not a legal determination</strong>.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive">
+                        {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-3">
+                        Examples of what this might mean:
+                        <ul className="list-disc pl-4 mt-1">
+                            <li><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</li>
+                            <li><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</li>
+                            <li><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</li>
+                             <li><strong>Indeterminate:</strong> Not enough specific detail in your narrative to make a meaningful assessment of due process risks.</li>
+                        </ul>
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                     <p className="text-xs text-muted-foreground">
+                        <strong>Legal Advice Required:</strong> This assessment is a conceptual tool. Any potential due process violation must be evaluated by a qualified attorney.
                     </p>
                   </CardFooter>
                 </Card>
