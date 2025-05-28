@@ -1,0 +1,122 @@
+
+// src/app/due-process-checklist/page.tsx
+"use client";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ListChecks, AlertTriangle } from "lucide-react";
+
+interface ChecklistItemProps {
+  id: string;
+  label: string;
+  details?: string;
+}
+
+const ChecklistItem = ({ id, label, details }: ChecklistItemProps) => (
+  <div className="flex items-start space-x-3 py-2">
+    <Checkbox id={id} className="mt-1" />
+    <div className="grid gap-1.5 leading-snug">
+      <Label htmlFor={id} className="font-normal text-sm">
+        {label}
+      </Label>
+      {details && <p className="text-xs text-muted-foreground">{details}</p>}
+    </div>
+  </div>
+);
+
+const criminalArraignmentItems: ChecklistItemProps[] = [
+  { id: "ca-notice", label: "Received timely and clear notice of the specific charges against you?" },
+  { id: "ca-silent", label: "Informed of your right to remain silent?" },
+  { id: "ca-attorney", label: "Informed of your right to an attorney?" },
+  { id: "ca-appointed", label: "If you cannot afford an attorney, were you informed of your right to a court-appointed one?" },
+  { id: "ca-plea", label: "Given an opportunity to enter a plea (e.g., guilty, not guilty, no contest)?" },
+  { id: "ca-bail", label: "Bail/bond discussed and determined, if applicable?", details: "Were factors like flight risk and danger to community considered?" },
+  { id: "ca-future-dates", label: "Clearly informed of future court dates and obligations?" },
+];
+
+const adminHearingItems: ChecklistItemProps[] = [
+  { id: "ah-notice", label: "Received adequate written notice of the proposed action and the reasons for it?" },
+  { id: "ah-timing", label: "Was the notice provided with enough time for you to prepare a response?" },
+  { id: "ah-rules", label: "Informed of the specific rules, regulations, or laws you allegedly violated?" },
+  { id: "ah-evidence", label: "Will you have an opportunity to present your evidence and arguments?", details: "This includes documents and potentially witness testimony." },
+  { id: "ah-cross-examine", label: "Will you have an opportunity to see the evidence against you and (if applicable) cross-examine adverse witnesses?" },
+  { id: "ah-counsel", label: "Are you permitted to have legal counsel represent you (often at your own expense)?" },
+  { id: "ah-impartial", label: "Is the hearing conducted by a neutral and impartial decision-maker?" },
+  { id: "ah-record", label: "Will a record of the proceedings be made?" },
+  { id: "ah-decision", label: "Will you receive a written decision explaining the outcome and the reasons for it?" },
+  { id: "ah-appeal", label: "Informed of any rights to appeal the decision?" },
+];
+
+const cpsInvolvementItems: ChecklistItemProps[] = [
+  { id: "cps-reason", label: "Clearly informed by CPS about the reason for their involvement and the specific concerns or allegations?" },
+  { id: "cps-respond", label: "Given a meaningful opportunity to respond to the allegations or concerns?" },
+  { id: "cps-rights-investigation", label: "Informed of your rights during the CPS investigation?", details: "E.g., right to speak with an attorney, right not to speak without an attorney present for certain inquiries." },
+  { id: "cps-safety-plan", label: "If a safety plan is proposed, do you understand its terms, and was your input considered?" },
+  { id: "cps-court-notice", label: "If CPS intends to file a court petition (e.g., for dependency or removal), have you received formal written notice of the court hearing?" },
+  { id: "cps-hearing-rights", label: "If a court hearing is scheduled, are you aware of your right to attend, to be represented by an attorney (and to have one appointed if you cannot afford one in many jurisdictions for these types of cases), to present evidence, and to cross-examine witnesses?" },
+  { id: "cps-placement", label: "If children are removed, were you informed about placement, visitation rights, and the steps required for reunification?" },
+];
+
+export default function DueProcessChecklistPage() {
+  return (
+    <div className="space-y-8">
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <ListChecks className="w-7 h-7 text-primary" />
+            Due Process Checklist Builder (Conceptual)
+          </CardTitle>
+          <CardDescription>
+            This tool provides general checklists to help you think about common due process elements in various legal scenarios.
+            These are for informational purposes only, not exhaustive, and not legal advice. Procedures vary greatly by jurisdiction and the specific facts of your case.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Alert variant="default" className="border-accent bg-accent/10">
+            <AlertTriangle className="h-5 w-5 text-accent" />
+            <AlertTitle className="font-semibold text-accent">Important Note</AlertTitle>
+            <AlertDescription>
+              The checkboxes below are for your personal reference and to guide your thinking. Their state is not saved.
+              Always consult with a qualified legal professional for advice tailored to your specific situation.
+            </AlertDescription>
+          </Alert>
+
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="criminal-arraignment">
+              <AccordionTrigger className="text-lg hover:no-underline">
+                Preparing for a Criminal Arraignment
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2 pt-2">
+                <p className="text-sm mb-2">An arraignment is typically your first court appearance after being charged with a crime. Key due process rights are often addressed here.</p>
+                {criminalArraignmentItems.map(item => <ChecklistItem key={item.id} {...item} />)}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="administrative-hearing">
+              <AccordionTrigger className="text-lg hover:no-underline">
+                Facing an Administrative Hearing
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2 pt-2">
+                <p className="text-sm mb-2">Administrative hearings deal with issues like professional licenses, government benefits, zoning, etc. Due process still applies.</p>
+                {adminHearingItems.map(item => <ChecklistItem key={item.id} {...item} />)}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="cps-involvement">
+              <AccordionTrigger className="text-lg hover:no-underline">
+                Responding to CPS Involvement (Initial Stages)
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2 pt-2">
+                <p className="text-sm mb-2">Child Protective Services (CPS) involvement has significant due process implications for families. These are initial considerations.</p>
+                {cpsInvolvementItems.map(item => <ChecklistItem key={item.id} {...item} />)}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
