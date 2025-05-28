@@ -1,12 +1,14 @@
 // src/app/document-generator/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 
 type DocumentType = "motion" | "affidavit" | "complaint" | "";
 
@@ -132,20 +134,56 @@ ____________________________
 export default function DocumentGeneratorPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>("");
   const [generatedDocument, setGeneratedDocument] = useState<string>("");
+  const [suggestedByAI, setSuggestedByAI] = useState<string[]>([]); // Store AI suggestions
+
+  const searchParams = useSearchParams();
+  const { toast } = useToast(); // Initialize useToast
+
+  useEffect(() => {
+    const suggestedTypesParam = searchParams.get('suggested');
+    if (suggestedTypesParam) {
+      const typesFromURL = suggestedTypesParam.split(',') as DocumentType[];
+      const validSuggestedTypes = typesFromURL.filter(
+        type => Object.keys(DOCUMENT_TEMPLATES).includes(type)
+      );
+
+      if (validSuggestedTypes.length > 0) {
+        setSuggestedByAI(validSuggestedTypes);
+        // Pre-select the first valid suggestion
+        const firstValidType = validSuggestedTypes[0] as Exclude<DocumentType, "">;
+        setSelectedDocument(firstValidType);
+        setGeneratedDocument(DOCUMENT_TEMPLATES[firstValidType]);
+        toast({
+          title: "AI Suggestion Applied",
+          description: `Pre-selected '${firstValidType}' based on your case analysis. You can change this selection.`,
+        });
+      }
+    }
+  }, [searchParams, toast]);
+
 
   const handleSelectDocument = (value: string) => {
-    const docType = value as Exclude<DocumentType, "">;
-    setSelectedDocument(docType);
-    if (docType && DOCUMENT_TEMPLATES[docType]) {
-      setGeneratedDocument(DOCUMENT_TEMPLATES[docType]);
+    const docType = value as Exclude<DocumentType, "">; // Can be empty string from placeholder
+    if (value === "") {
+        setSelectedDocument("");
+        setGeneratedDocument("");
+    } else if (docType && DOCUMENT_TEMPLATES[docType]) {
+        setSelectedDocument(docType);
+        setGeneratedDocument(DOCUMENT_TEMPLATES[docType]);
     } else {
-      setGeneratedDocument("");
+        setSelectedDocument("");
+        setGeneratedDocument("");
     }
   };
 
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(generatedDocument);
-    // Consider adding a toast notification here
+    if (generatedDocument) {
+        navigator.clipboard.writeText(generatedDocument);
+        toast({
+            title: "Copied to Clipboard",
+            description: "The document template has been copied.",
+        });
+    }
   };
 
   return (
@@ -158,6 +196,16 @@ export default function DocumentGeneratorPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {suggestedByAI.length > 0 && (
+            <Alert variant="default" className="bg-accent/10 border-accent/50">
+                <FileText className="h-4 w-4 text-accent" />
+                <AlertTitle className="text-accent">AI Suggestions</AlertTitle>
+                <AlertDescription>
+                    Based on your case analysis, we suggested: {suggestedByAI.join(', ')}.
+                    The first valid suggestion has been pre-selected.
+                </AlertDescription>
+            </Alert>
+          )}
           <div>
             <label htmlFor="doc-type-select" className="block text-sm font-medium text-foreground mb-1">Select Document Type</label>
             <Select onValueChange={handleSelectDocument} value={selectedDocument}>
@@ -195,7 +243,6 @@ export default function DocumentGeneratorPage() {
         )}
       </Card>
 
-      {/* Placeholder for step-by-step guidance or additional features */}
       {selectedDocument && (
         <Card className="shadow-md">
           <CardHeader>

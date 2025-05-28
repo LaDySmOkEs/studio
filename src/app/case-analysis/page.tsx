@@ -2,23 +2,21 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-// z is no longer directly needed here if formSchema is imported
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb } from "lucide-react";
+import { Loader2, Lightbulb, ArrowRight, FileText } from "lucide-react"; // Added FileText and ArrowRight
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
-// suggestRelevantLaws and SuggestRelevantLawsInput are no longer directly needed here
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 
-// Import from actions file and new schemas file
 import { handleCaseAnalysisAction } from "./actions";
-import { formSchema, type CaseAnalysisFormValues } from "./schemas"; // Updated import
+import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 
 export default function CaseAnalysisPage() {
@@ -28,7 +26,7 @@ export default function CaseAnalysisPage() {
   const { toast } = useToast();
 
   const form = useForm<CaseAnalysisFormValues>({
-    resolver: zodResolver(formSchema), // formSchema is now imported from schemas.ts
+    resolver: zodResolver(formSchema),
     defaultValues: {
       caseDetails: "",
     },
@@ -39,7 +37,7 @@ export default function CaseAnalysisPage() {
     setError(null);
     setAnalysisResult(null);
 
-    const result = await handleCaseAnalysisAction(data); // Uses imported action
+    const result = await handleCaseAnalysisAction(data);
 
     if ('error' in result) {
       setError(result.error);
@@ -52,7 +50,7 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(result);
       toast({
         title: "Analysis Complete",
-        description: "Relevant laws and confidence score are now available.",
+        description: "Relevant laws, confidence score, and suggested documents are now available.",
       });
     }
     setIsLoading(false);
@@ -64,7 +62,7 @@ export default function CaseAnalysisPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Intelligent Case Analysis</CardTitle>
           <CardDescription>
-            Enter the details of your case below. Our AI will analyze the information and suggest relevant case laws. This tool is for informational purposes only and does not constitute legal advice.
+            Enter the details of your case below. Our AI will analyze the information, suggest relevant case laws, and recommend document types. This tool is for informational purposes only and does not constitute legal advice.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -99,7 +97,7 @@ export default function CaseAnalysisPage() {
                     Analyzing...
                   </>
                 ) : (
-                  "Suggest Relevant Laws"
+                  "Analyze Case & Suggest Documents"
                 )}
               </Button>
             </CardFooter>
@@ -115,37 +113,68 @@ export default function CaseAnalysisPage() {
       )}
 
       {analysisResult && (
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-accent" />
-                Suggested Relevant Laws
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm whitespace-pre-wrap">{analysisResult.relevantLaws}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle>Confidence Score</CardTitle>
-              <CardDescription>
-                Our confidence in the relevance of the suggested laws based on the provided details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Progress value={analysisResult.confidenceScore * 100} className="w-full" aria-label={`Confidence score: ${Math.round(analysisResult.confidenceScore * 100)}%`}/>
-              <p className="text-2xl font-bold text-center text-primary">
-                {Math.round(analysisResult.confidenceScore * 100)}%
-              </p>
-            </CardContent>
-            <CardFooter>
-              <p className="text-xs text-muted-foreground">
-                Note: Higher scores indicate greater confidence. Always consult with a legal professional.
-              </p>
-            </CardFooter>
-          </Card>
+        <div className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-accent" />
+                  Suggested Relevant Laws
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm whitespace-pre-wrap">{analysisResult.relevantLaws}</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle>Confidence Score</CardTitle>
+                <CardDescription>
+                  Our confidence in the relevance of the suggested laws based on the provided details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Progress value={analysisResult.confidenceScore * 100} className="w-full" aria-label={`Confidence score: ${Math.round(analysisResult.confidenceScore * 100)}%`}/>
+                <p className="text-2xl font-bold text-center text-primary">
+                  {Math.round(analysisResult.confidenceScore * 100)}%
+                </p>
+              </CardContent>
+              <CardFooter>
+                <p className="text-xs text-muted-foreground">
+                  Note: Higher scores indicate greater confidence. Always consult with a legal professional.
+                </p>
+              </CardFooter>
+            </Card>
+          </div>
+
+          {analysisResult.suggestedDocumentTypes && analysisResult.suggestedDocumentTypes.length > 0 && (
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-accent" />
+                  Suggested Document Types
+                </CardTitle>
+                <CardDescription>
+                  Based on your case analysis, we suggest considering these document types:
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc pl-5 space-y-1">
+                  {analysisResult.suggestedDocumentTypes.map((docType) => (
+                    <li key={docType} className="capitalize text-sm">{docType}</li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Link href={`/document-generator?suggested=${analysisResult.suggestedDocumentTypes.join(',')}`}>
+                  <Button variant="outline">
+                    Go to Document Generator
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          )}
         </div>
       )}
     </div>
