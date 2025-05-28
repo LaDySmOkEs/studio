@@ -17,6 +17,7 @@ import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 import { handleCaseAnalysisAction } from "./actions";
@@ -156,7 +157,7 @@ export default function CaseAnalysisPage() {
                     <FormLabel htmlFor="caseCategorySelect">Case Category</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger id="caseCategorySelect" aria-describedby="caseCategory-message">
+                        <SelectTrigger id="caseCategorySelect" aria-describedby="caseCategory-message" aria-label="Case Category">
                           <SelectValue placeholder="Select a case category" />
                         </SelectTrigger>
                       </FormControl>
