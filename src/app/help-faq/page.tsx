@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -45,13 +45,23 @@ export default function HelpFaqPage() {
 
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-lg">
-                <Lightbulb className="w-5 h-5 mr-2 text-accent" />
-                Is my data secure?
+                <ShieldCheck className="w-5 h-5 mr-2 text-accent" />
+                How is my data handled regarding security and privacy?
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>For features like the "Rights Recorder" and "Trauma Log" in this prototype, data is stored locally in your browser and is not uploaded to any server. This means it's private to your session but will be cleared if you close the browser window or clear your browser's data.</p>
-                <p>Case details submitted for "Case Analysis" are processed by an AI model to provide suggestions. Please avoid submitting highly sensitive personal identifiable information that you do not want processed by an external AI service.</p>
-                <p>For a production version of this application, robust data security and privacy measures would be implemented according to industry best practices and legal requirements.</p>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p><strong>Prototype Data Handling:</strong></p>
+                <ul className="list-disc pl-5">
+                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser</strong>. This data is not uploaded to any server, meaning it's private to your current browser session but will be cleared if you close the browser window or clear your browser's data.</li>
+                    <li>Case details submitted for "Case Analysis" are processed by an AI model to provide suggestions. Please be mindful and avoid submitting highly sensitive personal identifiable information that you do not want processed by an external AI service.</li>
+                </ul>
+                <p className="mt-2"><strong>Production System Considerations:</strong></p>
+                <p>For a production version of DUE PROCESS AI, the following measures would be paramount:</p>
+                <ul className="list-disc pl-5">
+                    <li><strong>Data Security:</strong> All sensitive legal information would be stored using robust encryption-at-rest and in-transit. Access controls and regular security audits would be implemented.</li>
+                    <li><strong>Privacy:</strong> Clear data retention policies would be established, detailing how long sensitive legal narratives and other user data are stored and under what conditions they are deleted. We would aim for compliance with relevant data privacy regulations (e.g., GDPR, CCPA if applicable).</li>
+                    <li><strong>Scalability:</strong> The application's backend and infrastructure would be designed to accommodate a growing user base and increasing data load, ensuring performance and reliability. The frontend is built using Next.js, a modern framework capable of handling scalable web applications.</li>
+                </ul>
+                <p className="mt-2">We are committed to user privacy and data security. These principles would guide the development of a production-ready application.</p>
               </AccordionContent>
             </AccordionItem>
 

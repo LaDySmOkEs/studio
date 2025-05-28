@@ -135,7 +135,8 @@ export default function CaseAnalysisPage() {
             <Scale /> Intelligent Case Analysis Engine
             </CardTitle>
           <CardDescription>
-            Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown. This tool is for informational purposes only.
+            Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown.
+            This tool is for informational purposes only. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -376,6 +377,7 @@ export default function CaseAnalysisPage() {
               </CardTitle>
               <CardDescription>
                 Review the AI's current understanding and provide corrections or additional details. In a full system, this feedback would help the AI learn and improve.
+                For this prototype, the AI does not learn from feedback.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
