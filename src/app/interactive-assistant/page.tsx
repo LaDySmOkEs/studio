@@ -54,21 +54,29 @@ export default function InteractiveAssistantPage() {
     const lowerCaseInput = trimmedInput.toLowerCase();
 
     if (lowerCaseInput.includes("evicted") || lowerCaseInput.includes("eviction")) {
-      aiResponseText = `If you're facing eviction, it's a serious situation. Generally, a landlord must follow a specific legal procedure. This often starts with a formal written 'Notice to Quit' or 'Eviction Notice,' stating the reason (e.g., non-payment of rent, lease violation) and giving you a timeframe to fix the issue or move out. If you don't comply, the landlord usually has to file an eviction lawsuit in court. You then have the right to receive a copy of that lawsuit (a summons and complaint) and the opportunity to respond and attend a court hearing where a judge decides if the eviction is lawful. Attempting to evict without a court order (like changing locks) could be illegal. What specific part of the eviction process are you concerned about?`;
+      aiResponseText = `When facing an eviction, there's a legal process landlords must follow. Usually, it starts with a formal written notice (like a "Notice to Quit") specifying the reason (e.g., non-payment, lease violation) and a timeframe to resolve the issue or move. If you don't, the landlord typically needs to file an eviction lawsuit. You should then be served with court papers (a summons and complaint) and have the right to respond and attend a hearing. 
+Key things to check are:
+1. The Notice: Is it valid? Does it give the legally required time? Does it state clear reasons?
+2. Your Lease: What does it say about termination or eviction?
+3. Property Condition: If conditions are an issue, document them thoroughly.
+4. Court Filings: If you receive court papers, pay close attention to deadlines for responding.
+What specific part are you concerned about, like the notice you received, your tenant rights, or what to expect in court?`;
     } else if (lowerCaseInput.includes("hearing")) {
-      aiResponseText = `A 'hearing' is a formal opportunity to present your side of a case to a neutral decision-maker, which is a key part of due process. There are many types:
-- In criminal cases: arraignment, bail hearing, preliminary hearing, trial.
-- In civil cases (lawsuits): motion hearings, pre-trial conferences, trial.
-- Administrative hearings: before government agencies (e.g., for benefits, licenses).
-A fair hearing generally means you get proper notice, a chance to see evidence against you, an opportunity to present your own evidence and arguments, and a decision based on that evidence. Could you tell me what kind of hearing you're asking about?`;
+      aiResponseText = `A 'hearing' is a fundamental part of due process, providing a formal chance to present your case to a neutral decision-maker. The specifics vary greatly depending on the type of hearing:
+- Criminal Hearings: Can include arraignments (initial appearance), bail hearings, preliminary hearings (to determine if there's enough evidence for trial), motion hearings (to decide on legal issues before trial), and the trial itself.
+- Civil Hearings: Often involve motions (e.g., for summary judgment, to dismiss), pre-trial conferences, and the trial.
+- Administrative Hearings: These are before government agencies (e.g., for benefits, licenses, permits).
+Generally, for any hearing, you should receive proper notice beforehand detailing the date, time, location, and purpose. You often have the right to see evidence against you, present your own evidence, call witnesses, and question the other side's witnesses. Understanding the specific rules and procedures for *your* type of hearing is crucial. What kind of hearing are you preparing for or asking about?`;
     } else if (lowerCaseInput.includes("notice")) {
-      aiResponseText = `Proper legal 'notice' means being formally and adequately informed about something that could affect your rights. For example:
-- If sued, you must receive a 'summons' and 'complaint' (this is 'service of process').
-- Before an agency acts against you (e.g., denies benefits), they usually send a written notice explaining the action and your hearing rights.
-- Landlords must provide specific written notices in eviction cases.
-Good notice should be timely (giving you time to prepare), clear about what's happening, and explain your rights. What situation involving a notice are you referring to?`;
+      aiResponseText = `Proper legal 'notice' is key to due process. It means being formally and adequately informed about something that could affect your rights, giving you a chance to respond. A good notice should typically:
+1. Be in writing.
+2. Clearly identify who it's from and who it's for.
+3. Explain the issue, proposed action, or allegations.
+4. Mention any relevant dates, deadlines, or hearing information.
+5. Inform you of your rights to respond, appeal, or seek legal counsel.
+Examples include a 'summons and complaint' if you're sued, a 'notice of proposed agency action' for benefits, or a 'notice to quit' in an eviction. The exact requirements depend on the situation and jurisdiction. If you've received a notice, what is it regarding? Knowing the context helps provide more relevant general information.`;
     } else {
-      aiResponseText = `I understand you're looking for information. As a prototype assistant, I can provide general explanations about common legal terms or processes if you use keywords like 'eviction,' 'hearing,' or 'notice.' If your question is very specific to your situation or uses terms I don't recognize, I may not be able to give a detailed answer. For personalized legal advice, consulting a qualified legal professional is always the best step. Perhaps try rephrasing, or explore other app sections like the 'Document Generator' or 'Due Process Checklist'?`;
+      aiResponseText = `I can provide general information about common legal terms or processes if you use keywords like 'eviction,' 'hearing,' or 'notice.' I'm still learning and my responses are based on pre-defined information for this prototype. If your question is very specific to your personal situation or involves complex legal analysis, I won't be able to provide a detailed answer. Trying to rephrase your question with clear keywords might help, or you can explore other features of the app.`;
     }
     
     const aiMessage: Message = {
@@ -86,7 +94,7 @@ Good notice should be timely (giving you time to prepare), clear about what's ha
       {
         id: "initial-ai-greeting",
         sender: "ai",
-        text: "Hello! I am a prototype Legal Assistant. You can ask me general questions about legal processes or rights by using keywords like 'eviction', 'hearing', or 'notice'. How can I conceptually help you today?",
+        text: "Hello! I'm a prototype Legal Assistant. I can offer general information on common legal topics if you ask using keywords like 'eviction', 'hearing', or 'notice'. How can I conceptually help you today?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);
@@ -182,9 +190,10 @@ Good notice should be timely (giving you time to prepare), clear about what's ha
         <Bot className="h-5 w-5 text-accent" />
         <AlertTitle className="font-semibold text-accent">Important Disclaimer</AlertTitle>
         <AlertDescription>
-          This Interactive Legal Assistant is a conceptual prototype for demonstration purposes. The responses are pre-defined or very general and <strong>do not constitute legal advice</strong>. Always consult with a qualified legal professional for any legal concerns or specific advice regarding your situation.
+          This Interactive Legal Assistant is a conceptual prototype for demonstration purposes. The responses are general information and <strong>do not constitute legal advice</strong>. Always consult with a qualified legal professional for any legal concerns or specific advice regarding your situation.
         </AlertDescription>
       </Alert>
     </div>
   );
 }
+

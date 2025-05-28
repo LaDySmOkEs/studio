@@ -1,3 +1,4 @@
+
 // src/app/document-generator/page.tsx
 "use client";
 
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText, Info, LibrarySquare } from "lucide-react";
+import { FileText, Info, LibrarySquare, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
@@ -83,7 +84,7 @@ My Commission Expires: [Date]
 [Your City, State, Zip Code]
 [Your Phone Number]
 [Your Email Address]
-Plaintiff, Pro Se (or indicate if represented by counsel)
+Plaintiff, Pro Per (or indicate if represented by counsel)
 
 [NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]
 [Division, if applicable - e.g., [City] Division]
@@ -152,7 +153,7 @@ Respectfully submitted,
 ____________________________
 [Your Signature]
 [Your Typed Full Name]
-Plaintiff, Pro Se (or Attorney Name, Bar Number, Firm if represented)
+Plaintiff, Pro Per (or Attorney Name, Bar Number, Firm if represented)
 `,
   motionForBailReduction: `[MOTION FOR BAIL REDUCTION]
 
@@ -160,7 +161,7 @@ Case Name: [State/Commonwealth/People] v. [Defendant Name]
 Case Number: [Case Number]
 Court: [Court Name]
 
-Defendant, [Defendant Name], by and through undersigned counsel (or Pro Se), respectfully moves this Honorable Court to reduce the bail previously set in this case. In support of this motion, Defendant states as follows:
+Defendant, [Defendant Name], by and through undersigned counsel (or Pro Per), respectfully moves this Honorable Court to reduce the bail previously set in this case. In support of this motion, Defendant states as follows:
 
 1. Current Bail Status: [Describe current bail amount and conditions, e.g., "Bail is currently set at $X cash or $Y bond."]
 2. Defendant's Ties to the Community: [Describe defendant's local residence, family, employment, etc., to show they are not a flight risk.]
@@ -188,7 +189,7 @@ Court: [Court Name]
 TO: Prosecuting Attorney
 [Prosecutor's Name and Address]
 
-Defendant, [Defendant Name], by and through undersigned counsel (or Pro Se), hereby requests discovery and inspection of all materials to which the Defendant is entitled pursuant to [State's Rules of Criminal Procedure, e.g., Rule X], the United States Constitution, including Brady v. Maryland, 373 U.S. 83 (1963), Giglio v. United States, 405 U.S. 150 (1972), and their progeny.
+Defendant, [Defendant Name], by and through undersigned counsel (or Pro Per), hereby requests discovery and inspection of all materials to which the Defendant is entitled pursuant to [State's Rules of Criminal Procedure, e.g., Rule X], the United States Constitution, including Brady v. Maryland, 373 U.S. 83 (1963), Giglio v. United States, 405 U.S. 150 (1972), and their progeny.
 
 This request includes, but is not limited to, the following:
 
@@ -253,7 +254,7 @@ I declare under penalty of perjury under the laws of the State of [Your State] t
 Dated: [Date]
 
 ____________________________
-[Your Full Name] - Petitioner (Pro Se)
+[Your Full Name] - Petitioner (Pro Per)
 
 (Notary Public section may be required depending on jurisdiction)
 `,
