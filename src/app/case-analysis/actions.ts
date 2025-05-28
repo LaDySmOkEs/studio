@@ -1,18 +1,42 @@
+
 // src/app/case-analysis/actions.ts
 'use server';
 
-import { z } from "zod"; // Still needed for instanceof check
+import { z } from "zod";
 import type { SuggestRelevantLawsInput, SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { suggestRelevantLaws } from "@/ai/flows/suggest-relevant-laws";
-import { formSchema, type CaseAnalysisFormValues } from "./schemas"; // Import from the new schemas file
 
-// Server Action
+import type { CriminalLawSuggestionsInput, CriminalLawSuggestionsOutput } from "@/ai/flows/criminalLawSuggestions";
+import { criminalLawSuggestions } from "@/ai/flows/criminalLawSuggestions";
+
+import type { CivilLawSuggestionsInput, CivilLawSuggestionsOutput } from "@/ai/flows/civilLawSuggestions";
+import { civilLawSuggestions } from "@/ai/flows/civilLawSuggestions";
+
+import { formSchema, type CaseAnalysisFormValues } from "./schemas";
+
+// The output type remains consistent across all flows
 export async function handleCaseAnalysisAction(data: CaseAnalysisFormValues): Promise<SuggestRelevantLawsOutput | { error: string }> {
   try {
-    // Validate input with the schema (React Hook Form does this on client, but good practice for actions)
     const validatedData = formSchema.parse(data);
-    const input: SuggestRelevantLawsInput = { caseDetails: validatedData.caseDetails };
-    const result = await suggestRelevantLaws(input);
+    const { caseDetails, caseCategory } = validatedData;
+
+    let result: SuggestRelevantLawsOutput; // Using the general output type as they are structurally identical
+
+    switch (caseCategory) {
+      case "criminal":
+        const criminalInput: CriminalLawSuggestionsInput = { caseDetails };
+        result = await criminalLawSuggestions(criminalInput);
+        break;
+      case "civil":
+        const civilInput: CivilLawSuggestionsInput = { caseDetails };
+        result = await civilLawSuggestions(civilInput);
+        break;
+      case "general":
+      default:
+        const generalInput: SuggestRelevantLawsInput = { caseDetails };
+        result = await suggestRelevantLaws(generalInput);
+        break;
+    }
     return result;
   } catch (error) {
     console.error("Error in AI suggestion:", error);

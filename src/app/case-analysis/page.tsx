@@ -1,3 +1,4 @@
+
 // src/app/case-analysis/page.tsx
 "use client";
 
@@ -10,9 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, ArrowRight, FileText } from "lucide-react"; // Added FileText and ArrowRight
+import { Loader2, Lightbulb, ArrowRight, FileText, Scale } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 import { handleCaseAnalysisAction } from "./actions";
@@ -29,6 +31,7 @@ export default function CaseAnalysisPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       caseDetails: "",
+      caseCategory: "general",
     },
   });
 
@@ -50,7 +53,7 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(result);
       toast({
         title: "Analysis Complete",
-        description: "Relevant laws, confidence score, and suggested documents are now available.",
+        description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, and suggested documents are now available.`,
       });
     }
     setIsLoading(false);
@@ -60,14 +63,38 @@ export default function CaseAnalysisPage() {
     <div className="space-y-6">
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl">Intelligent Case Analysis</CardTitle>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <Scale /> Intelligent Case Analysis Engine
+            </CardTitle>
           <CardDescription>
-            Enter the details of your case below. Our AI will analyze the information, suggest relevant case laws, and recommend document types. This tool is for informational purposes only and does not constitute legal advice.
+            Enter the details of your case and select the primary legal category. Our AI will analyze the information, suggest relevant case laws, and recommend document types. This tool is for informational purposes only and does not constitute legal advice.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="caseCategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="caseCategory" className="text-lg">Case Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger id="caseCategory" aria-describedby="caseCategory-message">
+                          <SelectValue placeholder="Select a case category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="general">General Inquiry</SelectItem>
+                        <SelectItem value="criminal">Criminal Law</SelectItem>
+                        <SelectItem value="civil">Civil Law</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage id="caseCategory-message" />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="caseDetails"
@@ -119,7 +146,7 @@ export default function CaseAnalysisPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-accent" />
-                  Suggested Relevant Laws
+                  Suggested Relevant Laws ({form.getValues("caseCategory").charAt(0).toUpperCase() + form.getValues("caseCategory").slice(1)})
                 </CardTitle>
               </CardHeader>
               <CardContent>
