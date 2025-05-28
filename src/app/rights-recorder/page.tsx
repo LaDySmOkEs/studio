@@ -162,12 +162,12 @@ export default function RightsRecorderPage() {
             )}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               {!isRecording ? (
-                <Button onClick={handleStartRecording} className="w-full sm:w-auto bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                <Button onClick={handleStartRecording} className="w-full sm:w-auto bg-destructive hover:bg-destructive/90 text-destructive-foreground" aria-label="Start recording">
                   <Mic className="mr-2 h-5 w-5" />
                   Start Recording
                 </Button>
               ) : (
-                <Button onClick={handleStopRecording} className="w-full sm:w-auto">
+                <Button onClick={handleStopRecording} className="w-full sm:w-auto" aria-label="Stop recording">
                   <Square className="mr-2 h-5 w-5" />
                   Stop Recording
                 </Button>
@@ -242,6 +242,9 @@ export default function RightsRecorderPage() {
                         You have the right to refuse consent to a search of yourself, your car, or your home if law enforcement does not have a warrant or probable cause for a warrantless search.
                     </p>
                 </div>
+                 <p className="text-muted-foreground mt-2">
+                    Understanding your rights is a critical first step in navigating any legal situation. If you are working with appointed counsel, being informed about your rights can help you ask relevant questions and better understand the advice and actions being taken on your behalf. If you are considering self-representation, this knowledge is even more vital.
+                </p>
 
                 <div className="pt-2">
                   <h3 className="text-md font-semibold mt-2 mb-1 text-primary flex items-center gap-2">

@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -29,7 +29,7 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
-                <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction.</p>
+                <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction. This tool is not a substitute for professional legal representation.</p>
               </AccordionContent>
             </AccordionItem>
 
@@ -69,6 +69,57 @@ export default function HelpFaqPage() {
                 <p>We believe in responsible AI development. Providing transparency about how our AI works and its limitations is key to ensuring users can leverage DUE PROCESS AI effectively and safely as a supportive tool.</p>
               </AccordionContent>
             </AccordionItem>
+
+            <AccordionItem value="item-self-advocacy-engagement">
+              <AccordionTrigger className="text-lg">
+                <UserCheck className="w-5 h-5 mr-2 text-accent" />
+                Tips for Self-Advocacy & Engaging with Counsel
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-3">
+                <p>Navigating the legal system can be challenging, especially if you are representing yourself (pro per) or working with appointed counsel. While DUE PROCESS AI cannot provide legal advice, its tools can help you stay organized and informed. Here are some general tips:</p>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Stay Organized:</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li><strong>Timeline:</strong> Use the "Timeline & Event Log" to keep a chronological record of all important dates, communications, filings, and events related to your case. This can be invaluable for recalling details.</li>
+                    <li><strong>Evidence:</strong> Use the "Evidence Compiler" to gather and label any documents, photos, videos, or notes relevant to your case. Having evidence organized makes it easier to understand and present.</li>
+                    <li><strong>Documents:</strong> Keep copies of all documents you send or receive. The "Document Generator" can help you create initial drafts, but always keep the final versions.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground/90">Preparing for Meetings (with any legal representative):</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li>Write down your main points and questions beforehand.</li>
+                    <li>Bring copies of relevant documents, organized by date or topic. Your timeline and compiled evidence can help here.</li>
+                    <li>Be honest and provide all relevant information, even if it seems unfavorable.</li>
+                    <li>Take notes during the meeting.</li>
+                  </ul>
+                </div>
+                 <div>
+                  <h4 className="font-semibold text-foreground/90">Understanding Your Rights & Procedures:</h4>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                    <li>Utilize the "Know Your Rights" section in the Rights Recorder and the "Due Process Checklist" to understand basic rights and common procedures.</li>
+                    <li>The "Filing Assistant" provides general guidance on e-filing, but always refer to your specific court's rules.</li>
+                    <li>The "Court Directory" can help you find contact information for court personnel if you have procedural questions (they cannot give legal advice).</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-foreground/90">If Representing Yourself (Pro Per):</h4>
+                  <p>Representing yourself is a significant undertaking. Be prepared to:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-1">
+                     <li>Learn your court's specific Rules of Procedure and Rules of Evidence. These are critical.</li>
+                     <li>Understand deadlines. Missing them can have serious consequences.</li>
+                     <li>Be respectful and professional in all interactions with the court and opposing parties.</li>
+                     <li>Consider using the "Mock Trial Simulator" to get a conceptual feel for courtroom interactions.</li>
+                  </ul>
+                </div>
+
+                <p className="mt-2"><strong>Important Disclaimer:</strong> These are general tips for organization and preparation. They are not legal advice. Every case is unique, and the law is complex. If you have legal representation, work closely with your attorney. If you are representing yourself, strongly consider seeking at least a consultation with an attorney to understand your options and the complexities of your case. Legal aid resources are listed on the "Legal Aid Referral" page.</p>
+              </AccordionContent>
+            </AccordionItem>
+
 
             <AccordionItem value="item-pattern-recognition">
               <AccordionTrigger className="text-lg">
