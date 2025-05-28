@@ -2,7 +2,7 @@
 // src/app/timeline-event-log/page.tsx
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
 
 interface LoggedEvent {
   id: string;
@@ -63,8 +70,22 @@ export default function TimelineEventLogPage() {
   const [currentEventTypeValue, setCurrentEventTypeValue] = useState(""); // Store the value
   const [currentEventDescription, setCurrentEventDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
 
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load stored case summary from localStorage
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+    }
+  }, []);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -124,6 +145,23 @@ export default function TimelineEventLogPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+               {storedCaseSummary && (
+                <Card className="bg-muted/50 mb-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Context</CardTitle>
+                    <CardDescription className="text-xs">This summary was entered in the Case Analysis section. Use it to help describe your timeline events.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={storedCaseSummary}
+                      readOnly
+                      rows={2}
+                      className="text-sm bg-background cursor-default h-auto"
+                      aria-label="Stored case summary from case analysis"
+                    />
+                  </CardContent>
+                </Card>
+              )}
               <div>
                 <Label htmlFor="eventDateInput">Event Date*</Label>
                 <Input
@@ -285,5 +323,4 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
-
     

@@ -10,9 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck } from "lucide-react";
+import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
 
 interface ConceptualAnalysis {
   transcriptionHighlights?: string;
@@ -60,12 +67,24 @@ export default function EvidenceCompilerPage() {
   
   const [analysisLoadingItemId, setAnalysisLoadingItemId] = useState<string | null>(null);
   const [currentAnalysisDisplay, setCurrentAnalysisDisplay] = useState<AnalysisDisplayState | null>(null);
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    // Load stored case summary from localStorage
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+    }
+
     return () => {
       evidenceItems.forEach(item => {
         if (item.previewUrl && item.previewUrl.startsWith('blob:')) {
@@ -73,7 +92,7 @@ export default function EvidenceCompilerPage() {
         }
       });
     };
-  }, [evidenceItems]);
+  }, [evidenceItems]); // evidenceItems dependency for cleanup
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -239,6 +258,23 @@ export default function EvidenceCompilerPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {storedCaseSummary && (
+                <Card className="bg-muted/50 mb-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Context</CardTitle>
+                    <CardDescription className="text-xs">This summary was entered in the Case Analysis section. Use it to help label and describe your evidence.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={storedCaseSummary}
+                      readOnly
+                      rows={2}
+                      className="text-sm bg-background cursor-default h-auto"
+                      aria-label="Stored case summary from case analysis"
+                    />
+                  </CardContent>
+                </Card>
+              )}
               <div>
                 <Label htmlFor="inputTypeSelect">Evidence Source</Label>
                  <Select value={inputType} onValueChange={(value: 'file' | 'url') => { setInputType(value); setCurrentFile(null); setCurrentUrl(""); if(fileInputRef.current) fileInputRef.current.value = ""; }}>
@@ -331,7 +367,7 @@ export default function EvidenceCompilerPage() {
                         <div className="flex items-start gap-3 flex-grow min-w-0">
                            {item.previewUrl && (item.type === 'photo' || item.type === 'video') ? (
                             item.type === 'photo' ?
-                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded flex-shrink-0" /> :
+                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded flex-shrink-0" data-ai-hint="evidence item" /> :
                               <video src={item.previewUrl} className="w-16 h-16 object-cover rounded flex-shrink-0" controls={false} muted loop playsInline />
                           ) : (
                             <div className="w-16 h-16 flex items-center justify-center bg-muted rounded flex-shrink-0">
@@ -473,5 +509,4 @@ export default function EvidenceCompilerPage() {
     </div>
   );
 }
-
     

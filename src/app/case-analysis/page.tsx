@@ -2,7 +2,7 @@
 // src/app/case-analysis/page.tsx
 "use client";
 
-import { useState, type ChangeEvent, useRef } from "react";
+import { useState, type ChangeEvent, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert } from "lucide-react";
-import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws"; // This type now includes dueProcessViolationScore
+import { Loader2, Lightbulb, ArrowRight, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArchiveRestore } from "lucide-react";
+import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -22,6 +22,13 @@ import { useToast } from "@/hooks/use-toast";
 
 import { handleCaseAnalysisAction } from "./actions";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
+
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
 
 interface ConfidenceDetails {
   level: string;
@@ -89,6 +96,30 @@ export default function CaseAnalysisPage() {
     },
   });
 
+  useEffect(() => {
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        if (storedData.caseDetails || storedData.caseCategory) {
+           form.reset({
+            caseDetails: storedData.caseDetails || "",
+            caseCategory: storedData.caseCategory || "general",
+          });
+          toast({
+            title: "Previous Case Data Loaded",
+            description: "Your previously entered case details and category have been loaded.",
+            action: ( <Button variant="ghost" size="sm" onClick={() => clearStoredCaseDetails(true)}> <Trash2 className="mr-2 h-4 w-4" /> Clear Data </Button> ),
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear corrupted data
+    }
+  }, [form, toast]);
+
+
   const onSubmit: SubmitHandler<CaseAnalysisFormValues> = async (data) => {
     setIsLoading(true);
     setError(null);
@@ -108,13 +139,53 @@ export default function CaseAnalysisPage() {
       });
     } else {
       setAnalysisResult(result);
-      toast({
-        title: "Initial Analysis Complete",
-        description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, due process violation assessment, and suggested documents are now available. Conceptual follow-up steps are shown below.`,
-      });
+      try {
+        const dataToStore: StoredCaseData = {
+          caseDetails: data.caseDetails,
+          caseCategory: data.caseCategory,
+        };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToStore));
+        toast({
+          title: "Initial Analysis Complete & Saved",
+          description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, due process violation assessment, and suggested documents are now available. Case details saved for other app features.`,
+        });
+      } catch (e) {
+        console.error("Failed to save case data to localStorage", e);
+        toast({
+          title: "Analysis Complete (Save Failed)",
+          description: "Analysis complete, but failed to save case details for other app features due to a storage issue.",
+          variant: "destructive",
+        });
+      }
     }
     setIsLoading(false);
   };
+
+  const clearStoredCaseDetails = (showToast = true) => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      form.reset({
+        caseDetails: "",
+        caseCategory: "general",
+      });
+      if (showToast) {
+        toast({
+          title: "Stored Case Data Cleared",
+          description: "Previously saved case details and category have been removed.",
+        });
+      }
+    } catch (e) {
+      console.error("Failed to clear case data from localStorage", e);
+      if (showToast) {
+        toast({
+          title: "Error Clearing Data",
+          description: "Could not clear stored case data.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -143,6 +214,7 @@ export default function CaseAnalysisPage() {
             </CardTitle>
           <CardDescription>
             Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown.
+            Case details entered here can be saved and referenced in other parts of the app (e.g., Document Generator).
             This tool is for informational purposes and to assist with organizing your thoughts. <strong>It does not provide legal advice.</strong> All AI-generated suggestions, including any assessment of due process, should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
         </CardHeader>
@@ -155,7 +227,7 @@ export default function CaseAnalysisPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel htmlFor="caseCategorySelect">Case Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger id="caseCategorySelect" aria-describedby="caseCategory-message" aria-label="Case Category">
                           <SelectValue placeholder="Select a case category" />
@@ -193,7 +265,7 @@ export default function CaseAnalysisPage() {
                 )}
               />
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2">
               <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
@@ -201,8 +273,11 @@ export default function CaseAnalysisPage() {
                     Analyzing (Phase 1)...
                   </>
                 ) : (
-                  "Analyze Case & Suggest Documents"
+                  "Analyze Case & Save Details"
                 )}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => clearStoredCaseDetails(true)} className="w-full sm:w-auto" aria-label="Clear stored case details from browser">
+                 <Trash2 className="mr-2 h-4 w-4" /> Clear Stored Details
               </Button>
             </CardFooter>
           </form>
@@ -457,5 +532,4 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
-
     

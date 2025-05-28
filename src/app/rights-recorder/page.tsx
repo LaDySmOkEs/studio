@@ -14,6 +14,12 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
 
 interface Recording {
   id: string;
@@ -36,16 +42,29 @@ export default function RightsRecorderPage() {
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [currentTime, setCurrentTime] = useState<string>("00:00");
   const [recordingTitle, setRecordingTitle] = useState("");
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
   const { toast } = useToast();
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
+    // Load stored case summary from localStorage
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+    }
+
+
     // For demo purposes, load mock recordings if no recordings exist (e.g. after a delete all)
     if (recordings.length === 0 && MOCK_RECORDINGS.length > 0 && !localStorage.getItem("hasLoadedOnceRightsRecorder")) {
         setRecordings(MOCK_RECORDINGS);
         localStorage.setItem("hasLoadedOnceRightsRecorder", "true"); // Ensure mock data is loaded only once per session typically
     }
-  }, []); 
+  }, []); // Empty dependency to run once on mount for summary and mock data loading
 
   useEffect(() => {
     if (isRecording) {
@@ -124,6 +143,23 @@ export default function RightsRecorderPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {storedCaseSummary && (
+              <Card className="bg-muted/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Context</CardTitle>
+                   <CardDescription className="text-xs">This summary was entered in the Case Analysis section. It may be relevant for your notes.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={storedCaseSummary}
+                    readOnly
+                    rows={2}
+                    className="text-sm bg-background cursor-default h-auto"
+                    aria-label="Stored case summary from case analysis"
+                  />
+                </CardContent>
+              </Card>
+            )}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               {!isRecording ? (
                 <Button onClick={handleStartRecording} className="w-full sm:w-auto bg-destructive hover:bg-destructive/90 text-destructive-foreground">
@@ -303,5 +339,4 @@ export default function RightsRecorderPage() {
     </div>
   );
 }
-
     

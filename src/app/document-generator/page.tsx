@@ -16,6 +16,14 @@ import { Label } from "@/components/ui/label";
 
 type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "";
 
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData"; // Same key as in CaseAnalysisPage
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
+
+
 const DOCUMENT_TEMPLATES: Record<Exclude<DocumentType, "">, string> = {
   motion: `[MOTION TITLE]
 
@@ -294,6 +302,7 @@ export default function DocumentGeneratorPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>("");
   const [generatedDocument, setGeneratedDocument] = useState<string>("");
   const [suggestedByAI, setSuggestedByAI] = useState<string[]>([]);
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
 
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>(""); // Represents County or City as per template
@@ -303,6 +312,17 @@ export default function DocumentGeneratorPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Load stored case summary from localStorage
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+    }
+
     const suggestedTypesParam = searchParams.get('suggested');
     if (suggestedTypesParam) {
       const typesFromURL = suggestedTypesParam.split(',') as DocumentType[];
@@ -418,6 +438,25 @@ export default function DocumentGeneratorPage() {
             </Alert>
           )}
 
+          {storedCaseSummary && (
+            <Card className="bg-muted/50">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Summary</CardTitle>
+                <CardDescription>This summary was entered in the Case Analysis section. You can use it to help fill out your document template.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={storedCaseSummary}
+                  readOnly
+                  rows={3}
+                  className="text-sm bg-background cursor-default"
+                  aria-label="Stored case summary from case analysis"
+                />
+              </CardContent>
+            </Card>
+          )}
+
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
               <Label htmlFor="state-select" className="block text-sm font-medium text-foreground mb-1">State</Label>
@@ -520,5 +559,4 @@ export default function DocumentGeneratorPage() {
     </div>
   );
 }
-
     
