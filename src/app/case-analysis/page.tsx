@@ -185,6 +185,7 @@ export default function CaseAnalysisPage() {
                         className="resize-none"
                         {...field}
                         aria-describedby="caseDetails-message"
+                        aria-label="Case details input"
                       />
                     </FormControl>
                     <FormMessage id="caseDetails-message" />
@@ -291,15 +292,15 @@ export default function CaseAnalysisPage() {
                     <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-3">
-                        Examples of what this might mean:
+                    <div className="text-xs text-muted-foreground mt-3">
+                        <p>Examples of what this might mean:</p>
                         <ul className="list-disc pl-4 mt-1">
                             <li><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</li>
                             <li><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</li>
                             <li><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</li>
                              <li><strong>Indeterminate:</strong> Not enough specific detail in your narrative to make a meaningful assessment of due process risks.</li>
                         </ul>
-                    </p>
+                    </div>
                   </CardContent>
                   <CardFooter>
                      <p className="text-xs text-muted-foreground">
