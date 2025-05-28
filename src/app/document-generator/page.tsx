@@ -284,7 +284,8 @@ const COURT_LEVELS = [
   { value: "Small Claims Court", label: "Small Claims Court" },
   { value: "Family Court", label: "Family Court" },
   { value: "Probate Court", label: "Probate Court" },
-  { value: "Justice Court", label: "Justice Court" }
+  { value: "Justice Court", label: "Justice Court" },
+  { value: "Tribal Court", label: "Tribal Court" },
 ];
 
 
