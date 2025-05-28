@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  CalendarClock, Trash2, AlertTriangle, Info, FileText, Gavel, Handcuffs, 
+  CalendarClock, Trash2, AlertTriangle, Info, FileText, Gavel, UserX, 
   DollarSign, Mail, Clock, Shield, Paperclip, Landmark, ClipboardList, type LucideIcon
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -45,7 +45,7 @@ interface LoggedEvent {
 }
 
 const EVENT_TYPES = [
-  { value: "arrest", label: "Arrest", icon: Handcuffs },
+  { value: "arrest", label: "Arrest", icon: UserX },
   { value: "initial_appearance", label: "Initial Court Appearance / Arraignment", icon: Gavel },
   { value: "bail_hearing", label: "Bail / Bond Hearing", icon: DollarSign },
   { value: "discovery_received", label: "Received Discovery", icon: FileText },
@@ -311,7 +311,7 @@ export default function TimelineEventLogPage() {
             </div>
              <Alert variant="default" className="border-accent bg-accent/10">
                 <AlertTriangle className="h-4 w-4 text-accent" />
-                <AlertTitle className="font-semibold">Important Note & Disclaimer</AlertTitle>
+                <AlertTitle className="font-semibold">Important Note &amp; Disclaimer</AlertTitle>
                 <AlertDescription>
                   The AI analysis described above is conceptual for this prototype. This tool currently only helps you log and visualize events with icons.
                   Always verify procedural requirements, timelines, and any potential violations with a qualified legal professional. This log is for personal organization and does not constitute legal advice.
