@@ -68,68 +68,81 @@ Notary Public
 My Commission Expires: [Date]
 (Notary Seal)
 `,
-  complaint: `[COMPLAINT TITLE]
+  complaint: `[YOUR FULL NAME / PLAINTIFF'S FULL NAME, if different, and "Next Friend" status if applicable]
+[Your Street Address]
+[Your City, State, Zip Code]
+[Your Phone Number]
+[Your Email Address]
+Plaintiff, Pro Se (or indicate if represented by counsel)
 
-[Court Name]
-[County/District]
+[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]
+[Division, if applicable - e.g., [City] Division]
 
-[Plaintiff Name(s)],
+[Plaintiff Name(s), including "Next Friend" status if applicable, e.g., JANE DOE, individually, and as Next Friend of JOHN DOE, a minor],
   Plaintiff(s),
 
-v.                                Case No.: [Leave blank, court will assign]
+v. Case No.: [Leave blank - to be filled by Court Clerk]
 
-[Defendant Name(s)],
+[Defendant Name(s), with titles if known, e.g., OFFICER JOHN SMITH, in his individual and official capacities; CITY OF ANYTOWN],
   Defendant(s).
 
-COMPLAINT
+COMPLAINT FOR VIOLATION OF CIVIL RIGHTS (42 U.S.C. § 1983) AND [OTHER CAUSES OF ACTION, IF ANY]
+(JURY TRIAL DEMANDED, if applicable)
 
-Plaintiff(s), [Plaintiff Name(s)], by and through their undersigned counsel (or Pro Se), bring this Complaint against Defendant(s), [Defendant Name(s)], and allege as follows:
+I. INTRODUCTION
+1. This is an action for [Briefly describe the nature of the lawsuit, e.g., violation of constitutional rights, personal injury, breach of contract]. This complaint seeks [Briefly state what you are asking the court to do, e.g., monetary damages, injunctive relief].
 
-I. JURISDICTION AND VENUE
-1. This Court has jurisdiction over this matter because [State basis for jurisdiction, e.g., diversity of citizenship, federal question, specific statute].
-2. Venue is proper in this district because [State basis for venue, e.g., where events occurred, where defendant resides].
+II. JURISDICTION AND VENUE
+2. This Court has subject matter jurisdiction over this action pursuant to [State the basis for the court's jurisdiction. For federal civil rights claims under 42 U.S.C. § 1983, cite 28 U.S.C. § 1331 (federal question) and 28 U.S.C. § 1343 (civil rights). For state law claims, state the basis for state court jurisdiction or supplemental jurisdiction if in federal court (28 U.S.C. § 1367)].
+3. Venue is proper in this district pursuant to [State the basis for venue, e.g., 28 U.S.C. § 1391(b) because a substantial part of the events or omissions giving rise to the claim occurred in this district, or a defendant resides in this district].
 
-II. PARTIES
-3. Plaintiff, [Plaintiff Name], is [Description of Plaintiff, e.g., an individual residing in City, State].
-4. Defendant, [Defendant Name], is [Description of Defendant, e.g., a corporation organized under the laws of State X with its principal place of business in City, State Y].
+III. PARTIES
+4. Plaintiff, [Plaintiff's Full Name], is an individual residing in [City, State]. [If filing as "Next Friend," add: Plaintiff, [Next Friend's Full Name], is the [Relationship, e.g., parent and legal guardian] of [Minor/Incompetent Person's Full Name], and brings this action on their behalf as Next Friend. [Minor/Incompetent Person's Full Name] is an individual residing in [City, State].]
+5. Defendant, [Defendant's Full Name and Title, if applicable, e.g., Officer John Smith], is sued in their [Individual and/or Official capacity, if a state actor]. At all times relevant to this complaint, Defendant [Defendant's Full Name] was acting under color of state law. [Provide address or location if known].
+6. Defendant, [Second Defendant's Full Name and Title, e.g., City of Anytown], is a [Type of entity, e.g., municipal corporation organized under the laws of the State of [State]]. [Provide address or location if known].
+   [Add more defendants as necessary]
 
-III. FACTUAL ALLEGATIONS
-5. [Describe the events leading to the lawsuit in chronological order. Provide specific dates, locations, and actions. Each paragraph should cover a distinct point.]
-6. [Continue with factual allegations.]
+IV. FACTUAL ALLEGATIONS
+   (Describe the events in detail, in chronological order. Use separate numbered paragraphs for each distinct fact or event.)
+7. On or about [Date], at approximately [Time], at [Location], the following occurred: [Describe the event].
+8. [Continue with specific facts, detailing who did what, when, and where. Be objective and stick to the facts.]
+9. [Provide details about any injuries, damages, or harm suffered.]
 
-IV. CAUSES OF ACTION
+V. CAUSES OF ACTION / CLAIMS FOR RELIEF
 
-COUNT I: [NAME OF FIRST CAUSE OF ACTION, e.g., Negligence]
-7. Plaintiff(s) re-allege and incorporate by reference paragraphs 1 through [Last factual paragraph number] as if fully set forth herein.
-8. [State the elements of the cause of action and how the defendant's actions meet those elements.]
-9. As a direct and proximate result of Defendant's [conduct], Plaintiff(s) has suffered damages including [List damages].
+COUNT I: VIOLATION OF CIVIL RIGHTS UNDER 42 U.S.C. § 1983 - [SPECIFIC CONSTITUTIONAL RIGHT, e.g., FOURTH AMENDMENT - UNLAWFUL SEIZURE] (Against Defendant [Name(s) of individual state actor(s)])
+10. Plaintiffs re-allege and incorporate by reference paragraphs 1 through [Last factual paragraph number] as if fully set forth herein.
+11. Defendant(s) [Name(s)], while acting under color of state law, deprived Plaintiff(s) of their rights secured by the [Specify Amendment, e.g., Fourth and Fourteenth Amendments] to the United States Constitution by [Describe specifically how the Defendant(s) violated the right, e.g., unlawfully arresting Plaintiff without probable cause, using excessive force].
+12. The actions of Defendant(s) [Name(s)] were [intentional, willful, reckless, and/or deliberately indifferent] to Plaintiff(s)'s constitutional rights.
+13. As a direct and proximate result of Defendant(s)' [Name(s)] unconstitutional conduct, Plaintiff(s) has suffered [Describe damages, e.g., physical injuries, emotional distress, financial loss, deprivation of liberty].
 
-COUNT II: [NAME OF SECOND CAUSE OF ACTION, e.g., Breach of Contract]
-10. Plaintiff(s) re-allege and incorporate by reference paragraphs 1 through [Last factual paragraph number] as if fully set forth herein.
-11. [State the elements of this cause of action and how the defendant's actions meet those elements.]
-12. As a direct and proximate result of Defendant's [conduct], Plaintiff(s) has suffered damages including [List damages].
+COUNT II: [NAME OF SECOND CAUSE OF ACTION, e.g., State Law Claim for Assault and Battery] (Against Defendant [Name(s)])
+14. Plaintiffs re-allege and incorporate by reference paragraphs 1 through [Last factual paragraph number] as if fully set forth herein.
+15. [State the elements of this cause of action and how the defendant's actions meet those elements under your state's law.]
+16. As a direct and proximate result of Defendant's [conduct], Plaintiff(s) has suffered damages including [List damages].
+    [Add more counts as necessary for other claims]
 
-V. PRAYER FOR RELIEF
-WHEREFORE, Plaintiff(s) respectfully request(s) that this Court enter judgment in their favor and against Defendant(s) for the following relief:
-A. [Specific relief sought, e.g., Monetary damages in an amount to be determined at trial];
-B. [Other specific relief, e.g., Injunctive relief ordering defendant to...];
-C. Costs of this action;
-D. Pre-judgment and post-judgment interest as allowed by law;
-E. Such other and further relief as this Court deems just and proper.
+VI. PRAYER FOR RELIEF
+WHEREFORE, Plaintiff(s) respectfully request(s) that this Court enter judgment in their favor and against Defendant(s), jointly and severally, for the following relief:
+A. Compensatory damages in an amount to be determined at trial, for [e.g., physical injuries, emotional pain and suffering, lost wages, medical expenses];
+B. Punitive damages against Defendant(s) [Name(s) of individual defendants sued in their individual capacity, if applicable] in an amount to be determined at trial, for their [willful, malicious, reckless] conduct;
+C. Declaratory relief stating that Defendant(s)' actions violated Plaintiff(s)' rights;
+D. Injunctive relief ordering Defendant(s) to [Specify action, e.g., cease certain conduct, implement new policies];
+E. Reasonable attorneys' fees and costs of this action pursuant to 42 U.S.C. § 1988 (if applicable) and/or [other relevant statutes];
+F. Pre-judgment and post-judgment interest as allowed by law; and
+G. Such other and further relief as this Court deems just and proper.
 
-DEMAND FOR JURY TRIAL (If applicable)
-Plaintiff(s) demand a trial by jury on all issues so triable.
+DEMAND FOR JURY TRIAL
+Plaintiff(s) hereby demand a trial by jury on all issues so triable in this action.
 
 Dated: [Date]
 
 Respectfully submitted,
+
 ____________________________
-[Your Name / Attorney Name]
-[Bar Number, if applicable]
-[Address]
-[Phone Number]
-[Email Address]
-[Pro Se or Attorney for Plaintiff(s)]
+[Your Signature]
+[Your Typed Full Name]
+Plaintiff, Pro Se (or Attorney Name, Bar Number, Firm if represented)
 `,
   motionForBailReduction: `[MOTION FOR BAIL REDUCTION]
 
@@ -311,19 +324,38 @@ export default function DocumentGeneratorPage() {
     if (docType && DOCUMENT_TEMPLATES[docType]) {
       let template = DOCUMENT_TEMPLATES[docType];
 
-      let effectiveCourtName = "[Court Name]";
+      let effectiveCourtName = "[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]"; // Default for complaint
+      if (docType !== "complaint") {
+        effectiveCourtName = "[Court Name]"; // Default for other docs
+      }
+
+
       if (selectedCourtLevel && selectedState) {
-        effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
+         if (docType === "complaint") {
+            const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
+            if (selectedCourtLevel.toLowerCase().includes("federal")) {
+                 effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity} DIVISION` : `DISTRICT OF ${stateLabel}` }`;
+            } else {
+                 effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` OF ${selectedCity}, ${stateLabel}` : `, ${stateLabel}` }`;
+            }
+         } else {
+            effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
+         }
       } else if (selectedCourtLevel) {
-        effectiveCourtName = selectedCourtLevel;
+        effectiveCourtName = docType === "complaint" ? selectedCourtLevel.toUpperCase() : selectedCourtLevel;
       } else if (selectedState) {
-        effectiveCourtName = `[Specify Court Level] in ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
+        const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
+        effectiveCourtName = docType === "complaint" ? `[SPECIFY COURT LEVEL] IN ${stateLabel.toUpperCase()}` : `[Specify Court Level] in ${stateLabel}`;
+      } else if (selectedCity && docType === "complaint") {
+         effectiveCourtName = `[SPECIFY COURT LEVEL AND STATE] FOR ${selectedCity.toUpperCase()} DIVISION`;
       } else if (selectedCity) {
          effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
       }
 
 
-      template = template.replace(/\[Court Name\]/g, effectiveCourtName);
+      template = template.replace(/\[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF \[Your District\]\]/g, effectiveCourtName);
+      template = template.replace(/\[Court Name\]/g, effectiveCourtName); // General for other docs
+
       template = template.replace(/\[State\/Commonwealth\/People\] v. \[Defendant Name\]/g, selectedState ? `${US_STATES.find(s => s.value === selectedState)?.label || '[State/Commonwealth/People]'} v. [Defendant Name]` : `[State/Commonwealth/People] v. [Defendant Name]`);
       template = template.replace(/State of \[State\]/g, `State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"}`);
       template = template.replace(/County of \[County\]/g, `County of ${selectedCity || "[County]"}`);
@@ -398,14 +430,14 @@ export default function DocumentGeneratorPage() {
               </Select>
             </div>
             <div>
-              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City / County</label>
+              <label htmlFor="city-input" className="block text-sm font-medium text-foreground mb-1">City / County / Federal District Division</label>
               <Input
                 id="city-input"
                 type="text"
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                placeholder="Enter City or County"
-                aria-label="Enter city or county"
+                placeholder="Enter City, County, or Division"
+                aria-label="Enter city, county, or federal district division"
               />
             </div>
             <div>
@@ -430,9 +462,9 @@ export default function DocumentGeneratorPage() {
                 <SelectValue placeholder="Choose a document..." />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="complaint">Complaint (Detailed Pre-Filing)</SelectItem>
                 <SelectItem value="motion">Motion (General)</SelectItem>
                 <SelectItem value="affidavit">Affidavit</SelectItem>
-                <SelectItem value="complaint">Complaint</SelectItem>
                 <SelectItem value="motionForBailReduction">Motion for Bail Reduction</SelectItem>
                 <SelectItem value="discoveryRequest">Discovery Request (Brady/Witness)</SelectItem>
                 <SelectItem value="petitionForExpungement">Petition for Expungement</SelectItem>
@@ -446,7 +478,7 @@ export default function DocumentGeneratorPage() {
               <Textarea
                 value={generatedDocument}
                 onChange={(e) => setGeneratedDocument(e.target.value)}
-                rows={20}
+                rows={25}
                 className="font-mono text-sm"
                 aria-label="Editable document template"
                 placeholder="Fill in jurisdiction details and select a document type to see the template. Then, edit as needed."
@@ -469,7 +501,9 @@ export default function DocumentGeneratorPage() {
           <CardContent>
             <p className="text-sm text-muted-foreground space-y-2">
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
-              The jurisdictional details (State, City/County, Court Level) you selected have been pre-filled where applicable.
+              The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable. Check these carefully.
+              <br />
+              For the "Complaint (Detailed Pre-Filing)" template, this is a comprehensive starting point often used for civil rights claims (like those under 42 U.S.C. § 1983). It includes sections for jurisdiction, parties (with "Next Friend" guidance), detailed factual allegations, specific causes of action, prayer for relief, and a jury demand. It requires substantial customization for your specific facts and legal claims.
               <br />
               For "Petition for Expungement", legal requirements vary significantly by state; this template is a very general starting point and requires careful review of your specific state's laws.
               <br />
