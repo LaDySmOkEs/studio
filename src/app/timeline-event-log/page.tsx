@@ -125,19 +125,20 @@ export default function TimelineEventLogPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="eventDate">Event Date*</Label>
+                <Label htmlFor="eventDateInput">Event Date*</Label>
                 <Input
-                  id="eventDate"
+                  id="eventDateInput"
                   type="date"
                   value={currentEventDate}
                   onChange={(e) => setCurrentEventDate(e.target.value)}
                   required
+                  aria-label="Event date"
                 />
               </div>
               <div>
-                <Label htmlFor="eventType">Event Type*</Label>
+                <Label htmlFor="eventTypeSelect">Event Type*</Label>
                 <Select onValueChange={setCurrentEventTypeValue} value={currentEventTypeValue}>
-                  <SelectTrigger id="eventType">
+                  <SelectTrigger id="eventTypeSelect" aria-label="Select event type">
                     <SelectValue placeholder="Select event type..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -153,15 +154,16 @@ export default function TimelineEventLogPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="eventDescription">Event Description*</Label>
+                <Label htmlFor="eventDescriptionTextarea">Event Description*</Label>
                 <Textarea
-                  id="eventDescription"
+                  id="eventDescriptionTextarea"
                   value={currentEventDescription}
                   onChange={(e) => setCurrentEventDescription(e.target.value)}
                   placeholder="Describe the event, who was involved, what happened, relevant details..."
                   rows={5}
                   required
                   className="resize-none"
+                  aria-label="Event description"
                 />
               </div>
             </CardContent>
@@ -201,7 +203,7 @@ export default function TimelineEventLogPage() {
                           </div>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80" aria-label={`Delete event: ${event.type} on ${event.date}`}>
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </AlertDialogTrigger>
@@ -235,7 +237,9 @@ export default function TimelineEventLogPage() {
                     <Button variant="outline" size="sm" className="w-full" onClick={() => {
                         setEvents([]);
                         toast({ title: "All Events Cleared", description: "All logged events have been cleared from the timeline.", variant: "destructive" });
-                    }}>
+                    }}
+                    aria-label="Clear entire timeline"
+                    >
                         <Trash2 className="mr-2 h-4 w-4" /> Clear Entire Timeline
                     </Button>
                 </CardFooter>
@@ -281,6 +285,5 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
-
 
     

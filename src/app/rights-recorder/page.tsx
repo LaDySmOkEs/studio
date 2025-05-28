@@ -1,3 +1,4 @@
+
 // src/app/rights-recorder/page.tsx
 "use client";
 
@@ -11,6 +12,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+
 
 interface Recording {
   id: string;
@@ -142,27 +145,29 @@ export default function RightsRecorderPage() {
             </div>
              {isRecording && (
               <div>
-                <label htmlFor="recording-title" className="block text-sm font-medium text-foreground mb-1">Recording Title</label>
+                <Label htmlFor="recording-title-input">Recording Title</Label>
                 <Input 
-                  id="recording-title"
+                  id="recording-title-input"
                   type="text" 
                   value={recordingTitle} 
                   onChange={(e) => setRecordingTitle(e.target.value)}
                   placeholder="Enter a title for your recording"
                   className="bg-background"
+                  aria-label="Recording title"
                 />
               </div>
             )}
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-foreground mb-1">Notes</label>
+              <Label htmlFor="notes-textarea">Notes</Label>
               <Textarea
-                id="notes"
+                id="notes-textarea"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={isRecording ? "Enter any relevant details, observations, badge numbers, etc. during your recording..." : "Notes will be enabled when you start a recording, or you can add notes to a saved recording later."}
                 rows={8}
                 className="resize-none"
                 disabled={!isRecording && notes === ""} 
+                aria-label="Recording notes"
               />
             </div>
           </CardContent>
@@ -267,7 +272,7 @@ export default function RightsRecorderPage() {
                         <p className="text-xs text-muted-foreground">{rec.date} - {rec.duration}</p>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Play recording (placeholder)" onClick={() => toast({ title: "Playback Not Implemented", description: "This is a placeholder for actual audio playback."})}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Play recording ${rec.title} (placeholder)`} onClick={() => toast({ title: "Playback Not Implemented", description: "This is a placeholder for actual audio playback."})}>
                           <PlayCircle className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive/90" aria-label={`Delete recording ${rec.title}`} onClick={() => handleDeleteRecording(rec.id)}>
@@ -287,7 +292,9 @@ export default function RightsRecorderPage() {
                 <Button variant="outline" size="sm" className="w-full" onClick={() => {
                     setRecordings([]);
                     toast({ title: "All Recordings Deleted", description: "All recordings have been cleared.", variant: "destructive" });
-                }}>
+                }}
+                aria-label="Clear all recordings"
+                >
                     <Trash2 className="mr-2 h-4 w-4" /> Clear All Recordings
                 </Button>
             </CardFooter>

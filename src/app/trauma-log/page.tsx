@@ -1,3 +1,4 @@
+
 // src/app/trauma-log/page.tsx
 "use client";
 
@@ -98,24 +99,26 @@ export default function TraumaLogPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="entryTitle">Entry Title (Optional)</Label>
+                <Label htmlFor="entryTitleInput">Entry Title (Optional)</Label>
                 <Input
-                  id="entryTitle"
+                  id="entryTitleInput"
                   value={currentTitle}
                   onChange={(e) => setCurrentTitle(e.target.value)}
                   placeholder="e.g., Reflections on today's events, Feelings about the upcoming hearing"
+                  aria-label="Entry title"
                 />
               </div>
               <div>
-                <Label htmlFor="entryContent">Log Entry*</Label>
+                <Label htmlFor="entryContentTextarea">Log Entry*</Label>
                 <Textarea
-                  id="entryContent"
+                  id="entryContentTextarea"
                   value={currentContent}
                   onChange={(e) => setCurrentContent(e.target.value)}
                   placeholder="Write about your experiences, feelings, and any details you want to remember..."
                   rows={10}
                   required
                   className="resize-none"
+                  aria-label="Log entry content"
                 />
               </div>
             </CardContent>
@@ -146,12 +149,12 @@ export default function TraumaLogPage() {
                           </p>
                         </div>
                         <div className="flex gap-1">
-                          <Button variant="outline" size="sm" onClick={() => setViewingEntry(entry)}>
+                          <Button variant="outline" size="sm" onClick={() => setViewingEntry(entry)} aria-label={`View entry: ${entry.title}`}>
                             <Eye className="w-4 h-4 mr-1 sm:mr-2" /> <span className="hidden sm:inline">View</span>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80" aria-label={`Delete entry: ${entry.title}`}>
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </AlertDialogTrigger>
@@ -185,7 +188,9 @@ export default function TraumaLogPage() {
                     <Button variant="outline" size="sm" className="w-full" onClick={() => {
                         setEntries([]);
                         toast({ title: "All Entries Cleared", description: "All log entries have been cleared.", variant: "destructive" });
-                    }}>
+                    }}
+                    aria-label="Clear all trauma log entries"
+                    >
                         <Trash2 className="mr-2 h-4 w-4" /> Clear All Entries
                     </Button>
                 </CardFooter>
@@ -253,3 +258,5 @@ export default function TraumaLogPage() {
     </div>
   );
 }
+
+    

@@ -1,3 +1,4 @@
+
 // src/app/interactive-assistant/page.tsx
 "use client";
 
@@ -10,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bot, User, Send } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils"; // Make sure cn is imported
 
 interface Message {
   id: string;
@@ -157,6 +159,7 @@ export default function InteractiveAssistantPage() {
         <CardFooter className="border-t p-4">
           <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
             <Input
+              id="user-question-input"
               type="text"
               placeholder="Type your question here..."
               value={inputValue}
@@ -165,7 +168,7 @@ export default function InteractiveAssistantPage() {
               disabled={isLoading}
               aria-label="User question input"
             />
-            <Button type="submit" size="icon" disabled={isLoading}>
+            <Button type="submit" size="icon" disabled={isLoading} aria-label="Send question">
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>
@@ -182,3 +185,5 @@ export default function InteractiveAssistantPage() {
     </div>
   );
 }
+
+    

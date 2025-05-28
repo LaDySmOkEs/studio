@@ -1,3 +1,4 @@
+
 // src/app/case-analysis/page.tsx
 "use client";
 
@@ -152,10 +153,10 @@ export default function CaseAnalysisPage() {
                 name="caseCategory"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="caseCategory" className="text-lg">Case Category</FormLabel>
+                    <FormLabel htmlFor="caseCategorySelect">Case Category</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger id="caseCategory" aria-describedby="caseCategory-message">
+                        <SelectTrigger id="caseCategorySelect" aria-describedby="caseCategory-message">
                           <SelectValue placeholder="Select a case category" />
                         </SelectTrigger>
                       </FormControl>
@@ -174,10 +175,10 @@ export default function CaseAnalysisPage() {
                 name="caseDetails"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="caseDetails" className="text-lg">Phase 1: Free-Form Narrative</FormLabel>
+                    <FormLabel htmlFor="caseDetailsInput">Phase 1: Free-Form Narrative</FormLabel>
                     <FormControl>
                       <Textarea
-                        id="caseDetails"
+                        id="caseDetailsInput"
                         placeholder="Describe your situation in your own words. Include key facts, parties involved, legal questions, and any concerns about how procedures were handled..."
                         rows={10}
                         className="resize-none"
@@ -360,11 +361,14 @@ export default function CaseAnalysisPage() {
                   </ul>
                 </AlertDescription>
               </Alert>
+              <Label htmlFor="clarificationsInput" className="sr-only">Your answers to potential clarifying questions</Label>
               <Textarea
+                id="clarificationsInput"
                 value={clarifications}
                 onChange={(e) => setClarifications(e.target.value)}
                 placeholder="Your answers to potential clarifying questions..."
                 rows={5}
+                aria-label="Your answers to potential clarifying questions"
               />
             </CardContent>
             <CardFooter>
@@ -392,12 +396,14 @@ export default function CaseAnalysisPage() {
                   In a full version, uploaded documents would be analyzed using techniques like OCR (Optical Character Recognition) and content analysis. This helps extract key information, confirm details from your narrative, and further refine the case assessment and confidence score.
                 </AlertDescription>
               </Alert>
+              <Label htmlFor="conceptualDocumentUploadInput" className="sr-only">Conceptual document upload</Label>
               <Input
-                id="conceptualDocumentUpload"
+                id="conceptualDocumentUploadInput"
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                aria-label="Conceptual document upload"
                 />
               {selectedFileName && <p className="text-xs text-muted-foreground mt-1">Selected: {selectedFileName}</p>}
             </CardContent>
@@ -427,11 +433,14 @@ export default function CaseAnalysisPage() {
                   The AI would present its summarized understanding of your case based on all information provided. You could then correct any misinterpretations or add crucial missing information. This iterative feedback loop is essential for refining the AI's accuracy and, in a production system, would contribute to its ongoing learning and improvement for future analyses.
                 </AlertDescription>
               </Alert>
+              <Label htmlFor="feedbackInput" className="sr-only">Your corrections or additional details for the AI</Label>
               <Textarea
+                id="feedbackInput"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Your corrections or additional details for the AI..."
                 rows={5}
+                aria-label="Your corrections or additional details for the AI"
               />
             </CardContent>
             <CardFooter>
@@ -446,3 +455,5 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
+
+    

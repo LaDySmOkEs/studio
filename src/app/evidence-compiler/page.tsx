@@ -240,9 +240,9 @@ export default function EvidenceCompilerPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="inputType">Evidence Source</Label>
+                <Label htmlFor="inputTypeSelect">Evidence Source</Label>
                  <Select value={inputType} onValueChange={(value: 'file' | 'url') => { setInputType(value); setCurrentFile(null); setCurrentUrl(""); if(fileInputRef.current) fileInputRef.current.value = ""; }}>
-                  <SelectTrigger id="inputType">
+                  <SelectTrigger id="inputTypeSelect" aria-label="Select evidence source type">
                     <SelectValue placeholder="Select source type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -254,14 +254,15 @@ export default function EvidenceCompilerPage() {
 
               {inputType === 'file' && (
                 <div>
-                  <Label htmlFor="evidenceFile">Select File</Label>
+                  <Label htmlFor="evidenceFileInput">Select File</Label>
                   <Input
-                    id="evidenceFile"
+                    id="evidenceFileInput"
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                    aria-label="Select file for evidence"
                   />
                   {currentFile && <p className="text-xs text-muted-foreground mt-1">Selected: {currentFile.name}</p>}
                 </div>
@@ -269,35 +270,38 @@ export default function EvidenceCompilerPage() {
 
               {inputType === 'url' && (
                 <div>
-                  <Label htmlFor="evidenceUrl">YouTube URL</Label>
+                  <Label htmlFor="evidenceUrlInput">YouTube URL</Label>
                   <Input
-                    id="evidenceUrl"
+                    id="evidenceUrlInput"
                     type="url"
                     value={currentUrl}
                     onChange={(e) => { setCurrentUrl(e.target.value); setCurrentFile(null); }}
                     placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    aria-label="YouTube URL for evidence"
                   />
                 </div>
               )}
 
               <div>
-                <Label htmlFor="evidenceLabel">Evidence Label*</Label>
+                <Label htmlFor="evidenceLabelInput">Evidence Label*</Label>
                 <Input
-                  id="evidenceLabel"
+                  id="evidenceLabelInput"
                   value={currentLabel}
                   onChange={(e) => setCurrentLabel(e.target.value)}
                   placeholder="e.g., Photo of damaged fence, Dashcam footage May 5th"
                   required
+                  aria-label="Evidence label"
                 />
               </div>
               <div>
-                <Label htmlFor="evidenceDescription">Description/Notes</Label>
+                <Label htmlFor="evidenceDescriptionTextarea">Description/Notes</Label>
                 <Textarea
-                  id="evidenceDescription"
+                  id="evidenceDescriptionTextarea"
                   value={currentDescription}
                   onChange={(e) => setCurrentDescription(e.target.value)}
                   placeholder="Add any relevant context, observations, or details about this piece of evidence."
                   rows={3}
+                  aria-label="Evidence description or notes"
                 />
               </div>
             </CardContent>
@@ -348,6 +352,7 @@ export default function EvidenceCompilerPage() {
                                   className="mt-2 text-xs"
                                   onClick={() => handleConceptualAnalyze(item)}
                                   disabled={analysisLoadingItemId === item.id}
+                                  aria-label={`Analyze evidence: ${item.label} (Conceptual)`}
                                 >
                                   {analysisLoadingItemId === item.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <SearchCheck className="mr-1 h-3 w-3" />}
                                   Analyze (Conceptual)
@@ -355,7 +360,7 @@ export default function EvidenceCompilerPage() {
                               )}
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 flex-shrink-0" onClick={() => handleDeleteEvidence(item.id)} aria-label="Delete evidence">
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 flex-shrink-0" onClick={() => handleDeleteEvidence(item.id)} aria-label={`Delete evidence: ${item.label}`}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -382,11 +387,14 @@ export default function EvidenceCompilerPage() {
               {currentAnalysisDisplay.analysis.transcriptionHighlights && (
                 <div>
                   <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Transcription Highlights (Conceptual)</h4>
+                  <Label htmlFor="transcriptionHighlightsTextarea" className="sr-only">Conceptual Transcription Highlights</Label>
                   <Textarea
+                    id="transcriptionHighlightsTextarea"
                     value={currentAnalysisDisplay.analysis.transcriptionHighlights}
                     readOnly
                     rows={4}
                     className="bg-muted/50 text-sm font-mono"
+                    aria-label="Conceptual Transcription Highlights"
                   />
                 </div>
               )}
@@ -466,3 +474,4 @@ export default function EvidenceCompilerPage() {
   );
 }
 
+    

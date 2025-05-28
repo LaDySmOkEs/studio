@@ -1,3 +1,4 @@
+
 // src/app/document-generator/page.tsx
 "use client";
 
@@ -97,7 +98,7 @@ II. JURISDICTION AND VENUE
 3. Venue is proper in this district pursuant to [State the basis for venue, e.g., 28 U.S.C. § 1391(b) because a substantial part of the events or omissions giving rise to the claim occurred in this district, or a defendant resides in this district].
 
 III. PARTIES
-4. Plaintiff, [Plaintiff's Full Name], is an individual residing in [City, State]. [If filing as "Next Friend," add: Plaintiff, [Next Friend's Full Name], is the [Relationship, e.g., parent and legal guardian] of [Minor/Incompetent Person's Full Name], and brings this action on their behalf as Next Friend. [Minor/Incompetent Person's Full Name] is an individual residing in [City, State].]
+4. Plaintiff, [Plaintiff's Full Name], is an individual residing in [City, State]. [If filing as "Next Friend," add: Plaintiff, [Next Friend'S Full Name], is the [Relationship, e.g., parent and legal guardian] of [Minor/Incompetent Person's Full Name], and brings this action on their behalf as Next Friend. [Minor/Incompetent Person's Full Name] is an individual residing in [City, State].]
 5. Defendant, [Defendant's Full Name and Title, if applicable, e.g., Officer John Smith], is sued in their [Individual and/or Official capacity, if a state actor]. At all times relevant to this complaint, Defendant [Defendant's Full Name] was acting under color of state law. [Provide address or location if known].
 6. Defendant, [Second Defendant's Full Name and Title, e.g., City of Anytown], is a [Type of entity, e.g., municipal corporation organized under the laws of the State of [State]]. [Provide address or location if known].
    [Add more defendants as necessary]
@@ -475,7 +476,9 @@ export default function DocumentGeneratorPage() {
           {selectedDocument && (
             <div className="space-y-4 pt-4">
               <h3 className="text-xl font-semibold">Template: {getDocumentDisplayName(selectedDocument)}</h3>
+               <Label htmlFor="documentTemplateTextarea" className="sr-only">Editable document template</Label>
               <Textarea
+                id="documentTemplateTextarea"
                 value={generatedDocument}
                 onChange={(e) => setGeneratedDocument(e.target.value)}
                 rows={25}
@@ -515,3 +518,5 @@ export default function DocumentGeneratorPage() {
     </div>
   );
 }
+
+    
