@@ -34,12 +34,14 @@ export default function CourtDirectoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredClerks = useMemo(() => {
-    if (!searchTerm) return MOCK_COURT_CLERKS;
+    const lowerTrimmedSearchTerm = searchTerm.trim().toLowerCase();
+    if (!lowerTrimmedSearchTerm) return MOCK_COURT_CLERKS;
+    
     return MOCK_COURT_CLERKS.filter(clerk =>
-      clerk.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clerk.courtName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clerk.county.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      clerk.state.toLowerCase().includes(searchTerm.toLowerCase())
+      clerk.name.toLowerCase().includes(lowerTrimmedSearchTerm) ||
+      clerk.courtName.toLowerCase().includes(lowerTrimmedSearchTerm) ||
+      clerk.county.toLowerCase().includes(lowerTrimmedSearchTerm) ||
+      clerk.state.toLowerCase().includes(lowerTrimmedSearchTerm)
     );
   }, [searchTerm]);
 
@@ -121,4 +123,3 @@ export default function CourtDirectoryPage() {
     </Card>
   );
 }
-
