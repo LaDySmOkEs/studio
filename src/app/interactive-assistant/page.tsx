@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bot, User, Send } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils"; // Make sure cn is imported
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -48,20 +48,27 @@ export default function InteractiveAssistantPage() {
     setInputValue("");
     setIsLoading(true);
 
-    // Simulate AI response delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     let aiResponseText = "";
+    const lowerCaseInput = trimmedInput.toLowerCase();
 
-    if (trimmedInput.toLowerCase().includes("evicted") || trimmedInput.toLowerCase().includes("eviction")) {
-      aiResponseText = `If you're facing eviction, it's important to understand your rights. Generally, landlords must follow specific legal procedures. This usually includes providing you with a formal written notice stating the reasons for eviction and the time you have to respond or vacate. You also typically have the right to a court hearing where you can present your side of the story before a judge can order an eviction. If these steps weren't followed, it might be a point to discuss with legal counsel. What specific concerns do you have about your eviction process?`;
-    } else if (trimmedInput.toLowerCase().includes("hearing")) {
-      aiResponseText = `The right to a hearing is a cornerstone of due process. It means that before a significant decision is made that affects your rights (like in a court case, an administrative action such as a license revocation, or sometimes even employment termination in public jobs), you should have a chance to present your case, evidence, and arguments to a neutral decision-maker. The specifics can vary widely depending on the context (criminal, civil, administrative), but the core idea is a fair opportunity to be heard. Can you tell me more about the hearing you're asking about?`;
-    } else if (trimmedInput.toLowerCase().includes("notice")) {
-      aiResponseText = `Proper legal notice is crucial in many legal proceedings. It means you should be officially informed about any legal action being taken against you, or any government decision that could significantly impact your rights or property. This notice should be timely, clear, and provide enough information for you to understand what's happening and how to respond. For example, a summons for a lawsuit or a notice of a proposed administrative action should clearly state the allegations and any deadlines. What kind of notice are you referring to?`;
-    }
-    else {
-      aiResponseText = `I've received your query: "${trimmedInput}". As a prototype assistant, my ability to answer complex or very specific questions is limited. For a detailed understanding or advice on your situation, consulting a legal professional is always the best approach. However, I can try to provide some general information if you can rephrase or specify your question.`;
+    if (lowerCaseInput.includes("evicted") || lowerCaseInput.includes("eviction")) {
+      aiResponseText = `If you're facing eviction, it's a serious situation. Generally, a landlord must follow a specific legal procedure. This often starts with a formal written 'Notice to Quit' or 'Eviction Notice,' stating the reason (e.g., non-payment of rent, lease violation) and giving you a timeframe to fix the issue or move out. If you don't comply, the landlord usually has to file an eviction lawsuit in court. You then have the right to receive a copy of that lawsuit (a summons and complaint) and the opportunity to respond and attend a court hearing where a judge decides if the eviction is lawful. Attempting to evict without a court order (like changing locks) could be illegal. What specific part of the eviction process are you concerned about?`;
+    } else if (lowerCaseInput.includes("hearing")) {
+      aiResponseText = `A 'hearing' is a formal opportunity to present your side of a case to a neutral decision-maker, which is a key part of due process. There are many types:
+- In criminal cases: arraignment, bail hearing, preliminary hearing, trial.
+- In civil cases (lawsuits): motion hearings, pre-trial conferences, trial.
+- Administrative hearings: before government agencies (e.g., for benefits, licenses).
+A fair hearing generally means you get proper notice, a chance to see evidence against you, an opportunity to present your own evidence and arguments, and a decision based on that evidence. Could you tell me what kind of hearing you're asking about?`;
+    } else if (lowerCaseInput.includes("notice")) {
+      aiResponseText = `Proper legal 'notice' means being formally and adequately informed about something that could affect your rights. For example:
+- If sued, you must receive a 'summons' and 'complaint' (this is 'service of process').
+- Before an agency acts against you (e.g., denies benefits), they usually send a written notice explaining the action and your hearing rights.
+- Landlords must provide specific written notices in eviction cases.
+Good notice should be timely (giving you time to prepare), clear about what's happening, and explain your rights. What situation involving a notice are you referring to?`;
+    } else {
+      aiResponseText = `I understand you're looking for information. As a prototype assistant, I can provide general explanations about common legal terms or processes if you use keywords like 'eviction,' 'hearing,' or 'notice.' If your question is very specific to your situation or uses terms I don't recognize, I may not be able to give a detailed answer. For personalized legal advice, consulting a qualified legal professional is always the best step. Perhaps try rephrasing, or explore other app sections like the 'Document Generator' or 'Due Process Checklist'?`;
     }
     
     const aiMessage: Message = {
@@ -75,17 +82,15 @@ export default function InteractiveAssistantPage() {
   };
   
   useEffect(() => {
-    // Initial greeting message from AI
     setMessages([
       {
         id: "initial-ai-greeting",
         sender: "ai",
-        text: "Hello! I am a prototype Legal Assistant. You can ask me general questions about legal processes or rights. How can I conceptually help you today?",
+        text: "Hello! I am a prototype Legal Assistant. You can ask me general questions about legal processes or rights by using keywords like 'eviction', 'hearing', or 'notice'. How can I conceptually help you today?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);
   }, []);
-
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]"> {/* Adjust height as needed */}
@@ -159,7 +164,7 @@ export default function InteractiveAssistantPage() {
             <Input
               id="user-question-input"
               type="text"
-              placeholder="Type your question here..."
+              placeholder="Ask about 'eviction', 'hearing', 'notice'..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               className="flex-grow"
@@ -183,5 +188,3 @@ export default function InteractiveAssistantPage() {
     </div>
   );
 }
-
-    
