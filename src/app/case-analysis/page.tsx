@@ -168,6 +168,7 @@ export default function CaseAnalysisPage() {
         caseDetails: "",
         caseCategory: "general",
       });
+      setAnalysisResult(null); // Also clear current analysis results from display
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -364,7 +365,7 @@ export default function CaseAnalysisPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive">
+                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive dark:text-destructive-foreground">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
                     <div className="text-xs text-muted-foreground mt-3">
