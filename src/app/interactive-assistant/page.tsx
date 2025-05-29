@@ -8,10 +8,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bot, User, Send } from "lucide-react";
+import { Bot, User, Send, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea"; // For displaying stored case summary
+
+const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
 
 interface Message {
   id: string;
@@ -24,8 +32,23 @@ export default function InteractiveAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load stored case summary from localStorage
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+    }
+  }, []);
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -90,29 +113,51 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
   };
   
   useEffect(() => {
+    let greetingText = "Hello! I'm a prototype Legal Assistant, an AI Co-litigator. I can help explain court processes, interpret general legal concepts (based on your keywords), and conceptually suggest next actions. ";
+    if (storedCaseSummary) {
+        greetingText += "I see you have a case summary saved from Case Analysis; I can use that for context if your questions are general. ";
+    }
+    greetingText += "How can I conceptually help you today?";
+
     setMessages([
       {
         id: "initial-ai-greeting",
         sender: "ai",
-        text: "Hello! I'm a prototype Legal Assistant. I can offer general information on common legal topics if you ask using keywords like 'eviction', 'hearing', or 'notice'. How can I conceptually help you today?",
+        text: greetingText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);
-  }, []);
+  }, [storedCaseSummary]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]"> {/* Adjust height as needed */}
       <Card className="flex-grow flex flex-col shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Bot className="w-7 h-7 text-primary" /> Interactive Legal Assistant (Prototype)
+            <Bot className="w-7 h-7 text-primary" /> Interactive Legal Assistant (AI Co-litigator)
           </CardTitle>
           <CardDescription>
-            Ask general questions about legal concepts or due process. This assistant is a prototype, offers informational responses only, and cannot provide legal advice.
+            A natural language assistant to help explain court processes, interpret general legal concepts (based on your keywords), and conceptually suggest next actions. It uses your saved case context (from Case Analysis) for more relevant general information. This assistant is a prototype and offers informational responses only.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-grow overflow-hidden p-0">
           <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+            {storedCaseSummary && (
+                <Card className="bg-muted/50 mb-4 text-sm">
+                  <CardHeader className="pb-2 pt-3 px-3">
+                    <CardTitle className="text-base flex items-center gap-2"><Info className="w-4 h-4 text-muted-foreground" />Using Case Context:</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 pb-3">
+                    <Textarea
+                      value={storedCaseSummary}
+                      readOnly
+                      rows={2}
+                      className="text-xs bg-background cursor-default h-auto"
+                      aria-label="Stored case summary from case analysis (used for context)"
+                    />
+                  </CardContent>
+                </Card>
+            )}
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -179,7 +224,7 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
               disabled={isLoading}
               aria-label="User question input"
             />
-            <Button type="submit" size="icon" disabled={isLoading} aria-label="Send question">
+            <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()} aria-label="Send question">
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>
@@ -197,3 +242,5 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
   );
 }
 
+
+    

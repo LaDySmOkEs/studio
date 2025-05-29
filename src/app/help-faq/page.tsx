@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck, ScrollText } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck, ScrollText, Brain, PocketKnife } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -397,6 +397,33 @@ export default function HelpFaqPage() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="item-advanced-ai-concepts">
+                <AccordionTrigger className="text-lg">
+                    <PocketKnife className="w-5 h-5 mr-2 text-accent" /> 
+                    Advanced AI Tools & Future Concepts (Conceptual)
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground space-y-3">
+                    <p>DUE PROCESS AI is continually evolving. Here are some advanced AI-powered tools and concepts that are part of our future vision, though they are complex and not yet implemented:</p>
+                    
+                    <div>
+                        <h4 className="font-semibold text-foreground/90">Deadline Calculator (Conceptual)</h4>
+                        <p>An AI tool that could help calculate important legal deadlines based on the type of filing, jurisdiction, and relevant court rules. This would require a sophisticated understanding of procedural rules, which vary greatly.</p>
+                    </div>
+
+                    <div>
+                        <h4 className="font-semibold text-foreground/90">Truly Context-Aware AI Co-litigator (Conceptual)</h4>
+                        <p>While our current Interactive Assistant uses saved case summaries for some context, a future AI Co-litigator could more deeply understand the nuances of a user's case from all their inputs across the app (timeline events, evidence details, document drafts). It might then offer more tailored general information, identify potential next steps with greater accuracy, or help draft more specific questions for a human lawyer. This involves significant advancements in natural language understanding and reasoning specific to the legal domain.</p>
+                    </div>
+                    
+                    <div>
+                        <h4 className="font-semibold text-foreground/90">AI-Powered "Charge Interpreter" (Conceptual)</h4>
+                        <p>An advanced tool that could take specific criminal charges (e.g., from a complaint or indictment) and explain them in plain language, outline common elements the prosecution needs to prove, and suggest general defense considerations or motions (like a "Motion to Suppress" if facts suggest it). This is distinct from providing legal advice and would be for informational purposes to help users understand the charges against them.</p>
+                    </div>
+
+                    <p><strong>Disclaimer:</strong> These advanced features are conceptual and represent aspirational goals for future development. They require significant AI research, robust data, and careful ethical consideration before implementation. The current app provides foundational tools and information.</p>
+                </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="item-citation-mode">
               <AccordionTrigger className="text-lg">
                 <ExternalLinkIcon className="w-5 h-5 mr-2 text-accent" />
@@ -485,3 +512,6 @@ export default function HelpFaqPage() {
 
 
 
+
+
+    

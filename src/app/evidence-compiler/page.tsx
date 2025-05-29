@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, 
   VideoIcon, Trash2, AlertTriangle, SearchCheck, Loader2, MessageSquareQuote, 
-  AlertOctagon, ShieldCheck, Info, Lightbulb, Eye // Added Eye icon
+  AlertOctagon, ShieldCheck, Info, Lightbulb, Eye, Package // Added Package icon
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -42,10 +42,10 @@ interface EvidenceItem {
   previewUrl?: string; 
   addedDate: string;
   fileObject?: File;
-  size?: number; // New: File size in bytes
-  exhibitLabel?: string; // New: User-defined exhibit label (e.g., A, B, C)
-  status: 'Pending' | 'Analyzed (Conceptual)'; // New: Status of the item
-  analysisTags?: string[]; // New: Conceptual tags from AI analysis
+  size?: number; 
+  exhibitLabel?: string; 
+  status: 'Pending' | 'Analyzed (Conceptual)'; 
+  analysisTags?: string[]; 
 }
 
 interface AnalysisDisplayState {
@@ -78,7 +78,7 @@ export default function EvidenceCompilerPage() {
   const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
   const [currentLabel, setCurrentLabel] = useState("");
   const [currentDescription, setCurrentDescription] = useState("");
-  const [currentExhibitLabel, setCurrentExhibitLabel] = useState(""); // New state for exhibit label
+  const [currentExhibitLabel, setCurrentExhibitLabel] = useState(""); 
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentUrl, setCurrentUrl] = useState("");
   const [inputType, setInputType] = useState<'file' | 'url'>('file');
@@ -156,9 +156,9 @@ export default function EvidenceCompilerPage() {
         description: currentDescription,
         previewUrl: previewUrl,
         fileObject: currentFile,
-        size: currentFile.size, // Added file size
-        exhibitLabel: currentExhibitLabel.trim() || undefined, // Added exhibit label
-        status: 'Pending', // Default status
+        size: currentFile.size, 
+        exhibitLabel: currentExhibitLabel.trim() || undefined, 
+        status: 'Pending', 
       };
     } else if (inputType === 'url' && currentUrl) {
       if (!currentUrl.match(/^(https|http):\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/)) {
@@ -171,8 +171,8 @@ export default function EvidenceCompilerPage() {
         url: currentUrl,
         label: currentLabel,
         description: currentDescription,
-        exhibitLabel: currentExhibitLabel.trim() || undefined, // Added exhibit label
-        status: 'Pending', // Default status
+        exhibitLabel: currentExhibitLabel.trim() || undefined, 
+        status: 'Pending', 
       };
     } else {
       toast({ title: "Error", description: "Could not process evidence.", variant: "destructive" });
@@ -188,7 +188,7 @@ export default function EvidenceCompilerPage() {
     toast({ title: "Evidence Added", description: `"${currentLabel}" has been added to your collection.`, variant: "default" });
     setCurrentLabel("");
     setCurrentDescription("");
-    setCurrentExhibitLabel(""); // Reset exhibit label
+    setCurrentExhibitLabel(""); 
     setCurrentFile(null);
     setCurrentUrl("");
     if (fileInputRef.current) {
@@ -280,7 +280,7 @@ export default function EvidenceCompilerPage() {
     }
     toast({
       title: "Bundle Assembly (Placeholder)",
-      description: "This feature would compile selected evidence into a court-ready format. Not yet implemented.",
+      description: "This feature would compile selected evidence into a court-ready, print-ready format. Not yet implemented.",
       variant: "default",
       duration: 5000,
     });
@@ -399,7 +399,7 @@ export default function EvidenceCompilerPage() {
                 {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Adding...</> : "Add Evidence to Collection"}
               </Button>
               <Button type="button" variant="outline" onClick={handleAssembleBundle}>
-                Assemble Bundle (Placeholder)
+                 <Package className="mr-2 h-4 w-4" /> Assemble Bundle (Placeholder)
               </Button>
             </CardFooter>
           </form>
@@ -616,4 +616,6 @@ export default function EvidenceCompilerPage() {
     </div>
   );
 }
+    
+
     

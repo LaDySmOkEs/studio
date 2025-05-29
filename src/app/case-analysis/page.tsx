@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -304,7 +304,7 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
               <CardDescription>
-                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" section below.
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -367,7 +367,7 @@ export default function CaseAnalysisPage() {
                       Due Process Violation Assessment
                     </CardTitle>
                      <CardDescription>
-                      This is a conceptual AI assessment of potential due process concerns based on your input. It is <strong>not a legal determination</strong>.
+                      This is a conceptual AI assessment of potential due process concerns based on your input (e.g., issues with notice, opportunity to be heard, right to counsel if criminal). It considers the severity and volume of potential issues mentioned. It is <strong>not a legal determination</strong>.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -403,7 +403,7 @@ export default function CaseAnalysisPage() {
                       Based on your case analysis, we suggest considering these document types. Click on a type to go to the Document Generator with it pre-selected. These are templates and require legal review.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-2">
                     <ul className="list-disc pl-5 space-y-2">
                       {analysisResult.suggestedDocumentTypes.map((docType) => (
                         <li key={docType} className="text-sm">
@@ -414,9 +414,47 @@ export default function CaseAnalysisPage() {
                         </li>
                       ))}
                     </ul>
+                     <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toast({
+                            title: "Conceptual Feature: AI Filing Decider",
+                            description: "In a more advanced system, clicking this would trigger an AI to analyze your case further and provide more specific advice on exactly what to file and when. This feature is conceptual for now.",
+                            duration: 7000,
+                        })}
+                        className="mt-4"
+                        aria-label="Help me decide what to file (Conceptual)"
+                        >
+                        <Brain className="mr-2 h-4 w-4" /> Help Me Decide What to File (Conceptual)
+                    </Button>
                   </CardContent>
                 </Card>
               )}
+
+              <Card className="shadow-md mt-6 border-accent">
+                <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-accent" /> AI Suggested Strategies & Motions (Conceptual)
+                    </CardTitle>
+                    <CardDescription>
+                    Based on the initial analysis and due process assessment, a more advanced AI could suggest specific legal strategies or motions. This is a conceptual feature.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Alert variant="default" className="bg-accent/10">
+                    <AlertTitle className="font-semibold text-accent">Example AI Suggestions (Conceptual):</AlertTitle>
+                    <AlertDescription>
+                        <ul className="list-disc pl-5 text-sm mt-1">
+                        <li>If 'High Risk' Due Process Violation related to search and seizure: "Consider researching a 'Motion to Suppress Evidence' based on potential Fourth Amendment violations."</li>
+                        <li>If case details imply coercion for a confession: "Explore if an 'Entrapment' defense or issues with voluntariness of statements are relevant."</li>
+                        <li>If inadequate notice for a hearing is indicated: "Review procedures for 'Motion to Vacate Order' due to improper notice."</li>
+                        </ul>
+                        <p className="mt-2 text-xs"><strong>Disclaimer:</strong> These are highly simplified examples. Actual legal strategy is complex and requires professional legal advice.</p>
+                    </AlertDescription>
+                    </Alert>
+                </CardContent>
+              </Card>
+
             </CardContent>
           </Card>
 
@@ -537,4 +575,6 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
+    
+
     
