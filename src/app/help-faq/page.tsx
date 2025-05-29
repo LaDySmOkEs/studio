@@ -28,14 +28,17 @@ export default function HelpFaqPage() {
                 What is DUE PROCESS AI?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
-                <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
-                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters, particularly if you are representing yourself (in propria persona / pro per).</p>
+                <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand their rights and charges, organize case information, generate document templates, and navigate complex legal processes. It aims to make legal concepts more accessible and can assist in identifying and exposing potential government abuse or official misconduct.</p>
+                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters.</p>
                 <p className="font-semibold text-foreground/90">This app is especially useful for:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>People pursuing civil rights claims, including those under 42 U.S.C. § 1983.</li>
-                  <li>Victims of selective prosecution or police misconduct seeking to understand their rights and options.</li>
-                  <li>Individuals in rural areas or tribal jurisdictions who may have limited access to legal professionals.</li>
-                  <li>Families and advocates seeking justice or clarity for incarcerated or persecuted loved ones.</li>
+                  <li>Pro Se litigants (people representing themselves without lawyers).</li>
+                  <li>Victims of police misconduct, selective prosecution, or other forms of public official misconduct.</li>
+                  <li>Civil rights activists and advocates.</li>
+                  <li>Paralegals seeking tools for case preparation.</li>
+                  <li>Individuals in rural areas, tribal jurisdictions, or underserved communities with limited access to legal professionals.</li>
+                  <li>Families seeking justice or clarity for incarcerated or persecuted loved ones.</li>
+                  <li>Anyone preparing to file lawsuits or make requests under statutes such as 42 U.S.C. § 1983 (Civil Rights), Freedom of Information Act (FOIA), Americans with Disabilities Act (ADA), etc.</li>
                 </ul>
                 <p className="mt-2"><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction. This tool is not a substitute for professional legal representation.</p>
               </AccordionContent>
