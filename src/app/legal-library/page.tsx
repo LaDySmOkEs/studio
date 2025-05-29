@@ -37,7 +37,7 @@ export default function LegalLibraryPage() {
   const handleSearch = () => {
     toast({
       title: "Search (Conceptual)",
-      description: `This is a conceptual search. In a full system, searching for "${searchTerm}" with selected filters would query a legal database.`,
+      description: `This is a conceptual search. In a full system, searching for "${searchTerm}" with selected filters would query a legal database. Selected jurisdiction: ${selectedJurisdiction || 'All'}, Selected issue: ${selectedLegalIssue || 'All'}`,
       duration: 5000,
     });
   };
@@ -83,7 +83,7 @@ export default function LegalLibraryPage() {
                   <SelectValue placeholder="Select Jurisdiction..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Jurisdictions</SelectItem>
+                  {/* <SelectItem value="">All Jurisdictions</SelectItem> */} {/* Removed this line */}
                   {JURISDICTIONS.map(j => <SelectItem key={j.value} value={j.value}>{j.label}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -97,7 +97,7 @@ export default function LegalLibraryPage() {
                   <SelectValue placeholder="Select Legal Issue..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Legal Issues</SelectItem>
+                  {/* <SelectItem value="">All Legal Issues</SelectItem> */} {/* Removed this line */}
                   {LEGAL_ISSUE_AREAS.map(issue => <SelectItem key={issue.value} value={issue.value}>{issue.label}</SelectItem>)}
                 </SelectContent>
               </Select>
