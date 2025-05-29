@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck, ScrollText, Brain, PocketKnife } from "lucide-react";
+import { HelpCircle, BookOpen, Lightbulb, ShieldCheck, Landmark, Info, Siren, Film, Users, ExternalLinkIcon, AlertTriangle as AlertTriangleIcon, Anchor, Route, UserCheck, ScrollText, Brain, PocketKnife, BellRing } from "lucide-react";
 
 export default function HelpFaqPage() {
   return (
@@ -29,7 +29,7 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
-                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters. This is particularly aimed at assisting those who are navigating the legal system in propria persona (representing themselves).</p>
+                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters, particularly if you are representing yourself (in propria persona / pro per).</p>
                 <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction. This tool is not a substitute for professional legal representation.</p>
               </AccordionContent>
             </AccordionItem>
@@ -357,7 +357,7 @@ export default function HelpFaqPage() {
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p><strong>Prototype Data Handling:</strong></p>
                 <ul className="list-disc pl-5">
-                    <li>Features like the "Rights Recorder" and "Trauma Log" in this prototype store data <strong>locally in your browser's current session</strong> for some data (like active recording notes) or in your browser's `localStorage` for persisted lists (like saved recordings, timeline events, trauma log entries after saving). This means the data is generally private to your browser on your device. Case details entered for "Case Analysis" are also saved to browser `localStorage` to be reused across different app features. This data persists until explicitly cleared by you or if you clear all browser data for this site. Uploaded files in "Evidence Compiler" or "Document Analyzer" are handled client-side and are not sent to a server.</li>
+                    <li>Features like the "Rights Recorder," "Evidence Compiler," "Timeline & Event Log," and "Trauma Log" in this prototype store data <strong>locally in your browser's `localStorage` or in-session memory</strong>. This means the data is generally private to your browser on your device and is not sent to any server. Case details entered for "Case Analysis" are also saved to browser `localStorage` to be reused across different app features. This data persists until explicitly cleared by you or if you clear all browser data for this site.</li>
                     <li>Case details submitted for "Case Analysis" are processed by an AI model to provide suggestions. Please be mindful and avoid submitting highly sensitive personal identifiable information that you do not want processed by an external AI service.</li>
                 </ul>
                 <p className="mt-2"><strong>Production System Considerations:</strong></p>
@@ -373,7 +373,7 @@ export default function HelpFaqPage() {
 
             <AccordionItem value="strawman-sovereign">
               <AccordionTrigger className="text-lg">
-                <AlertTriangleIcon className="w-5 h-5 mr-2 text-destructive" /> {/* Changed icon for emphasis */}
+                <AlertTriangleIcon className="w-5 h-5 mr-2 text-destructive" />
                 What about "Strawman" or "Sovereign Citizen" theories?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
@@ -422,6 +422,30 @@ export default function HelpFaqPage() {
 
                     <p><strong>Disclaimer:</strong> These advanced features are conceptual and represent aspirational goals for future development. They require significant AI research, robust data, and careful ethical consideration before implementation. The current app provides foundational tools and information.</p>
                 </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="smart-notifications-conceptual">
+              <AccordionTrigger className="text-lg">
+                <BellRing className="w-5 h-5 mr-2 text-accent" />
+                Conceptual: Smart Notifications
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  "Smart Notifications" are envisioned as a future proactive feature of DUE PROCESS AI. The goal would be to help users stay on top of crucial aspects of their case by providing timely alerts and reminders.
+                </p>
+                <h4 className="font-semibold text-foreground/90 mt-2">Potential Notification Types (Conceptual):</h4>
+                <ul className="list-disc pl-5">
+                  <li><strong>Filing Deadlines:</strong> Based on information entered in the Timeline & Event Log or Document Generator, the system could (conceptually) calculate and remind users of upcoming court filing deadlines.</li>
+                  <li><strong>Evidence Review Reminders:</strong> Prompt users to review or organize evidence they've compiled.</li>
+                  <li><strong>Court Feedback (Conceptual):</strong> In a highly advanced system integrated with court e-filing systems (which is a major undertaking), it might provide notifications on the status of submitted documents.</li>
+                  <li><strong>Red Flag Alerts:</strong> If AI analysis (from Document Analyzer or Case Analysis) detects potentially critical issues like missing documents for a standard procedure or language in a draft that might be problematic, it could raise a conceptual alert for user review.</li>
+                </ul>
+                <h4 className="font-semibold text-foreground/90 mt-2">Challenges:</h4>
+                <p>
+                  Implementing reliable smart notifications, especially for deadlines and "red flags," requires very accurate data input from the user, sophisticated AI analysis, and potentially integration with external systems. Ensuring accuracy and avoiding misleading alerts would be paramount.
+                </p>
+                <p><strong>Note:</strong> This feature is conceptual and not currently implemented. Users must independently track all deadlines and rely on professional legal advice for critical case decisions and document review.</p>
+              </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-citation-mode">
@@ -504,14 +528,3 @@ export default function HelpFaqPage() {
     </div>
   );
 }
-
-
-    
-
-    
-
-
-
-
-
-    
