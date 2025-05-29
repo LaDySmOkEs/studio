@@ -157,6 +157,7 @@ export default function FilingAssistantPage() {
                     <li><strong>Double-Check File Names:</strong> Use clear, descriptive file names as per court guidance (e.g., "Motion_to_Dismiss_Smith_v_Jones.pdf").</li>
                     <li><strong>Test with Non-Critical Filings (If Possible):</strong> Some courts might have a training or test environment, or you might file a simple document first (like a notice of appearance if required) to get familiar.</li>
                      <li><strong>Look for Pro Se Help Desks:</strong> Some courts or local bar associations offer help desks or resources specifically for self-represented litigants.</li>
+                     <li><strong>Conceptual Red Flag Alerts:</strong> In a more advanced system, AI might provide "Red Flag Alerts" for common filing mistakes, missing required elements, or language that could be problematic. For now, carefully review all requirements yourself and consider legal review.</li>
                 </ul>
             </CardContent>
           </Card>
@@ -174,4 +175,5 @@ export default function FilingAssistantPage() {
     </div>
   );
 }
+
 

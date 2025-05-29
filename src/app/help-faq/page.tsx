@@ -29,17 +29,8 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand their rights and charges, organize case information, generate document templates, and navigate complex legal processes. It aims to make legal concepts more accessible and can assist in identifying and exposing potential government abuse or official misconduct.</p>
+                <p>This app is especially useful for: Pro Se litigants (people representing themselves without lawyers); victims of police misconduct, selective prosecution, or other forms of public official misconduct; civil rights activists and advocates; paralegals seeking tools for case preparation; individuals in rural areas, tribal jurisdictions, or underserved communities with limited access to legal professionals; families seeking justice or clarity for incarcerated or persecuted loved ones; and anyone preparing to file lawsuits or make requests under statutes such as 42 U.S.C. § 1983 (Civil Rights), Freedom of Information Act (FOIA), Americans with Disabilities Act (ADA), etc.</p>
                 <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters.</p>
-                <p className="font-semibold text-foreground/90">This app is especially useful for:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Pro Se litigants (people representing themselves without lawyers).</li>
-                  <li>Victims of police misconduct, selective prosecution, or other forms of public official misconduct.</li>
-                  <li>Civil rights activists and advocates.</li>
-                  <li>Paralegals seeking tools for case preparation.</li>
-                  <li>Individuals in rural areas, tribal jurisdictions, or underserved communities with limited access to legal professionals.</li>
-                  <li>Families seeking justice or clarity for incarcerated or persecuted loved ones.</li>
-                  <li>Anyone preparing to file lawsuits or make requests under statutes such as 42 U.S.C. § 1983 (Civil Rights), Freedom of Information Act (FOIA), Americans with Disabilities Act (ADA), etc.</li>
-                </ul>
                 <p className="mt-2"><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction. This tool is not a substitute for professional legal representation.</p>
               </AccordionContent>
             </AccordionItem>
@@ -429,6 +420,11 @@ export default function HelpFaqPage() {
                         <h4 className="font-semibold text-foreground/90">AI-Powered "Charge Interpreter" (Conceptual)</h4>
                         <p>An advanced tool that could take specific criminal charges (e.g., from a complaint or indictment) and explain them in plain language, outline common elements the prosecution needs to prove, and suggest general defense considerations or motions (like a "Motion to Suppress" if facts suggest it). This is distinct from providing legal advice and would be for informational purposes to help users understand the charges against them.</p>
                     </div>
+                    
+                     <div>
+                        <h4 className="font-semibold text-foreground/90">AI-Powered Case Law Recommender & Citation Mode (Conceptual)</h4>
+                        <p>Imagine an AI that not only suggests relevant areas of law but also finds specific, relevant case law (precedents) based on the facts you provide. In "Citation Mode," the AI would attempt to provide citations for its explanations or suggestions, linking them to actual cases (e.g., <em>Goldberg v. Kelly</em> for due process in administrative hearings) or statutes. This would help you or your attorney quickly verify and utilize these references. This requires sophisticated AI for accurate information retrieval and contextual understanding.</p>
+                    </div>
 
                     <p><strong>Disclaimer:</strong> These advanced features are conceptual and represent aspirational goals for future development. They require significant AI research, robust data, and careful ethical consideration before implementation. The current app provides foundational tools and information.</p>
                 </AccordionContent>
@@ -437,18 +433,18 @@ export default function HelpFaqPage() {
             <AccordionItem value="smart-notifications-conceptual">
               <AccordionTrigger className="text-lg">
                 <BellRing className="w-5 h-5 mr-2 text-accent" />
-                Conceptual: Smart Notifications
+                Conceptual: Smart Notifications & Red Flag Alerts
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>
-                  "Smart Notifications" are envisioned as a future proactive feature of DUE PROCESS AI. The goal would be to help users stay on top of crucial aspects of their case by providing timely alerts and reminders.
+                  "Smart Notifications" are envisioned as a future proactive feature of DUE PROCESS AI. The goal would be to help users stay on top of crucial aspects of their case by providing timely alerts and reminders. "Red Flag Alerts" would be a component of this, warning users of potential issues.
                 </p>
                 <h4 className="font-semibold text-foreground/90 mt-2">Potential Notification Types (Conceptual):</h4>
                 <ul className="list-disc pl-5">
                   <li><strong>Filing Deadlines:</strong> Based on information entered in the Timeline & Event Log or Document Generator, the system could (conceptually) calculate and remind users of upcoming court filing deadlines.</li>
                   <li><strong>Evidence Review Reminders:</strong> Prompt users to review or organize evidence they've compiled.</li>
                   <li><strong>Court Feedback (Conceptual):</strong> In a highly advanced system integrated with court e-filing systems (which is a major undertaking), it might provide notifications on the status of submitted documents.</li>
-                  <li><strong>Red Flag Alerts:</strong> If AI analysis (from Document Analyzer or Case Analysis) detects potentially critical issues like missing documents for a standard procedure or language in a draft that might be problematic, it could raise a conceptual alert for user review.</li>
+                  <li><strong>Red Flag Alerts:</strong> If AI analysis (from Document Analyzer or Case Analysis) detects potentially critical issues like missing legal elements, weak language in drafts, potential Unlicensed Practice of Law (UPL) risks, or common filing mistakes, it could raise a conceptual alert for user review and encourage consultation with an attorney.</li>
                 </ul>
                 <h4 className="font-semibold text-foreground/90 mt-2">Challenges:</h4>
                 <p>
@@ -538,5 +534,4 @@ export default function HelpFaqPage() {
     </div>
   );
 }
-
     

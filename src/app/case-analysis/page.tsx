@@ -304,7 +304,7 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
               <CardDescription>
-                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below.
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below. The Case Law Recommender (conceptually) finds relevant cases based on your facts, to help you back your claims.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -367,7 +367,7 @@ export default function CaseAnalysisPage() {
                       Due Process Violation Assessment
                     </CardTitle>
                      <CardDescription>
-                      This is a conceptual AI assessment of potential due process concerns based on your input (e.g., issues with notice, opportunity to be heard, right to counsel if criminal). It considers the severity and volume of potential issues mentioned. It is <strong>not a legal determination</strong>.
+                      This is a conceptual AI assessment of potential due process concerns (e.g., issues with notice, opportunity to be heard, right to counsel if criminal, Miranda issues, inadequate representation). It considers the severity and volume of potential issues mentioned. It is <strong>not a legal determination</strong>.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -376,12 +376,12 @@ export default function CaseAnalysisPage() {
                     </p>
                     <div className="text-xs text-muted-foreground mt-3">
                         <p>Examples of what this might mean:</p>
-                        <ul className="list-disc pl-4 mt-1">
-                            <li><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</li>
-                            <li><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</li>
-                            <li><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</li>
-                             <li><strong>Indeterminate:</strong> Not enough specific detail in your narrative to make a meaningful assessment of due process risks.</li>
-                        </ul>
+                        <div className="list-disc pl-4 mt-1"> {/* Changed from ul to div to fix nesting issue */}
+                            <div><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</div>
+                            <div><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</div>
+                            <div><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</div>
+                             <div><strong>Indeterminate:</strong> Not enough specific detail in your narrative to make a meaningful assessment of due process risks.</div>
+                        </div>
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -437,7 +437,7 @@ export default function CaseAnalysisPage() {
                     <Brain className="w-5 h-5 text-accent" /> AI Suggested Strategies & Motions (Conceptual)
                     </CardTitle>
                     <CardDescription>
-                    Based on the initial analysis and due process assessment, a more advanced AI could suggest specific legal strategies or motions. This is a conceptual feature.
+                    Based on the initial analysis and due process assessment, a more advanced AI could suggest specific legal strategies or motions (e.g., "Motion to Suppress," "Entrapment defense considerations"). This is a conceptual feature.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
