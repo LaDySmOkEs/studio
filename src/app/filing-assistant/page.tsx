@@ -10,7 +10,7 @@ import { LibrarySquare, AlertTriangle, CheckSquare, ExternalLink } from "lucide-
 const generalSteps = [
   {
     title: "1. Research Your Court's Specific E-Filing Rules",
-    content: "This is the most critical step. Every court (federal, state, county, even specific judges) can have unique rules. Look for 'e-filing rules', 'local rules', 'administrative orders', or 'pro se filer information' on your court's official website. Pay attention to document formatting (PDF/A often required), file size limits, and how to handle exhibits."
+    content: "This is the most critical step. Every court (federal, state, county, even specific judges) can have unique rules. Look for 'e-filing rules', 'local rules', 'administrative orders', or 'pro se filer information' / 'pro per filer information' on your court's official website. Pay attention to document formatting (PDF/A often required), file size limits, and how to handle exhibits."
   },
   {
     title: "2. Register for an E-Filing Account",
@@ -34,7 +34,7 @@ const generalSteps = [
   },
   {
     title: "7. Serve Other Parties",
-    content: "E-filing your document with the court does not automatically mean other parties in the case have been served. You must still follow your court's rules for 'service of process'. Some e-filing systems may handle service for registered attorneys, but pro se litigants often have additional responsibilities. Check your local rules carefully."
+    content: "E-filing your document with the court does not automatically mean other parties in the case have been served. You must still follow your court's rules for 'service of process'. Some e-filing systems may handle service for registered attorneys, but self-represented litigants (pro per) often have additional responsibilities. Check your local rules carefully."
   }
 ];
 
@@ -96,7 +96,7 @@ export default function FilingAssistantPage() {
             Pro Per Court Filing Assistant (Guidance)
           </CardTitle>
           <CardDescription>
-            This guide provides general information and key considerations for individuals representing themselves (pro per or pro se) when e-filing court documents.
+            This guide provides general information and key considerations for individuals representing themselves (in propria persona, pro per, or pro se) when e-filing court documents.
             E-filing procedures vary significantly by jurisdiction. <strong>Always consult your specific court's official website, rules, and clerk's office for accurate and up-to-date instructions.</strong>
           </CardDescription>
         </CardHeader>
@@ -174,3 +174,4 @@ export default function FilingAssistantPage() {
     </div>
   );
 }
+

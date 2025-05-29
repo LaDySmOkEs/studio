@@ -29,7 +29,7 @@ export default function HelpFaqPage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>DUE PROCESS AI is an AI-powered legal assistance tool designed to help users understand legal concepts, generate document templates, organize case information, and more. It aims to make legal processes more accessible.</p>
-                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters.</p>
+                <p>Our goal is to provide you with comprehensive information and powerful organizational tools, assisting you in understanding and preparing for your engagement with the legal system. We aim to help level the playing field by making knowledge more accessible, allowing you to be a more informed and empowered participant in your own legal matters. This is particularly aimed at assisting those who are navigating the legal system in propria persona (representing themselves).</p>
                 <p><strong>Disclaimer:</strong> DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs, suggestions, and document templates are for guidance only and should be thoroughly reviewed and verified by a qualified legal professional before use. Always consult with an attorney for advice specific to your situation and jurisdiction. This tool is not a substitute for professional legal representation.</p>
               </AccordionContent>
             </AccordionItem>
@@ -77,7 +77,7 @@ export default function HelpFaqPage() {
                 Tips for Self-Advocacy & Engaging with Counsel
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-3">
-                <p>Navigating the legal system can be challenging, especially if you are representing yourself (pro per) or working with appointed counsel. While DUE PROCESS AI cannot provide legal advice, its tools can help you stay organized and informed. Here are some general tips:</p>
+                <p>Navigating the legal system can be challenging, especially if you are representing yourself (in propria persona / pro per) or working with appointed counsel. While DUE PROCESS AI cannot provide legal advice, its tools can help you stay organized and informed. Here are some general tips:</p>
                 
                 <div>
                   <h4 className="font-semibold text-foreground/90">Stay Organized:</h4>
@@ -107,8 +107,8 @@ export default function HelpFaqPage() {
                 </div>
                 
                 <div>
-                  <h4 className="font-semibold text-foreground/90">If Representing Yourself (Pro Per):</h4>
-                  <p>Representing yourself is a significant undertaking. Be prepared to:</p>
+                  <h4 className="font-semibold text-foreground/90">If Representing Yourself (Pro Per / In Propria Persona):</h4>
+                  <p>Representing yourself is a significant undertaking. DUE PROCESS AI aims to provide tools and information to assist you. Be prepared to:</p>
                   <ul className="list-disc pl-5 space-y-1 mt-1">
                      <li>Learn your court's specific Rules of Procedure and Rules of Evidence. These are critical.</li>
                      <li>Understand deadlines. Missing them can have serious consequences.</li>
@@ -482,5 +482,6 @@ export default function HelpFaqPage() {
     
 
     
+
 
 

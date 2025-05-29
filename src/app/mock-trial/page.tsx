@@ -126,7 +126,7 @@ export default function MockTrialPage() {
             <Gavel className="w-7 h-7 text-primary" /> Mock Trial Simulator (Conceptual)
           </CardTitle>
           <CardDescription>
-            Practice basic court procedures for common scenarios. This tool can be particularly helpful for understanding courtroom dynamics if you are representing yourself or wish to be a more informed participant in your case. This is a simplified simulation and NOT legal advice or a substitute for understanding your specific court's rules.
+            Practice basic court procedures for common scenarios, especially if you are representing yourself (pro per / in propria persona) or wish to be a more informed participant in your case. This tool helps demystify courtroom dynamics. This is a simplified simulation and NOT legal advice or a substitute for understanding your specific court's rules.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -193,4 +193,5 @@ export default function MockTrialPage() {
     </div>
   );
 }
+
 
