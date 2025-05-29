@@ -21,6 +21,7 @@ type DocumentType =
   | "foiaRequest" 
   | "civilCoverSheet" | "summons" | "motionToQuash" | "motionToDismiss" 
   | "inFormaPauperisApplication" | "declarationOfNextFriend"
+  | "tpoChallengeResponse" // Added new type
   | "";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData"; // Same key as in CaseAnalysisPage
@@ -521,6 +522,52 @@ ____________________________
 [Next Friend's Full Name]
 Declarant
 `,
+tpoChallengeResponse: `[MOTION TO DISSOLVE TEMPORARY PROTECTIVE ORDER / RESPONSE TO PETITION FOR PROTECTIVE ORDER]
+**NOTE: This is a very general template. TPO/Restraining Order laws and procedures are highly specific to each state. Always consult your state's laws and court rules, and seek legal advice.**
+
+Case Name: [Petitioner Name] v. [Respondent Name - Your Name]
+Case Number: [Case Number of TPO, if assigned]
+Court: [Court Name]
+
+Respondent, [Your Full Name], Pro Per, respectfully submits this [Motion to Dissolve Temporary Protective Order / Response to Petition for Protective Order] and states as follows:
+
+I. INTRODUCTION
+1.  This [motion/response] is submitted in opposition to the Temporary Protective Order (TPO) issued on [Date TPO was issued] or the Petition for a Protective Order filed by [Petitioner Name] ("Petitioner").
+2.  Respondent, [Your Name], denies the allegations made by the Petitioner that form the basis for the [TPO/Petition] and contends that [Briefly state your main argument, e.g., "the TPO was issued based on false or misleading information," or "there is no ongoing threat of harm justifying a protective order," or "Petitioner's request does not meet the legal standard for a protective order in this jurisdiction."].
+
+II. FACTUAL BACKGROUND / RESPONSE TO ALLEGATIONS
+   (Respond specifically to each key allegation made by the Petitioner. Use numbered paragraphs. Be factual and calm.)
+3.  Regarding Petitioner's allegation that [Quote or summarize Petitioner's first key allegation]: [Your factual response, including dates, times, locations, and what actually happened from your perspective. If you have evidence, refer to it generally, e.g., "This is contradicted by text messages exchanged on that day (see Exhibit A)."].
+4.  Regarding Petitioner's allegation that [Quote or summarize Petitioner's second key allegation]: [Your factual response].
+5.  [Continue responding to each significant allegation. If an allegation is true, admit it if appropriate, but explain the context if necessary.]
+6.  [If applicable, state any facts that support your position that a protective order is not necessary or appropriate, or that the TPO should be dissolved.]
+
+III. ARGUMENT (Optional, focus on facts if Pro Per, but understand the legal standard if possible)
+7.  The Petitioner has failed to meet the legal standard required for the issuance of a [permanent protective order / continuation of the TPO] under [Cite your state's relevant statute, e.g., Family Code § XXXX].
+8.  [If applicable: "Petitioner has not demonstrated a credible threat of future harm." Or "Respondent poses no threat to Petitioner." Explain why, based on facts.]
+9.  [If applicable: "The incidents described do not constitute [domestic violence/harassment/stalking - as defined by your state's law]."]
+
+IV. REQUESTED RELIEF
+WHEREFORE, Respondent, [Your Full Name], respectfully requests that this Court:
+A. [If TPO issued: DENY Petitioner's request for a permanent protective order and DISSOLVE the Temporary Protective Order issued on [Date].]
+B. [If responding to initial petition: DENY Petitioner's Petition for a Protective Order.]
+C. [If applicable: Order Petitioner to return any personal property belonging to Respondent that was taken or is being held.]
+D. Grant such other and further relief as the Court deems just and proper.
+
+I declare under penalty of perjury under the laws of the State of [Your State] that the foregoing is true and correct to the best of my knowledge and belief.
+
+Dated: [Date]
+
+Respectfully submitted,
+
+____________________________
+[Your Full Name], Respondent, Pro Per
+[Your Address]
+[Your Phone Number]
+[Your Email Address]
+
+(Consider attaching exhibits like relevant text messages, emails, photos, or declarations from witnesses, if allowed by your court's rules for this type of response/motion. Label them Exhibit A, Exhibit B, etc.)
+`,
 };
 
 const US_STATES = [
@@ -687,6 +734,7 @@ export default function DocumentGeneratorPage() {
       case 'motionToDismiss': return "Motion to Dismiss";
       case 'inFormaPauperisApplication': return "Application to Proceed In Forma Pauperis (IFP)";
       case 'declarationOfNextFriend': return "Declaration of Next Friend";
+      case 'tpoChallengeResponse': return "Temporary Protective Order (TPO) Challenge/Response";
       default:
         // Add spaces before capital letters and capitalize first letter
         return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
@@ -702,7 +750,7 @@ export default function DocumentGeneratorPage() {
           <CardDescription>
             Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA requests). 
             Then, choose a document type to generate a template. The system uses AI-driven suggestions (from Case Analysis) and your saved case summary (if available) to provide context. 
-            More advanced AI-powered form filling and smart document selection based on case type are conceptual future enhancements.
+            Conceptual future enhancements include AI-powered "Smart Form Filling" (extracting data from your case summary or uploads to populate templates, suggesting legal phrasing), "Evidence-to-Complaint" generation, and support for highly "Custom Pleadings."
             Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
           </CardDescription>
         </CardHeader>
@@ -797,6 +845,7 @@ export default function DocumentGeneratorPage() {
                 <SelectItem value="discoveryRequest">{getDocumentDisplayName("discoveryRequest")}</SelectItem>
                 <SelectItem value="petitionForExpungement">{getDocumentDisplayName("petitionForExpungement")}</SelectItem>
                 <SelectItem value="foiaRequest">{getDocumentDisplayName("foiaRequest")}</SelectItem>
+                <SelectItem value="tpoChallengeResponse">{getDocumentDisplayName("tpoChallengeResponse")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -844,7 +893,7 @@ export default function DocumentGeneratorPage() {
               <br />
               For the "Complaint (Detailed Pre-Filing)" template, this is a comprehensive starting point often used for civil rights claims (like those under 42 U.S.C. § 1983). It includes sections for jurisdiction, parties (with "Next Friend" guidance), detailed factual allegations, specific causes of action, prayer for relief, and a jury demand. It requires substantial customization for your specific facts and legal claims.
               <br />
-              For "Petition for Expungement" and "Application to Proceed In Forma Pauperis (IFP)," legal requirements and specific forms vary significantly by jurisdiction; these templates are general starting points and require careful review of your specific state's laws and court rules.
+              For "Petition for Expungement," "Application to Proceed In Forma Pauperis (IFP)," and "Temporary Protective Order (TPO) Challenge/Response," legal requirements and specific forms vary significantly by jurisdiction; these templates are general starting points and require careful review of your specific state's laws and court rules.
               <br />
               The "Freedom of Information Act (FOIA) Request" template is for requesting records from U.S. federal government agencies. State-level public records laws (often called "Sunshine Laws" or similar) have different procedures and request formats.
               <br />
@@ -856,6 +905,8 @@ export default function DocumentGeneratorPage() {
     </div>
   );
 }
+    
+
     
 
     

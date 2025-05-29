@@ -280,9 +280,9 @@ export default function EvidenceCompilerPage() {
     }
     toast({
       title: "Bundle Assembly (Placeholder)",
-      description: "This feature would compile selected evidence into a court-ready, print-ready format. Not yet implemented.",
+      description: "This feature would compile selected evidence into a court-ready, print-ready format. In a full system, this might also be a step towards an evidence-to-complaint auto-generator. Not yet implemented.",
       variant: "default",
-      duration: 5000,
+      duration: 7000,
     });
   };
 
@@ -295,8 +295,9 @@ export default function EvidenceCompilerPage() {
               <UploadCloud className="w-7 h-7 text-primary" /> Evidence Compiler & Analyzer
             </CardTitle>
             <CardDescription>
-              Upload or link evidence (photos, videos, documents, YouTube URLs). Label it, add descriptions, and an exhibit label. You can also perform a conceptual analysis on audio/video files.
-              Uploaded files are handled locally in your browser.
+              Upload or link evidence (photos, videos, documents, YouTube URLs). Label it, add descriptions, and an exhibit label. 
+              You can perform a conceptual analysis on audio/video files. Uploaded files are handled locally in your browser.
+              A conceptual future enhancement could link compiled evidence to an "Evidence-to-Complaint Auto-Generator."
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -616,6 +617,8 @@ export default function EvidenceCompilerPage() {
     </div>
   );
 }
+    
+
     
 
     

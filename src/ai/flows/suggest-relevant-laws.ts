@@ -1,3 +1,4 @@
+
 // src/ai/flows/suggest-relevant-laws.ts
 'use server';
 
@@ -24,7 +25,7 @@ const DocumentTypeEnum = z.enum([
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
-  "inFormaPauperisApplication", "declarationOfNextFriend"
+  "inFormaPauperisApplication", "declarationOfNextFriend", "tpoChallengeResponse"
 ]);
 
 const SuggestRelevantLawsOutputSchema = z.object({
@@ -51,7 +52,7 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestRelevantLawsOutputSchema},
   prompt: `You are an expert legal assistant. Based on the following case details:
 1. Suggest relevant case laws.
-2. Suggest types of legal documents that might be appropriate to generate for this case. You can suggest from the following list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement', 'foiaRequest', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend'. Focus on the most pertinent document types.
+2. Suggest types of legal documents that might be appropriate to generate for this case. You can suggest from the following list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement', 'foiaRequest', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend', 'tpoChallengeResponse'. Focus on the most pertinent document types.
 3. Provide a confidence score (0-1) for your legal suggestions. The confidence score must be between 0 and 1.
 4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks (e.g., "Low Risk", "Moderate Risk: Potential notice issue", "High Risk: Multiple concerns like lack of hearing and representation indicated"). Analyze the severity and volume of potential violations mentioned. Consider common due process elements: timely and adequate notice, opportunity to be heard, right to counsel (especially if criminal context is implied), impartial decision-maker. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess due process risks.").
 
@@ -73,3 +74,6 @@ const suggestRelevantLawsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+
+    

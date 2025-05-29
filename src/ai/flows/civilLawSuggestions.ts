@@ -1,3 +1,4 @@
+
 // src/ai/flows/civilLawSuggestions.ts
 'use server';
 
@@ -24,7 +25,7 @@ const DocumentTypeEnum = z.enum([
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
-  "inFormaPauperisApplication", "declarationOfNextFriend"
+  "inFormaPauperisApplication", "declarationOfNextFriend", "tpoChallengeResponse"
 ]);
 
 // Output schema is the same as SuggestRelevantLawsOutput for consistency
@@ -52,7 +53,7 @@ const prompt = ai.definePrompt({
   output: {schema: CivilLawSuggestionsOutputSchema},
   prompt: `You are an expert AI legal assistant specializing in Civil Law. Based on the case details provided:
 1. Suggest relevant state and federal case laws. Focus on contract law, tort law, family law, employment law, civil rights claims (e.g., Section 1983), administrative law, and different burden of proof standards.
-2. Suggest types of legal documents that might be appropriate. Consider from this list: 'motion', 'affidavit', 'complaint', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend'. You may also suggest 'foiaRequest' if relevant for obtaining information.
+2. Suggest types of legal documents that might be appropriate. Consider from this list: 'motion', 'affidavit', 'complaint', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend', 'tpoChallengeResponse'. You may also suggest 'foiaRequest' if relevant for obtaining information from government entities.
 3. Provide a confidence score (0-1) for your legal suggestions.
 4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks in a civil context (e.g., "Low Risk", "Moderate Risk: Potential issue with notice of hearing", "High Risk: Concerns about biased decision-maker and lack of opportunity to present evidence."). Analyze the severity and volume of potential violations suggested by the case details. Consider elements like proper service of process, adequate notice of hearings, opportunity to be heard, and impartial adjudication. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess specific due process risks.").
 
@@ -75,3 +76,6 @@ const civilLawSuggestionsFlow = ai.defineFlow(
     return output! as CivilLawSuggestionsOutput; // Ensure correct typing
   }
 );
+
+
+    

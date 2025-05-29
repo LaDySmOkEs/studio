@@ -304,7 +304,9 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
               <CardDescription>
-                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below. The Case Law Recommender (conceptually) finds relevant cases based on your facts, to help you back your claims.
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. 
+                The "Case Law Recommender" aspect (conceptually) finds relevant cases based on your facts, to help you back your claims.
+                For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -367,16 +369,16 @@ export default function CaseAnalysisPage() {
                       Due Process Violation Assessment
                     </CardTitle>
                      <CardDescription>
-                      This is a conceptual AI assessment of potential due process concerns (e.g., issues with notice, opportunity to be heard, right to counsel if criminal, Miranda issues, inadequate representation). It considers the severity and volume of potential issues mentioned. It is <strong>not a legal determination</strong>.
+                      This is a conceptual AI assessment of potential due process concerns (e.g., issues with notice, opportunity to be heard, right to counsel if criminal, Miranda issues, inadequate representation). It considers the severity and volume of potential issues mentioned in your case narrative. It is <strong>not a legal determination</strong>.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive-foreground/90">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
-                    <div className="text-xs text-muted-foreground mt-3">
+                    <div className="text-xs text-muted-foreground mt-3"> 
                         <p>Examples of what this might mean:</p>
-                        <div className="list-disc pl-4 mt-1"> {/* Changed from ul to div to fix nesting issue */}
+                        <div className="list-disc pl-4 mt-1"> 
                             <div><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</div>
                             <div><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</div>
                             <div><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</div>
@@ -575,6 +577,8 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
+    
+
     
 
     

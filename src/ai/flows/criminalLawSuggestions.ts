@@ -1,3 +1,4 @@
+
 // src/ai/flows/criminalLawSuggestions.ts
 'use server';
 
@@ -24,7 +25,7 @@ const DocumentTypeEnum = z.enum([
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
-  "inFormaPauperisApplication", "declarationOfNextFriend"
+  "inFormaPauperisApplication", "declarationOfNextFriend", "tpoChallengeResponse"
 ]);
 
 // Output schema is the same as SuggestRelevantLawsOutput for consistency
@@ -76,3 +77,6 @@ const criminalLawSuggestionsFlow = ai.defineFlow(
     return output! as CriminalLawSuggestionsOutput; // Ensure correct typing
   }
 );
+
+
+    
