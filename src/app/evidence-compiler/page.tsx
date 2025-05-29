@@ -10,9 +10,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, VideoIcon, Trash2, AlertTriangle, CheckCircle, SearchCheck, Loader2, MessageSquareQuote, AlertOctagon, ShieldCheck, Info, Lightbulb } from "lucide-react";
+import { 
+  UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, 
+  VideoIcon, Trash2, AlertTriangle, SearchCheck, Loader2, MessageSquareQuote, 
+  AlertOctagon, ShieldCheck, Info, Lightbulb, Eye // Added Eye icon
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge"; // For displaying tags
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
 
@@ -34,9 +39,13 @@ interface EvidenceItem {
   url?: string;
   label: string;
   description: string;
-  previewUrl?: string; // Data URL for images, or icon identifier
+  previewUrl?: string; 
   addedDate: string;
-  fileObject?: File; // To store the actual file if needed later & for preview
+  fileObject?: File;
+  size?: number; // New: File size in bytes
+  exhibitLabel?: string; // New: User-defined exhibit label (e.g., A, B, C)
+  status: 'Pending' | 'Analyzed (Conceptual)'; // New: Status of the item
+  analysisTags?: string[]; // New: Conceptual tags from AI analysis
 }
 
 interface AnalysisDisplayState {
@@ -56,10 +65,20 @@ const getFileIcon = (type: EvidenceItem['type']) => {
   }
 };
 
+const formatFileSize = (bytes?: number) => {
+  if (bytes === undefined || bytes === null) return '';
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
 export default function EvidenceCompilerPage() {
   const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
   const [currentLabel, setCurrentLabel] = useState("");
   const [currentDescription, setCurrentDescription] = useState("");
+  const [currentExhibitLabel, setCurrentExhibitLabel] = useState(""); // New state for exhibit label
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentUrl, setCurrentUrl] = useState("");
   const [inputType, setInputType] = useState<'file' | 'url'>('file');
@@ -69,12 +88,10 @@ export default function EvidenceCompilerPage() {
   const [currentAnalysisDisplay, setCurrentAnalysisDisplay] = useState<AnalysisDisplayState | null>(null);
   const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
 
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load stored case summary from localStorage
     try {
       const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedDataString) {
@@ -122,7 +139,7 @@ export default function EvidenceCompilerPage() {
     }
 
     setIsSubmitting(true);
-    setCurrentAnalysisDisplay(null); // Clear previous analysis display
+    setCurrentAnalysisDisplay(null); 
 
     let newEvidenceItemBase: Omit<EvidenceItem, 'id' | 'addedDate'>;
     let previewUrl: string | undefined = undefined;
@@ -139,6 +156,9 @@ export default function EvidenceCompilerPage() {
         description: currentDescription,
         previewUrl: previewUrl,
         fileObject: currentFile,
+        size: currentFile.size, // Added file size
+        exhibitLabel: currentExhibitLabel.trim() || undefined, // Added exhibit label
+        status: 'Pending', // Default status
       };
     } else if (inputType === 'url' && currentUrl) {
       if (!currentUrl.match(/^(https|http):\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/)) {
@@ -151,6 +171,8 @@ export default function EvidenceCompilerPage() {
         url: currentUrl,
         label: currentLabel,
         description: currentDescription,
+        exhibitLabel: currentExhibitLabel.trim() || undefined, // Added exhibit label
+        status: 'Pending', // Default status
       };
     } else {
       toast({ title: "Error", description: "Could not process evidence.", variant: "destructive" });
@@ -166,6 +188,7 @@ export default function EvidenceCompilerPage() {
     toast({ title: "Evidence Added", description: `"${currentLabel}" has been added to your collection.`, variant: "default" });
     setCurrentLabel("");
     setCurrentDescription("");
+    setCurrentExhibitLabel(""); // Reset exhibit label
     setCurrentFile(null);
     setCurrentUrl("");
     if (fileInputRef.current) {
@@ -181,7 +204,7 @@ export default function EvidenceCompilerPage() {
     }
     setEvidenceItems(prevItems => prevItems.filter(item => item.id !== id));
     if (currentAnalysisDisplay?.itemId === id) {
-      setCurrentAnalysisDisplay(null); // Clear analysis if the analyzed item is deleted
+      setCurrentAnalysisDisplay(null); 
     }
     toast({ title: "Evidence Removed", description: "The item has been removed from your collection.", variant: "default" });
   };
@@ -203,32 +226,51 @@ export default function EvidenceCompilerPage() {
     conceptualTranscription += `In a real system, the full audio/video content would be transcribed here by an AI. Key phrases, speaker identification, and timestamps would be extracted for detailed analysis against legal and procedural standards.`;
 
     mockAnalysis.transcriptionHighlights = conceptualTranscription;
+    
+    const mockTags = ["Keyword: " + item.type, "Context: " + (item.label.split(" ")[0] || "General")];
+    if (item.description.toLowerCase().includes("important")) mockTags.push("Priority: High");
 
-    // These are examples of what an AI might identify after analyzing a real transcription
+
     if (item.type === 'audio' || item.type === 'video' || item.type === 'youtube') {
         mockAnalysis.flaggedIrregularities = [
             "Example Irregularity: The reason for the interaction was not clearly stated at the outset (if applicable).",
             "Example Irregularity: Questions regarding rights or legal status (e.g., 'Am I free to go?', 'Do I need a lawyer?') were potentially ignored or deflected.",
-            "Example Irregularity: A notable escalation in tone or language by one party without clear proportionate response from the other.",
-            "Example Irregularity: Statements made that might contradict official reports or other provided evidence.",
-            "Example Irregularity: Lack of explicit consent for a search, if one occurred and was recorded."
         ],
         mockAnalysis.linkedPrinciples = [
-            "Example Principle: Right to understand the nature of an official interaction (e.g., consensual encounter vs. detention).",
-            "Example Principle: Right to counsel (Sixth Amendment, attaches at certain critical stages of criminal proceedings, particularly custodial interrogation).",
-            "Example Principle: Right to remain silent (Fifth Amendment, protects against self-incrimination).",
-            "Example Principle: Fourth Amendment protections against unreasonable searches and seizures (relevant if a search is discussed or occurs).",
-            "Example Principle: General due process considerations regarding fair procedure and opportunity to be heard."
+            "Example Principle: Right to understand the nature of an official interaction.",
+            "Example Principle: Right to counsel (Sixth Amendment, if applicable).",
         ]
     }
-
+    
+    setEvidenceItems(prevItems => 
+      prevItems.map(ev => 
+        ev.id === item.id 
+          ? { ...ev, status: 'Analyzed (Conceptual)', analysisTags: mockTags } 
+          : ev
+      )
+    );
 
     setCurrentAnalysisDisplay({ itemId: item.id, label: item.label, analysis: mockAnalysis });
     setAnalysisLoadingItemId(null);
     toast({
       title: "Conceptual Analysis Complete",
-      description: `Showing conceptual analysis for "${item.label}". The transcription is a placeholder.`,
+      description: `Showing conceptual analysis for "${item.label}". The transcription is a placeholder. Item status updated.`,
     });
+  };
+
+  const handlePreview = (item: EvidenceItem) => {
+    if (item.type === 'photo' && item.previewUrl) {
+      window.open(item.previewUrl, '_blank');
+    } else if (item.type === 'youtube' && item.url) {
+      window.open(item.url, '_blank');
+    } else if (item.type === 'video' && item.previewUrl) {
+       window.open(item.previewUrl, '_blank');
+    } else {
+      toast({
+        title: `Preview: ${item.label}`,
+        description: `Type: ${item.type}. ${item.fileName || item.url || 'No direct preview for this type.'}. Consider downloading or opening externally if applicable.`,
+      });
+    }
   };
 
   const handleAssembleBundle = () => {
@@ -244,7 +286,6 @@ export default function EvidenceCompilerPage() {
     });
   };
 
-
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
@@ -254,7 +295,7 @@ export default function EvidenceCompilerPage() {
               <UploadCloud className="w-7 h-7 text-primary" /> Evidence Compiler & Analyzer
             </CardTitle>
             <CardDescription>
-              Upload or link evidence (photos, videos, documents, YouTube URLs). Label and organize them. You can also perform a conceptual analysis on audio/video files.
+              Upload or link evidence (photos, videos, documents, YouTube URLs). Label it, add descriptions, and an exhibit label. You can also perform a conceptual analysis on audio/video files.
               Uploaded files are handled locally in your browser.
             </CardDescription>
           </CardHeader>
@@ -302,7 +343,7 @@ export default function EvidenceCompilerPage() {
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                     aria-label="Select file for evidence"
                   />
-                  {currentFile && <p className="text-xs text-muted-foreground mt-1">Selected: {currentFile.name}</p>}
+                  {currentFile && <p className="text-xs text-muted-foreground mt-1">Selected: {currentFile.name} ({formatFileSize(currentFile.size)})</p>}
                 </div>
               )}
 
@@ -329,6 +370,16 @@ export default function EvidenceCompilerPage() {
                   placeholder="e.g., Photo of damaged fence, Dashcam footage May 5th"
                   required
                   aria-label="Evidence label"
+                />
+              </div>
+               <div>
+                <Label htmlFor="evidenceExhibitLabelInput">Exhibit Label (Optional)</Label>
+                <Input
+                  id="evidenceExhibitLabelInput"
+                  value={currentExhibitLabel}
+                  onChange={(e) => setCurrentExhibitLabel(e.target.value)}
+                  placeholder="e.g., Exhibit A, Plaintiff's Exhibit 1"
+                  aria-label="Exhibit label for evidence"
                 />
               </div>
               <div>
@@ -369,7 +420,7 @@ export default function EvidenceCompilerPage() {
                         <div className="flex items-start gap-3 flex-grow min-w-0">
                            {item.previewUrl && (item.type === 'photo' || item.type === 'video') ? (
                             item.type === 'photo' ?
-                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded flex-shrink-0" data-ai-hint="evidence item" /> :
+                              <img src={item.previewUrl} alt={item.label} className="w-16 h-16 object-cover rounded flex-shrink-0" data-ai-hint="evidence photo" /> :
                               <video src={item.previewUrl} className="w-16 h-16 object-cover rounded flex-shrink-0" controls={false} muted loop playsInline />
                           ) : (
                             <div className="w-16 h-16 flex items-center justify-center bg-muted rounded flex-shrink-0">
@@ -377,17 +428,41 @@ export default function EvidenceCompilerPage() {
                             </div>
                           )}
                           <div className="flex-grow min-w-0">
-                            <h4 className="font-semibold text-md truncate" title={item.label}>{item.label}</h4>
+                            <h4 className="font-semibold text-md truncate" title={item.label}>
+                              {item.exhibitLabel && <span className="text-primary font-bold mr-1">[{item.exhibitLabel}]</span>}
+                              {item.label}
+                            </h4>
                             <p className="text-xs text-muted-foreground">
                               Type: <span className="capitalize">{item.type}</span> | Added: {item.addedDate}
                             </p>
                             {item.fileName && <p className="text-xs text-muted-foreground truncate">File: {item.fileName}</p>}
                             {item.url && <p className="text-xs text-muted-foreground truncate">URL: <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{item.url}</a></p>}
-                             {(item.type === 'audio' || item.type === 'video' || item.type === 'youtube') && (
+                            {item.size !== undefined && <p className="text-xs text-muted-foreground">Size: {formatFileSize(item.size)}</p>}
+                            <p className="text-xs text-muted-foreground">Status: <Badge variant={item.status === 'Analyzed (Conceptual)' ? 'default' : 'secondary'}>{item.status}</Badge></p>
+                            
+                            {item.status === 'Analyzed (Conceptual)' && item.analysisTags && item.analysisTags.length > 0 && (
+                              <div className="mt-1">
+                                {item.analysisTags.map(tag => (
+                                  <Badge key={tag} variant="outline" className="mr-1 mb-1 text-xs">{tag}</Badge>
+                                ))}
+                              </div>
+                            )}
+                            
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-xs"
+                                onClick={() => handlePreview(item)}
+                                aria-label={`Preview evidence: ${item.label}`}
+                              >
+                                <Eye className="mr-1 h-3 w-3" /> Preview
+                              </Button>
+                              {(item.type === 'audio' || item.type === 'video' || item.type === 'youtube') && (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="mt-2 text-xs"
+                                  className="text-xs"
                                   onClick={() => handleConceptualAnalyze(item)}
                                   disabled={analysisLoadingItemId === item.id}
                                   aria-label={`Analyze evidence: ${item.label} (Conceptual)`}
@@ -396,6 +471,7 @@ export default function EvidenceCompilerPage() {
                                   Analyze (Conceptual)
                                 </Button>
                               )}
+                            </div>
                           </div>
                         </div>
                         <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 flex-shrink-0" onClick={() => handleDeleteEvidence(item.id)} aria-label={`Delete evidence: ${item.label}`}>
