@@ -15,7 +15,13 @@ import { FileText, Info, LibrarySquare, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
-type DocumentType = "motion" | "affidavit" | "complaint" | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" | "foiaRequest" | "";
+type DocumentType = 
+  | "motion" | "affidavit" | "complaint" 
+  | "motionForBailReduction" | "discoveryRequest" | "petitionForExpungement" 
+  | "foiaRequest" 
+  | "civilCoverSheet" | "summons" | "motionToQuash" | "motionToDismiss" 
+  | "inFormaPauperisApplication" | "declarationOfNextFriend"
+  | "";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData"; // Same key as in CaseAnalysisPage
 
@@ -296,6 +302,225 @@ Sincerely,
 ____________________________
 [Your Typed Full Name/Signature]
 `,
+  civilCoverSheet: `CIVIL COVER SHEET (Generic Example)
+**IMPORTANT: This is a generic example. Most courts require you to use their specific, official Civil Cover Sheet form (e.g., Form JS 44 for U.S. Federal District Courts). Obtain the correct form from your court's website or clerk's office.**
+
+1.  **Court:** [Name of Court]
+2.  **Plaintiff(s):** [Full Name(s) and Address(es)]
+    **Defendant(s):** [Full Name(s) and Address(es)]
+3.  **County of Residence of First Listed Plaintiff:** [County] (If U.S. Plaintiff)
+    **County of Residence of First Listed Defendant:** [County] (If U.S. Defendant)
+4.  **Attorneys (Firm Name, Address, and Telephone Number):**
+    **Plaintiff's Attorney (or Pro Per):** [Your Information if Pro Per]
+    **Defendant's Attorney:** [Leave blank if unknown]
+5.  **Basis of Jurisdiction (Check One):**
+    ( ) U.S. Government Plaintiff     ( ) Federal Question (U.S. Government Not a Party)
+    ( ) U.S. Government Defendant   ( ) Diversity (Indicate Citizenship of Parties in Item III)
+6.  **Citizenship of Principal Parties (For Diversity Cases Only):**
+    Plaintiff: Citizen of This State ( ) Citizen of Another State ( ) [Specify State] Citizen or Subject of a Foreign Country ( ) [Specify Country]
+    Defendant: Citizen of This State ( ) Citizen of Another State ( ) [Specify State] Citizen or Subject of a Foreign Country ( ) [Specify Country]
+7.  **Nature of Suit (Select the one most appropriate):**
+    [Examples: Contract, Real Property, Personal Injury, Civil Rights, Prisoner Petitions, Forfeiture/Penalty, Bankruptcy, Social Security, Tax, Immigration, Other Statute - List common categories relevant to the court]
+8.  **Cause of Action:** [Briefly state the primary cause of action and cite U.S. civil statute under which you are filing, if any]
+9.  **Requested in Complaint:**
+    **Class Action:** ( ) Yes ( ) No
+    **Monetary Demand:** $ [Amount, or "To be determined"]
+    **Jury Demand:** ( ) Yes ( ) No
+10. **Related Case(s), If Any:** [List case number(s) if applicable]
+
+Date: [Date] Signature: ____________________________ ([Your Name, Pro Per])
+`,
+  summons: `SUMMONS IN A CIVIL ACTION (Generic Example)
+**IMPORTANT: This is a generic example. Most courts have their own official Summons form that you MUST use. Obtain the correct form from your court's website or clerk's office.**
+
+To: [Defendant's Full Name]
+    [Defendant's Address]
+
+A lawsuit has been filed against you.
+
+Within [Number, e.g., 21] days after service of this summons on you (not counting the day you received it) — or [Number, e.g., 60] days if you are the United States or a United States agency, or an officer or employee of the United States described in Fed. R. Civ. P. 12 (a)(2) or (3) — you must serve on the plaintiff an answer to the attached complaint or a motion under Rule 12 of the Federal Rules of Civil Procedure. The answer or motion must be served on the plaintiff or plaintiff's attorney, whose name and address are:
+
+[Plaintiff's Name or Plaintiff's Attorney's Name]
+[Plaintiff's or Attorney's Address]
+[Plaintiff's or Attorney's Phone Number]
+[Plaintiff's or Attorney's Email Address]
+
+If you fail to respond, judgment by default will be entered against you for the relief demanded in the complaint. You also must file your answer or motion with the court.
+
+Date: [Date of Issuance]
+
+____________________________
+Clerk of Court (or Deputy Clerk)
+(Seal of the Court, if applicable)
+
+---
+Proof of Service (To be completed by server)
+This summons for [Name of individual served] was received by me on [Date].
+[ ] I personally served the summons on the individual at [Place] on [Date]; or
+[ ] I left the summons at the individual's dwelling or usual place of abode with [Name of person], a person of suitable age and discretion who resides there, on [Date], and mailed a copy to the individual's last known address; or
+[ ] Other (specify):
+My fees are $__________ for travel and $__________ for services, for a total of $__________.
+I declare under penalty of perjury that this information is true.
+Date: _________________ Server's signature: ____________________________
+Printed name and title: _________________________________________________
+Server's address: ______________________________________________________
+`,
+  motionToQuash: `[MOTION TO QUASH SERVICE OF SUMMONS / SUBPOENA / ETC.]
+
+Case Name: [Plaintiff Name] v. [Defendant Name]
+Case Number: [Case Number]
+Court: [Court Name]
+
+[Movant's Name], [Movant's Status, e.g., Defendant], respectfully moves this Court for an order quashing [Describe what is to be quashed, e.g., "the service of summons and complaint in this action," or "the subpoena duces tecum served on [Date] requiring production of documents"]. This motion is made on the grounds that [Briefly state grounds, e.g., "service was improper under Rule 4 of the Federal Rules of Civil Procedure," or "the subpoena is unduly burdensome and seeks irrelevant information"].
+
+This motion is based on this notice of motion, the attached memorandum of points and authorities, the declaration of [Declarant's Name], [any exhibits], and upon such other evidence and argument as may be presented to the Court.
+
+MEMORANDUM OF POINTS AND AUTHORITIES
+
+I. INTRODUCTION
+1.  [Briefly state who you are, what you are asking the court to do, and why.]
+
+II. FACTUAL BACKGROUND
+2.  [Describe the relevant facts leading up to the service of the document you want quashed. Be specific about dates, times, methods of service, or content of the subpoena.]
+
+III. ARGUMENT
+3.  [Present your legal arguments. Explain why the service was defective or why the subpoena is improper. Cite relevant court rules (e.g., Federal Rules of Civil Procedure, State Rules of Civil Procedure) and case law if possible.]
+    a.  [Argument Point 1: e.g., "Service of Process Was Defective Because..."]
+    b.  [Argument Point 2: e.g., "The Subpoena Seeks Privileged Information..."]
+
+IV. CONCLUSION
+4.  For the foregoing reasons, [Movant Name] respectfully requests that this Court grant this motion and quash the [summons/subpoena].
+
+Dated: [Date]
+
+Respectfully submitted,
+____________________________
+[Your Name, Pro Per / Attorney Name]
+[Your Address / Attorney Address]
+[Your Phone / Attorney Phone]
+[Your Email / Attorney Email]
+
+(Attach Declaration(s) and Exhibit(s) as needed)
+`,
+  motionToDismiss: `[MOTION TO DISMISS COMPLAINT PURSUANT TO RULE 12(b)(6) FOR FAILURE TO STATE A CLAIM / OR OTHER APPLICABLE RULE]
+
+Case Name: [Plaintiff Name] v. [Defendant Name]
+Case Number: [Case Number]
+Court: [Court Name]
+
+Defendant, [Defendant's Name], respectfully moves this Court to dismiss Plaintiff's Complaint (or specify counts/claims) pursuant to [Federal Rule of Civil Procedure 12(b)(6) for failure to state a claim upon which relief can be granted / or relevant state rule or other grounds, e.g., lack of subject matter jurisdiction (Rule 12(b)(1)), lack of personal jurisdiction (Rule 12(b)(2))].
+
+This motion is based on this notice of motion, the attached memorandum of points and authorities, [any attached exhibits, though typically for a 12(b)(6) motion, only the complaint is considered], and upon such other evidence and argument as may be presented to the Court.
+
+MEMORANDUM OF POINTS AND AUTHORITIES
+
+I. INTRODUCTION
+1.  [Briefly state who you are (e.g., Defendant in this action) and that you are seeking dismissal of the Plaintiff's Complaint (or specific claims). Briefly state the primary reason for dismissal (e.g., "because even if all allegations in the Complaint are taken as true, they do not establish a legally recognized claim for relief.").]
+
+II. STANDARD OF REVIEW (Example for FRCP 12(b)(6))
+2.  [Briefly state the legal standard for a motion to dismiss under the cited rule. For example, for a 12(b)(6) motion, the court accepts all well-pleaded factual allegations in the complaint as true and construes them in the light most favorable to the plaintiff. The complaint must contain sufficient factual matter, accepted as true, to 'state a claim to relief that is plausible on its face.' (Citing cases like Bell Atlantic Corp. v. Twombly and Ashcroft v. Iqbal is common here).]
+
+III. ARGUMENT
+3.  [This is the core of your motion. Explain, point by point, why the Plaintiff's complaint (or specific claims) should be dismissed based on the legal standard. Analyze the allegations in the complaint against the elements of the claims asserted.]
+    a.  [Example: "Plaintiff's First Cause of Action for [Claim Name] Fails Because It Does Not Allege [Missing Element X]."]
+        i.  [Discuss the law related to Element X.]
+        ii. [Show how Plaintiff's complaint fails to plead facts supporting Element X.]
+    b.  [Continue for each claim or reason for dismissal.]
+
+IV. CONCLUSION
+4.  For the foregoing reasons, Defendant [Defendant's Name] respectfully requests that this Court grant this motion and dismiss Plaintiff's Complaint [with/without prejudice].
+
+Dated: [Date]
+
+Respectfully submitted,
+____________________________
+[Your Name, Pro Per / Attorney Name]
+[Your Address / Attorney Address]
+[Your Phone / Attorney Phone]
+[Your Email / Attorney Email]
+`,
+  inFormaPauperisApplication: `APPLICATION TO PROCEED IN FORMA PAUPERIS AND SUPPORTING DECLARATION (Generic Example)
+**IMPORTANT: This is a generic example. Many courts have their own official form for applying to proceed In Forma Pauperis (IFP) that you MUST use. Obtain the correct form from your court's website or clerk's office.**
+
+Case Name: [Plaintiff Name] v. [Defendant Name] (Or "In Re: [Your Name]" if initiating a case)
+Case Number: [Case Number, or "To be assigned if new case"]
+Court: [Court Name]
+
+Applicant: [Your Full Name]
+Address: [Your Street Address, City, State, Zip Code]
+Phone Number: [Your Phone Number]
+Email Address: [Your Email Address]
+
+I, [Your Full Name], declare that I am the [Plaintiff/Petitioner/Movant/Defendant] in the above-entitled case. In support of my application to proceed in forma pauperis (without prepayment of fees or costs), I state that I am unable to pay the costs of these proceedings and that I am entitled to the relief sought in my [Complaint/Petition/Motion].
+
+I further declare under penalty of perjury that the following information is true and correct:
+
+1.  **Employment:**
+    Are you currently employed? ( ) Yes ( ) No
+    If yes, name and address of employer: [Employer Name and Address]
+    Your occupation: [Your Occupation]
+    Gross monthly pay or wages: $ [Amount]
+
+2.  **Other Income:**
+    Have you received within the past 12 months any income from a business, profession, or other form of self-employment, or from interest, dividends, an inheritance, Social Security, disability, pensions, annuities, gifts, rents, or other sources? ( ) Yes ( ) No
+    If yes, describe each source of income and state the amount received from each during the past 12 months:
+    [Source 1]: $ [Amount]
+    [Source 2]: $ [Amount]
+
+3.  **Cash and Bank Accounts:**
+    Do you have any cash on hand or money in a checking or savings account? ( ) Yes ( ) No
+    If yes, state the total amount: $ [Amount]
+
+4.  **Property:**
+    Do you own any real estate, stocks, bonds, notes, automobiles, or other valuable property (excluding ordinary household furnishings and clothing)? ( ) Yes ( ) No
+    If yes, describe the property and state its approximate value:
+    [Property 1]: Value $ [Amount]
+    [Property 2]: Value $ [Amount]
+
+5.  **Dependents:**
+    List persons who are dependent on you for support, their relationship to you, and their ages:
+    [Dependent 1]: [Relationship], Age [Age]
+    [Dependent 2]: [Relationship], Age [Age]
+
+6.  **Monthly Expenses (Approximate):**
+    Rent/Mortgage: $ [Amount]
+    Utilities: $ [Amount]
+    Food: $ [Amount]
+    Transportation: $ [Amount]
+    Other essential expenses: $ [Amount]
+
+I understand that a false statement or answer to any question in this declaration may subject me to penalties for perjury.
+
+Dated: [Date]
+
+____________________________
+[Your Signature]
+[Your Typed Full Name]
+`,
+  declarationOfNextFriend: `DECLARATION OF [Next Friend's Full Name]
+IN SUPPORT OF FILING AS NEXT FRIEND FOR [Minor/Incompetent Person's Name]
+
+Case Name: [Plaintiff Name] v. [Defendant Name] (Or "In Re: [Minor/Incompetent Person's Name]" if initiating)
+Case Number: [Case Number, or "To be assigned"]
+Court: [Court Name]
+
+I, [Next Friend's Full Name], declare as follows:
+
+1.  I am the [Relationship to the minor/incompetent person, e.g., "parent and legal guardian," "court-appointed conservator"] of [Full Name of Minor/Incompetent Person] ("the Real Party in Interest").
+2.  The Real Party in Interest is [a minor, being [Age] years of age / an adult who has been deemed incompetent to manage their own affairs by [Name of Court, Case Number, Date of Order, if applicable] because [briefly state reason for incompetency, e.g., "of a medical condition diagnosed as X"]].
+3.  As a result of their [minority/incompetency], the Real Party in Interest is unable to adequately understand or prosecute this legal action on their own behalf.
+4.  I am bringing this action as "Next Friend" on behalf of the Real Party in Interest to [Briefly state the nature of the action and the relief sought, e.g., "assert their claim for personal injuries sustained on [Date]," or "protect their rights concerning [Subject Matter]"].
+5.  I have no interests that are adverse to the interests of the Real Party in Interest in this litigation. My sole purpose in acting as Next Friend is to protect and pursue the rights and best interests of the Real Party in Interest.
+6.  I understand my duties as Next Friend, including the duty to act in the best interests of the Real Party in Interest and to account for any funds recovered on their behalf as required by law or court order.
+
+I declare under penalty of perjury under the laws of the State of [Your State] that the foregoing is true and correct.
+
+Executed on [Date], at [City, State].
+
+____________________________
+[Next Friend's Full Name]
+Declarant
+`,
 };
 
 const US_STATES = [
@@ -391,13 +616,12 @@ export default function DocumentGeneratorPage() {
 
       if (docType !== "foiaRequest") { // FOIA requests are typically not court-specific in the same way
         let effectiveCourtName = "[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]"; // Default for complaint
-        if (docType !== "complaint") {
+        if (docType !== "complaint" && docType !== "civilCoverSheet") { // Civil Cover Sheet also uses more detailed court name
           effectiveCourtName = "[Court Name]"; // Default for other docs
         }
-
-
+        
         if (selectedCourtLevel && selectedState) {
-           if (docType === "complaint") {
+           if (docType === "complaint" || docType === "civilCoverSheet") {
               const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
               if (selectedCourtLevel.toLowerCase().includes("federal")) {
                    effectiveCourtName = `${selectedCourtLevel.replace("Federal ", "UNITED STATES ")} FOR THE ${selectedCity ? `DISTRICT OF ${stateLabel}, ${selectedCity.toUpperCase()} DIVISION` : `DISTRICT OF ${stateLabel.toUpperCase()}` }`;
@@ -408,11 +632,11 @@ export default function DocumentGeneratorPage() {
               effectiveCourtName = `${selectedCourtLevel}${selectedCity ? ` for ${selectedCity}` : ''}, ${US_STATES.find(s => s.value === selectedState)?.label || selectedState}`;
            }
         } else if (selectedCourtLevel) {
-          effectiveCourtName = docType === "complaint" ? selectedCourtLevel.toUpperCase() : selectedCourtLevel;
+          effectiveCourtName = (docType === "complaint" || docType === "civilCoverSheet") ? selectedCourtLevel.toUpperCase() : selectedCourtLevel;
         } else if (selectedState) {
           const stateLabel = US_STATES.find(s => s.value === selectedState)?.label || selectedState;
-          effectiveCourtName = docType === "complaint" ? `[SPECIFY COURT LEVEL] IN ${stateLabel.toUpperCase()}` : `[Specify Court Level] in ${stateLabel}`;
-        } else if (selectedCity && docType === "complaint") {
+          effectiveCourtName = (docType === "complaint" || docType === "civilCoverSheet") ? `[SPECIFY COURT LEVEL] IN ${stateLabel.toUpperCase()}` : `[Specify Court Level] in ${stateLabel}`;
+        } else if (selectedCity && (docType === "complaint" || docType === "civilCoverSheet")) {
            effectiveCourtName = `[SPECIFY COURT LEVEL AND STATE] FOR ${selectedCity.toUpperCase()} DIVISION`;
         } else if (selectedCity) {
            effectiveCourtName = `[Specify Court Level & State] for ${selectedCity}`;
@@ -454,9 +678,19 @@ export default function DocumentGeneratorPage() {
   
   const getDocumentDisplayName = (docType: DocumentType | string): string => {
     if (!docType) return "Choose a document...";
-    if (docType === 'foiaRequest') return "Freedom of Information Act (FOIA) Request";
-    // Add spaces before capital letters and capitalize first letter
-    return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+    switch (docType) {
+      case 'foiaRequest': return "Freedom of Information Act (FOIA) Request";
+      case 'complaint': return "Complaint (Detailed Pre-Filing)";
+      case 'civilCoverSheet': return "Civil Cover Sheet (Generic Example)";
+      case 'summons': return "Summons (Generic Example)";
+      case 'motionToQuash': return "Motion to Quash";
+      case 'motionToDismiss': return "Motion to Dismiss";
+      case 'inFormaPauperisApplication': return "Application to Proceed In Forma Pauperis (IFP)";
+      case 'declarationOfNextFriend': return "Declaration of Next Friend";
+      default:
+        // Add spaces before capital letters and capitalize first letter
+        return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+    }
   };
 
 
@@ -467,6 +701,7 @@ export default function DocumentGeneratorPage() {
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
             Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA requests). Then, choose a document type to generate a template. 
+            The system uses your saved case summary (if available) for context. More advanced AI-powered form filling and smart document selection based on case type are conceptual future enhancements.
             Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
           </CardDescription>
         </CardHeader>
@@ -548,13 +783,19 @@ export default function DocumentGeneratorPage() {
                 <SelectValue placeholder="Choose a document..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="complaint">Complaint (Detailed Pre-Filing)</SelectItem>
-                <SelectItem value="motion">Motion (General)</SelectItem>
-                <SelectItem value="affidavit">Affidavit</SelectItem>
-                <SelectItem value="motionForBailReduction">Motion for Bail Reduction</SelectItem>
-                <SelectItem value="discoveryRequest">Discovery Request (Brady/Witness)</SelectItem>
-                <SelectItem value="petitionForExpungement">Petition for Expungement</SelectItem>
-                <SelectItem value="foiaRequest">Freedom of Information Act (FOIA) Request</SelectItem>
+                <SelectItem value="complaint">{getDocumentDisplayName("complaint")}</SelectItem>
+                <SelectItem value="civilCoverSheet">{getDocumentDisplayName("civilCoverSheet")}</SelectItem>
+                <SelectItem value="summons">{getDocumentDisplayName("summons")}</SelectItem>
+                <SelectItem value="motion">{getDocumentDisplayName("motion")}</SelectItem>
+                <SelectItem value="motionToQuash">{getDocumentDisplayName("motionToQuash")}</SelectItem>
+                <SelectItem value="motionToDismiss">{getDocumentDisplayName("motionToDismiss")}</SelectItem>
+                <SelectItem value="affidavit">{getDocumentDisplayName("affidavit")}</SelectItem>
+                <SelectItem value="declarationOfNextFriend">{getDocumentDisplayName("declarationOfNextFriend")}</SelectItem>
+                <SelectItem value="inFormaPauperisApplication">{getDocumentDisplayName("inFormaPauperisApplication")}</SelectItem>
+                <SelectItem value="motionForBailReduction">{getDocumentDisplayName("motionForBailReduction")}</SelectItem>
+                <SelectItem value="discoveryRequest">{getDocumentDisplayName("discoveryRequest")}</SelectItem>
+                <SelectItem value="petitionForExpungement">{getDocumentDisplayName("petitionForExpungement")}</SelectItem>
+                <SelectItem value="foiaRequest">{getDocumentDisplayName("foiaRequest")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -598,9 +839,11 @@ export default function DocumentGeneratorPage() {
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
               The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable (except for FOIA requests). Check these carefully.
               <br />
+              For templates like "Civil Cover Sheet" and "Summons," these are generic examples. **Most courts require you to use their specific, official forms.** Always obtain the correct forms from your court's website or clerk's office.
+              <br />
               For the "Complaint (Detailed Pre-Filing)" template, this is a comprehensive starting point often used for civil rights claims (like those under 42 U.S.C. § 1983). It includes sections for jurisdiction, parties (with "Next Friend" guidance), detailed factual allegations, specific causes of action, prayer for relief, and a jury demand. It requires substantial customization for your specific facts and legal claims.
               <br />
-              For "Petition for Expungement", legal requirements vary significantly by state; this template is a very general starting point and requires careful review of your specific state's laws.
+              For "Petition for Expungement" and "Application to Proceed In Forma Pauperis (IFP)," legal requirements and specific forms vary significantly by jurisdiction; these templates are general starting points and require careful review of your specific state's laws and court rules.
               <br />
               The "Freedom of Information Act (FOIA) Request" template is for requesting records from U.S. federal government agencies. State-level public records laws (often called "Sunshine Laws" or similar) have different procedures and request formats.
               <br />

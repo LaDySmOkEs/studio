@@ -19,6 +19,14 @@ const CriminalLawSuggestionsInputSchema = z.object({
 });
 export type CriminalLawSuggestionsInput = z.infer<typeof CriminalLawSuggestionsInputSchema>;
 
+const DocumentTypeEnum = z.enum([
+  "motion", "affidavit", "complaint", 
+  "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
+  "foiaRequest",
+  "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
+  "inFormaPauperisApplication", "declarationOfNextFriend"
+]);
+
 // Output schema is the same as SuggestRelevantLawsOutput for consistency
 const CriminalLawSuggestionsOutputSchema = z.object({
   relevantLaws: z
@@ -26,7 +34,7 @@ const CriminalLawSuggestionsOutputSchema = z.object({
     .describe('A list of relevant criminal case laws and precedents suggested by the AI.'),
   confidenceScore: z.number().describe('The confidence score of the suggestion for criminal laws (0-1).'),
   suggestedDocumentTypes: z
-    .array(z.enum(["motion", "affidavit", "complaint", "motionForBailReduction", "discoveryRequest", "petitionForExpungement"]))
+    .array(DocumentTypeEnum)
     .describe('A list of document types relevant to this criminal case.'),
   dueProcessViolationScore: z
     .string()
@@ -45,7 +53,7 @@ const prompt = ai.definePrompt({
   output: {schema: CriminalLawSuggestionsOutputSchema},
   prompt: `You are an expert AI legal assistant specializing in Criminal Law. Based on the case details provided:
 1. Suggest relevant state and federal case laws. Focus on constitutional precedents (e.g., Fourth, Fifth, Sixth Amendments), Supreme Court criminal procedure rules, state criminal code interpretations, sentencing guidelines, landmark cases (Miranda, search/seizure, right to counsel), and issues related to bail, discovery (Brady, witness lists), and post-conviction relief (expungement).
-2. Suggest types of legal documents (from 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement') relevant to this case.
+2. Suggest types of legal documents from the following list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement', 'inFormaPauperisApplication', 'foiaRequest'. Ensure suggestions are relevant to criminal proceedings.
 3. Provide a confidence score (0-1) for your legal suggestions.
 4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks specific to criminal law (e.g., "Low Risk", "Moderate Risk: Potential speedy trial issue based on timeline", "High Risk: Multiple constitutional violations indicated e.g. lack of counsel and coerced confession."). Analyze the severity and volume of potential violations hinted at in the case details. Consider issues like Miranda rights, right to counsel, illegal search/seizure, coerced statements, speedy trial, prosecutorial misconduct. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess specific due process risks.").
 
