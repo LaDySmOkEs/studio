@@ -19,7 +19,8 @@ const JURISDICTIONS_FILTER_OPTIONS = [
   { value: "ca", label: "California" },
   { value: "tx", label: "Texas" },
   { value: "ny", label: "New York" },
-  { value: "all_states", label: "All States (General)"},
+  { value: "tribal", label: "Tribal" },
+  { value: "all_states", label: "All States (General Guide)"},
 ];
 
 const LEGAL_ISSUE_AREAS_FILTER_OPTIONS = [
@@ -31,6 +32,7 @@ const LEGAL_ISSUE_AREAS_FILTER_OPTIONS = [
   { value: "due_process", label: "Due Process" },
   { value: "public_records", label: "Public Records" },
   { value: "court_procedure", label: "Court Procedure" },
+  { value: "legislation", label: "Legislation & Statutes"},
 ];
 
 interface LegalResource {
@@ -123,6 +125,39 @@ const ALL_RESOURCES: LegalResource[] = [
     isExternalLink: false,
     keywords: ["due process", "checklist", "legal rights", "court procedure", "fairness"],
   },
+  {
+    id: "us_code_general",
+    title: "United States Code (U.S.C.)",
+    type: "external_resource",
+    description: "The official codification of general and permanent federal statutes of the United States. Maintained by the Office of the Law Revision Counsel of the U.S. House of Representatives.",
+    jurisdiction: ["federal"],
+    issueArea: ["legislation", "court_procedure", "civil_rights", "criminal_law"],
+    contentOrLink: "https://uscode.house.gov/",
+    isExternalLink: true,
+    keywords: ["us code", "federal statutes", "federal law", "legislation"],
+  },
+  {
+    id: "example_state_legislature",
+    title: "Example: Accessing State Statutes (e.g., via State Legislature Website)",
+    type: "guide",
+    description: "Most state legislatures provide online access to their state's codified laws and statutes. Search for '[Your State] Legislature' or '[Your State] General Statutes'.",
+    jurisdiction: ["all_states"],
+    issueArea: ["legislation", "court_procedure"],
+    contentOrLink: "For example, search 'California Legislative Information' for CA laws. This is a general guide; you need to find your specific state's portal.",
+    isExternalLink: false,
+    keywords: ["state statutes", "state laws", "legislature", "codified laws"],
+  },
+  {
+    id: "tribal_law_overview",
+    title: "Introduction to Tribal Law (General Overview)",
+    type: "external_resource",
+    description: "Tribal law consists of laws passed by Native American tribal governments, which have inherent sovereignty. These laws govern conduct on tribal lands and can cover a wide range of issues. Each tribe has its own distinct legal system.",
+    jurisdiction: ["tribal"],
+    issueArea: ["legislation", "court_procedure", "civil_rights"],
+    contentOrLink: "https://www.narf.org/nill/resources/triballaw.html",
+    isExternalLink: true,
+    keywords: ["tribal law", "native american law", "tribal sovereignty", "indian law"],
+  }
 ];
 
 const getResourceTypeIcon = (type: LegalResource['type']) => {
@@ -138,8 +173,8 @@ const getResourceTypeIcon = (type: LegalResource['type']) => {
 
 export default function LegalLibraryPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedJurisdiction, setSelectedJurisdiction] = useState("");
-  const [selectedLegalIssue, setSelectedLegalIssue] = useState("");
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState("all_jurisdictions");
+  const [selectedLegalIssue, setSelectedLegalIssue] = useState("all_issues");
   const [filteredResources, setFilteredResources] = useState<LegalResource[]>(ALL_RESOURCES);
 
   const { toast } = useToast();
@@ -159,7 +194,7 @@ export default function LegalLibraryPage() {
 
       if (selectedJurisdiction && selectedJurisdiction !== "all_jurisdictions") {
         if (selectedJurisdiction === "all_states") {
-          resources = resources.filter(res => res.jurisdiction.includes("all_states"));
+          resources = resources.filter(res => res.jurisdiction.includes("all_states") || res.jurisdiction.some(j => j !== "federal" && j !== "tribal"));
         } else {
           resources = resources.filter(res => res.jurisdiction.includes(selectedJurisdiction) || res.jurisdiction.includes("all_states"));
         }
@@ -196,8 +231,9 @@ export default function LegalLibraryPage() {
             Legal Resource Library
           </CardTitle>
           <CardDescription>
-            Access a curated library of statutes, case law summaries, guides, and templates.
-            Search or filter by jurisdiction and legal issue. Note: This is a limited collection for demonstration.
+            Access a library of legal resources. While the ultimate goal is comprehensive coverage of state, federal, and tribal laws and regulations, 
+            the current version offers a curated collection of examples and key resources. 
+            Search or filter by jurisdiction and legal issue to find relevant information.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -268,9 +304,9 @@ export default function LegalLibraryPage() {
                           resource.title
                         )}
                       </CardTitle>
-                       <div className="text-xs space-x-1">
+                       <div className="text-xs space-x-1 flex flex-wrap gap-1">
                         {resource.jurisdiction.map(j => {
-                            const jurLabel = JURISDICTIONS_FILTER_OPTIONS.find(opt => opt.value === j)?.label || j;
+                            const jurLabel = JURISDICTIONS_FILTER_OPTIONS.find(opt => opt.value === j)?.label || j.toUpperCase();
                             return <Badge key={j} variant="secondary">{jurLabel}</Badge>
                         })}
                         {resource.issueArea.map(area => {
@@ -299,7 +335,9 @@ export default function LegalLibraryPage() {
             <AlertTriangle className="h-5 w-5 text-accent" />
             <AlertTitle className="font-semibold text-accent">Disclaimer</AlertTitle>
             <AlertDescription>
-              This Legal Library provides a curated collection of resources for informational purposes only and is not exhaustive. It does not constitute legal advice. 
+              This Legal Library provides a curated collection of resources for informational purposes only and is not exhaustive. 
+              The goal is to eventually cover state, federal, and tribal laws comprehensively, but this is a complex and ongoing effort.
+              It does not constitute legal advice. 
               Always consult official sources and qualified legal professionals for definitive legal information and guidance specific to your situation.
             </AlertDescription>
           </Alert>
