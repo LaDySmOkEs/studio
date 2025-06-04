@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle, MessageSquare } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,11 +20,21 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-import { handleCaseAnalysisAction, handleSuggestStrategiesAction, handleSuggestFilingDecisionAction, handleRefineAnalysisAction } from "./actions";
+import { 
+  handleCaseAnalysisAction, 
+  handleSuggestStrategiesAction, 
+  handleSuggestFilingDecisionAction, 
+  handleRefineAnalysisAction,
+  handleSummarizeCaseAction,
+  handleRefineFromFeedbackAction
+} from "./actions";
 import type { SuggestLegalStrategiesInput, SuggestLegalStrategiesOutput } from "@/ai/flows/suggestLegalStrategies";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 import type { SuggestFilingDecisionHelperInput, SuggestFilingDecisionHelperOutput } from "@/ai/flows/suggestFilingDecisionHelper";
 import type { RefineCaseAnalysisInput } from "@/ai/flows/refineCaseAnalysisWithClarification";
+import type { SummarizeCaseInput, CaseSummaryOutput } from "@/ai/flows/summarizeCaseUnderstanding";
+import type { RefineFromFeedbackInput } from "@/ai/flows/refineAnalysisFromSummaryFeedback";
+
 
 import {
   AlertDialog,
@@ -120,7 +130,13 @@ export default function CaseAnalysisPage() {
 
   const [clarifications, setClarifications] = useState("");
   const [isRefiningAnalysis, setIsRefiningAnalysis] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  
+  // For Phase 4
+  const [aiCaseSummary, setAiCaseSummary] = useState<string | null>(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [userFeedbackOnSummary, setUserFeedbackOnSummary] = useState("");
+  const [isRefiningFromFeedback, setIsRefiningFromFeedback] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -176,6 +192,13 @@ export default function CaseAnalysisPage() {
     }
   }, [form, toast]);
 
+  const getCurrentFullNarrative = () => {
+    const originalDetails = form.getValues("caseDetails");
+    if (clarifications.trim()) {
+      return `${originalDetails}\n\nFurther User Clarifications (Phase 2):\n${clarifications}`;
+    }
+    return originalDetails;
+  };
 
   const onSubmit: SubmitHandler<CaseAnalysisFormValues> = async (data) => {
     setIsLoading(true);
@@ -184,8 +207,9 @@ export default function CaseAnalysisPage() {
     setStrategyResult(null);
     setFilingDecisionResult(null);
     setClarifications("");
+    setAiCaseSummary(null);
+    setUserFeedbackOnSummary("");
     setSelectedFileName(null);
-    setFeedback("");
 
     const result = await handleCaseAnalysisAction(data);
 
@@ -218,17 +242,16 @@ export default function CaseAnalysisPage() {
         });
       }
 
-      // Call strategy suggestion flow
       await triggerStrategySuggestion(data.caseDetails, data.caseCategory, result.dueProcessViolationScore, result.relevantLaws);
       setIsLoading(false);
     }
   };
 
-  const triggerStrategySuggestion = async (caseDetails: string, caseCategory: "general" | "criminal" | "civil", dueProcessViolationAssessment: string, relevantLaws: string) => {
+  const triggerStrategySuggestion = async (fullNarrative: string, caseCategory: "general" | "criminal" | "civil", dueProcessViolationAssessment: string, relevantLaws: string) => {
     setIsStrategyLoading(true);
-    setStrategyResult(null); // Clear previous strategy results
+    setStrategyResult(null); 
     const strategyInput: SuggestLegalStrategiesInput = {
-      caseDetails,
+      caseDetails: fullNarrative,
       caseCategory,
       dueProcessViolationAssessment,
       relevantLaws,
@@ -258,6 +281,8 @@ export default function CaseAnalysisPage() {
       setStrategyResult(null);
       setFilingDecisionResult(null);
       setClarifications("");
+      setAiCaseSummary(null);
+      setUserFeedbackOnSummary("");
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -304,8 +329,10 @@ export default function CaseAnalysisPage() {
     }
 
     setIsRefiningAnalysis(true);
-    setStrategyResult(null); // Clear old strategy
-    setFilingDecisionResult(null); // Clear old filing decision help
+    setStrategyResult(null); 
+    setFilingDecisionResult(null);
+    setAiCaseSummary(null); // Clear previous summary if any
+    setUserFeedbackOnSummary(""); // Clear feedback on summary
 
     const input: RefineCaseAnalysisInput = {
       originalCaseDetails: form.getValues("caseDetails"),
@@ -323,19 +350,20 @@ export default function CaseAnalysisPage() {
         variant: "destructive",
       });
     } else {
-      setAnalysisResult(refinedResult); // Update main analysis result
+      setAnalysisResult(refinedResult); 
       toast({
-        title: "Analysis Refined",
+        title: "Analysis Refined (Phase 2)",
         description: "The case analysis has been updated with your clarifications. New strategy suggestions will be generated.",
       });
-      // Automatically trigger new strategy suggestions based on refined analysis
+      
       await triggerStrategySuggestion(
-        form.getValues("caseDetails") + "\n\nClarifications:\n" + clarifications, // Combine original and clarifications for strategy context
+        getCurrentFullNarrative(), 
         form.getValues("caseCategory"),
         refinedResult.dueProcessViolationScore,
         refinedResult.relevantLaws
       );
-      setClarifications(""); // Clear the textarea
+      // Clarifications are now part of getCurrentFullNarrative(), so we don't clear the form's caseDetails, but we do clear the clarifications input field
+      setClarifications(""); 
     }
     setIsRefiningAnalysis(false);
   };
@@ -354,7 +382,7 @@ export default function CaseAnalysisPage() {
     setFilingDecisionResult(null);
 
     const input: SuggestFilingDecisionHelperInput = {
-      caseDetails: form.getValues("caseDetails"),
+      caseDetails: getCurrentFullNarrative(),
       caseCategory: form.getValues("caseCategory"),
       relevantLaws: analysisResult.relevantLaws,
       dueProcessViolationScore: analysisResult.dueProcessViolationScore,
@@ -371,9 +399,67 @@ export default function CaseAnalysisPage() {
       });
     } else {
       setFilingDecisionResult(result);
-      setIsFilingDecisionDialogOpen(true); // Open dialog on success
+      setIsFilingDecisionDialogOpen(true); 
     }
     setIsFilingDecisionLoading(false);
+  };
+
+  const handleRequestAiSummary = async () => {
+    if (!analysisResult) {
+      toast({ title: "Initial Analysis Needed", description: "Please complete Phase 1 analysis first.", variant: "destructive" });
+      return;
+    }
+    setIsSummarizing(true);
+    setAiCaseSummary(null);
+    const input: SummarizeCaseInput = {
+      fullCaseNarrative: getCurrentFullNarrative(),
+      relevantLaws: analysisResult.relevantLaws,
+      dueProcessViolationScore: analysisResult.dueProcessViolationScore,
+    };
+    const summary = await handleSummarizeCaseAction(input);
+    if ('error' in summary) {
+      toast({ title: "AI Summary Failed", description: summary.error, variant: "destructive" });
+    } else {
+      setAiCaseSummary(summary.summaryText);
+      toast({ title: "AI Summary Generated", description: "Review the AI's understanding below and provide feedback." });
+    }
+    setIsSummarizing(false);
+  };
+
+  const handleSubmitFeedbackOnSummary = async () => {
+    if (!analysisResult || !aiCaseSummary || !userFeedbackOnSummary.trim()) {
+      toast({ title: "Cannot Refine from Feedback", description: "AI summary must be generated and feedback provided.", variant: "destructive" });
+      return;
+    }
+    setIsRefiningFromFeedback(true);
+    setStrategyResult(null);
+    setFilingDecisionResult(null);
+
+    const input: RefineFromFeedbackInput = {
+      fullCaseNarrative: getCurrentFullNarrative(),
+      aiGeneratedSummary: aiCaseSummary,
+      userFeedbackOnSummary: userFeedbackOnSummary,
+      caseCategory: form.getValues("caseCategory"),
+    };
+
+    const finalRefinedResult = await handleRefineFromFeedbackAction(input);
+
+    if ('error' in finalRefinedResult) {
+      setError(finalRefinedResult.error);
+      toast({ title: "Refinement from Feedback Failed", description: finalRefinedResult.error, variant: "destructive" });
+    } else {
+      setAnalysisResult(finalRefinedResult);
+      toast({ title: "Analysis Refined (Phase 4)", description: "Case analysis updated based on your feedback to the AI's summary." });
+      await triggerStrategySuggestion(
+        getCurrentFullNarrative(), // Narrative remains the same
+        form.getValues("caseCategory"),
+        finalRefinedResult.dueProcessViolationScore,
+        finalRefinedResult.relevantLaws
+      );
+      setAiCaseSummary(null); // Clear summary and feedback for next potential cycle
+      setUserFeedbackOnSummary("");
+    }
+    setIsRefiningFromFeedback(false);
   };
   
   const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore, form.getValues("caseCategory")) : null;
@@ -386,9 +472,9 @@ export default function CaseAnalysisPage() {
             <Scale /> Intelligent Case Analysis Engine
             </CardTitle>
           <CardDescription>
-            Provide initial details about your case (Phase 1). After initial analysis, you can provide clarifications (Phase 2).
-            Case details entered here can be saved and referenced in other parts of the app (e.g., Document Generator).
-            This tool is for informational purposes and to assist with organizing your thoughts. <strong>It does not provide legal advice.</strong> All AI-generated suggestions, including any assessment of due process, should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
+            Provide initial details about your case (Phase 1). You can then refine the analysis by providing clarifications (Phase 2), and further refine by reviewing and correcting the AI's summary of its understanding (Phase 4).
+            Case details entered here can be saved and referenced in other parts of the app.
+            This tool is for informational purposes. <strong>It does not provide legal advice.</strong> All AI-generated suggestions should be reviewed by a qualified legal professional. Avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -439,7 +525,7 @@ export default function CaseAnalysisPage() {
               />
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <Button type="submit" disabled={isLoading || isRefiningAnalysis} className="w-full sm:w-auto">
+              <Button type="submit" disabled={isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -604,7 +690,7 @@ export default function CaseAnalysisPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleRequestFilingDecision}
-                      disabled={isFilingDecisionLoading || !analysisResult || isRefiningAnalysis}
+                      disabled={isFilingDecisionLoading || !analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
                       className="mt-4"
                       aria-label="Help me decide what to file"
                     >
@@ -625,13 +711,13 @@ export default function CaseAnalysisPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {(isStrategyLoading || isRefiningAnalysis) && ( // Show loader if strategy loading OR analysis is refining
+                  {(isStrategyLoading || isRefiningAnalysis || isRefiningFromFeedback) && ( 
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="mr-2 h-6 w-6 animate-spin text-accent" />
-                      <p className="text-accent">{isRefiningAnalysis ? "Refining analysis and generating new strategies..." : "Generating strategy suggestions..."}</p>
+                      <p className="text-accent">{(isRefiningAnalysis || isRefiningFromFeedback) ? "Refining analysis and generating new strategies..." : "Generating strategy suggestions..."}</p>
                     </div>
                   )}
-                  {!isStrategyLoading && !isRefiningAnalysis && strategyResult && (
+                  {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && strategyResult && (
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-semibold">Suggested Strategies:</h4>
@@ -660,7 +746,7 @@ export default function CaseAnalysisPage() {
                       </Alert>
                     </div>
                   )}
-                   {!isStrategyLoading && !isRefiningAnalysis && !strategyResult && !analysisResult && ( // Before any analysis
+                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && !analysisResult && ( 
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Suggestions Appear Here</AlertTitle>
                        <AlertDescription>
@@ -668,7 +754,7 @@ export default function CaseAnalysisPage() {
                        </AlertDescription>
                      </Alert>
                   )}
-                   {!isStrategyLoading && !isRefiningAnalysis && !strategyResult && analysisResult && ( // Analysis done, but strategy failed or not yet loaded
+                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && analysisResult && ( 
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Awaiting Strategy Suggestions</AlertTitle>
                        <AlertDescription>
@@ -728,7 +814,7 @@ export default function CaseAnalysisPage() {
           )}
 
 
-          {/* Phase 2: Guided Clarification */}
+          {/* Phase 2: Provide Clarifications to Refine Analysis */}
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
@@ -759,19 +845,19 @@ export default function CaseAnalysisPage() {
                 placeholder="Enter any clarifications, corrections, or additional details here to refine the AI's understanding..."
                 rows={5}
                 aria-label="Your clarifications for the AI"
-                disabled={!analysisResult || isLoading || isRefiningAnalysis}
+                disabled={!analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
               />
             </CardContent>
             <CardFooter>
               <Button 
                 variant="outline" 
                 onClick={handleSubmitClarifications}
-                disabled={!analysisResult || isLoading || isRefiningAnalysis || !clarifications.trim()}
+                disabled={!analysisResult || isLoading || isRefiningAnalysis || !clarifications.trim() || isSummarizing || isRefiningFromFeedback}
               >
                 {isRefiningAnalysis ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Refining Analysis...
+                    Refining Analysis (Phase 2)...
                   </>
                 ) : (
                   "Submit Clarifications & Refine Analysis"
@@ -816,38 +902,63 @@ export default function CaseAnalysisPage() {
             </CardFooter>
           </Card>
 
-          {/* Phase 4: Structured Verification (Conceptual) */}
+          {/* Phase 4: Verify AI's Understanding & Refine */}
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <Verified className="w-5 h-5 text-accent" />
-                 Conceptual Phase 4: Structured Verification & Refinement
+                 Phase 4: Verify AI's Understanding & Refine
               </CardTitle>
               <CardDescription>
-                Review the AI's current understanding and provide corrections or additional details. In a full system, this feedback would help the AI learn and improve.
-                For this prototype, the AI does not learn from feedback. This tool does not provide legal advice.
+                First, ask the AI to summarize its current understanding of your case. Then, review the summary and provide specific corrections or additional details. The AI will then generate a final refined analysis based on this feedback.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">Verification & System Improvement:</AlertTitle>
-                <AlertDescription>
-                  The AI would present its summarized understanding of your case based on all information provided. You could then correct any misinterpretations or add crucial missing information. This iterative feedback loop is essential for refining the AI's accuracy and, in a production system, would contribute to its ongoing learning and improvement for future analyses.
-                </AlertDescription>
-              </Alert>
-              <Label htmlFor="feedbackInput" className="sr-only">Your corrections or additional details for the AI</Label>
+              <Button
+                variant="outline"
+                onClick={handleRequestAiSummary}
+                disabled={!analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
+                className="mb-4"
+              >
+                {isSummarizing ? (
+                  <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Getting AI Summary... </>
+                ) : (
+                  <> <MessageSquare className="mr-2 h-4 w-4" /> Get AI's Summary of Understanding </>
+                )}
+              </Button>
+
+              {aiCaseSummary && (
+                <Alert variant="default" className="border-primary bg-primary/5">
+                  <AlertTitle className="font-semibold text-primary">AI's Current Understanding:</AlertTitle>
+                  <AlertDescription className="whitespace-pre-wrap text-sm">{aiCaseSummary}</AlertDescription>
+                </Alert>
+              )}
+
+              <Label htmlFor="feedbackOnSummaryInput" className="sr-only">Your corrections or feedback on the AI's summary</Label>
               <Textarea
-                id="feedbackInput"
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Your corrections or additional details for the AI..."
+                id="feedbackOnSummaryInput"
+                value={userFeedbackOnSummary}
+                onChange={(e) => setUserFeedbackOnSummary(e.target.value)}
+                placeholder="After reviewing the AI's summary above, enter your specific corrections, additions, or feedback here..."
                 rows={5}
-                aria-label="Your corrections or additional details for the AI"
+                aria-label="Your corrections or feedback on the AI's summary"
+                disabled={!aiCaseSummary || isSummarizing || isRefiningFromFeedback || isLoading || isRefiningAnalysis}
               />
             </CardContent>
             <CardFooter>
-              <Button variant="outline" onClick={() => handlePlaceholderSubmit("Feedback & Refinement")}>
-                Submit Feedback & Refine Analysis (Conceptual)
+              <Button 
+                variant="default" 
+                onClick={handleSubmitFeedbackOnSummary}
+                disabled={!aiCaseSummary || !userFeedbackOnSummary.trim() || isSummarizing || isRefiningFromFeedback || isLoading || isRefiningAnalysis}
+              >
+                {isRefiningFromFeedback ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Refining Final Analysis...
+                  </>
+                ) : (
+                  "Submit Feedback & Get Final Refined Analysis"
+                )}
               </Button>
             </CardFooter>
           </Card>
@@ -857,13 +968,3 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
-    
-
-    
-
-    
-
-
-
-    
-

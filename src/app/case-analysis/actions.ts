@@ -32,6 +32,19 @@ import {
   // RefineCaseAnalysisOutput is structurally the same as SuggestRelevantLawsOutput
 } from "@/ai/flows/refineCaseAnalysisWithClarification";
 
+import {
+  summarizeCaseUnderstanding,
+  type SummarizeCaseInput,
+  type CaseSummaryOutput
+} from "@/ai/flows/summarizeCaseUnderstanding";
+
+import {
+  refineAnalysisFromSummaryFeedback,
+  type RefineFromFeedbackInput,
+  // RefinedAnalysisOutput is structurally SuggestRelevantLawsOutput
+} from "@/ai/flows/refineAnalysisFromSummaryFeedback";
+
+
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 // The output type remains consistent across all flows, now including dueProcessViolationScore
@@ -102,5 +115,31 @@ export async function handleRefineAnalysisAction(input: RefineCaseAnalysisInput)
       return { error: "Invalid input for refinement: " + error.errors.map(e => e.message).join(", ") };
     }
     return { error: error instanceof Error ? error.message : "An unknown error occurred while refining analysis." };
+  }
+}
+
+export async function handleSummarizeCaseAction(input: SummarizeCaseInput): Promise<CaseSummaryOutput | { error: string }> {
+  try {
+    const result = await summarizeCaseUnderstanding(input);
+    return result;
+  } catch (error) {
+    console.error("Error in AI case summarization:", error);
+    if (error instanceof z.ZodError) {
+      return { error: "Invalid input for summarization: " + error.errors.map(e => e.message).join(", ") };
+    }
+    return { error: error instanceof Error ? error.message : "An unknown error occurred while summarizing the case." };
+  }
+}
+
+export async function handleRefineFromFeedbackAction(input: RefineFromFeedbackInput): Promise<SuggestRelevantLawsOutput | { error: string }> {
+  try {
+    const result = await refineAnalysisFromSummaryFeedback(input);
+    return result;
+  } catch (error) {
+    console.error("Error in AI refinement from feedback:", error);
+    if (error instanceof z.ZodError) {
+      return { error: "Invalid input for refinement from feedback: " + error.errors.map(e => e.message).join(", ") };
+    }
+    return { error: error instanceof Error ? error.message : "An unknown error occurred while refining analysis from feedback." };
   }
 }
