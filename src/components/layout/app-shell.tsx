@@ -2,7 +2,7 @@
 "use client";
 
 import type React from "react";
-import { Scale } from "lucide-react";
+import { LogoIcon } from "@/components/icons/logo-icon"; // Updated import
 import {
   SidebarProvider,
   Sidebar,
@@ -31,7 +31,7 @@ export function AppShell({ children }: AppShellProps) {
       <Sidebar>
         <SidebarHeader className="p-4">
           <div className="flex items-center gap-2">
-            <Scale className="w-8 h-8 text-primary" />
+            <LogoIcon className="w-8 h-8 text-primary" /> {/* Use LogoIcon */}
             <h1 className="text-xl font-semibold text-foreground group-data-[collapsible=icon]:hidden">
               DUE PROCESS AI
             </h1>
