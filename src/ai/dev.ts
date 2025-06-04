@@ -12,3 +12,4 @@ import '@/ai/flows/summarizeCaseUnderstanding.ts';
 import '@/ai/flows/refineAnalysisFromSummaryFeedback.ts';
 import '@/ai/flows/analyzeTimelineEvents.ts';
 import '@/ai/flows/generateMockTrialScript.ts';
+import '@/ai/flows/generateProceduralRoadmap.ts';
