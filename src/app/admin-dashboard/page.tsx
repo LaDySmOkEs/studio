@@ -8,7 +8,6 @@ export default function AdminDashboardPage() {
     <div>
       <h1>Admin Dashboard - Minimal Test</h1>
       <p>If you see this, the basic route and page component are working.</p>
-      <p>The original content has been temporarily replaced for debugging.</p>
     </div>
   );
 }
