@@ -1,8 +1,9 @@
+
 // src/ai/flows/refineAnalysisFromSummaryFeedback.ts
 'use server';
 
 /**
- * @fileOverview This flow refines the case analysis based on user feedback to an AI-generated summary.
+ * @fileOverview This flow refines the case analysis based on user feedback to an AI-generated summary, potentially asking further questions.
  *
  * - refineAnalysisFromSummaryFeedback - A function that takes original narrative, AI summary, user feedback, and category, then returns a refined analysis.
  * - RefineFromFeedbackInput - The input type for the function.
@@ -22,7 +23,7 @@ export type RefineFromFeedbackInput = z.infer<typeof RefineFromFeedbackInputSche
 
 // DocumentTypeEnum should be consistent with other flows
 const DocumentTypeEnum = z.enum([
-  "motion", "affidavit", "complaint", 
+  "motion", "affidavit", "complaint",
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
@@ -41,6 +42,7 @@ const RefinedAnalysisOutputSchema = z.object({
   dueProcessViolationScore: z
     .string()
     .describe('A qualitative assessment of potential due process violation risks based on the refined input after summary feedback. Consider common due process elements. If details are sparse, indicate that a more thorough review is needed.'),
+  clarifyingQuestions: z.array(z.string()).optional().describe('After incorporating feedback, a list of 1-2 new specific questions if ambiguities persist or new key questions arise. If sufficiently clear, an empty array can be returned.'),
 });
 export type RefinedAnalysisOutput = z.infer<typeof RefinedAnalysisOutputSchema>; // This is structurally SuggestRelevantLawsOutput
 
@@ -71,6 +73,7 @@ Your refined analysis should include:
 2. Suggested types of legal documents that might be appropriate from the allowed list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement', 'foiaRequest', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend', 'tpoChallengeResponse'.
 3. A new confidence score (0-1) for your *refined* legal suggestions.
 4. A *refined* 'Due Process Violation Score' (e.g., "Low Risk", "Moderate Risk", "High Risk", "Indeterminate").
+5. After incorporating this feedback, if ambiguities still remain or if new key questions arise that would further improve the analysis, formulate 1-2 new specific clarifying questions. If the analysis is now sufficiently clear, return an empty array for clarifyingQuestions.
 
 Ensure your output strictly adheres to the defined schema. If no specific documents seem immediately relevant, return an empty list for suggestedDocumentTypes.
 Focus on incorporating the user's feedback on your summary to improve the accuracy and specificity of the overall case analysis.
@@ -91,3 +94,5 @@ const refineAnalysisFromSummaryFeedbackFlow = ai.defineFlow(
     return output;
   }
 );
+
+    

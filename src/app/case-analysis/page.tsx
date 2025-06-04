@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle, MessageSquare } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle, MessageSquare, MessageCircleQuestion } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,10 +20,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-import { 
-  handleCaseAnalysisAction, 
-  handleSuggestStrategiesAction, 
-  handleSuggestFilingDecisionAction, 
+import {
+  handleCaseAnalysisAction,
+  handleSuggestStrategiesAction,
+  handleSuggestFilingDecisionAction,
   handleRefineAnalysisAction,
   handleSummarizeCaseAction,
   handleRefineFromFeedbackAction
@@ -130,7 +130,7 @@ export default function CaseAnalysisPage() {
 
   const [clarifications, setClarifications] = useState("");
   const [isRefiningAnalysis, setIsRefiningAnalysis] = useState(false);
-  
+
   // For Phase 4
   const [aiCaseSummary, setAiCaseSummary] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -231,7 +231,7 @@ export default function CaseAnalysisPage() {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToStore));
         toast({
           title: "Initial Analysis Complete & Saved",
-          description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, due process violation assessment, and suggested documents are now available. Case details saved for other app features.`,
+          description: `Relevant laws for ${form.getValues("caseCategory")} case, confidence score, due process violation assessment, and suggested documents are now available. Case details saved for other app features. The AI may also suggest clarifying questions below to help refine the analysis.`,
         });
       } catch (e) {
         console.error("Failed to save case data to localStorage", e);
@@ -249,7 +249,7 @@ export default function CaseAnalysisPage() {
 
   const triggerStrategySuggestion = async (fullNarrative: string, caseCategory: "general" | "criminal" | "civil", dueProcessViolationAssessment: string, relevantLaws: string) => {
     setIsStrategyLoading(true);
-    setStrategyResult(null); 
+    setStrategyResult(null);
     const strategyInput: SuggestLegalStrategiesInput = {
       caseDetails: fullNarrative,
       caseCategory,
@@ -277,7 +277,7 @@ export default function CaseAnalysisPage() {
         caseDetails: "",
         caseCategory: "general",
       });
-      setAnalysisResult(null); 
+      setAnalysisResult(null);
       setStrategyResult(null);
       setFilingDecisionResult(null);
       setClarifications("");
@@ -317,7 +317,7 @@ export default function CaseAnalysisPage() {
       duration: 5000,
     });
   };
-  
+
   const handleSubmitClarifications = async () => {
     if (!analysisResult || !form.getValues("caseDetails") || !clarifications.trim()) {
       toast({
@@ -329,7 +329,7 @@ export default function CaseAnalysisPage() {
     }
 
     setIsRefiningAnalysis(true);
-    setStrategyResult(null); 
+    setStrategyResult(null);
     setFilingDecisionResult(null);
     setAiCaseSummary(null); // Clear previous summary if any
     setUserFeedbackOnSummary(""); // Clear feedback on summary
@@ -350,20 +350,20 @@ export default function CaseAnalysisPage() {
         variant: "destructive",
       });
     } else {
-      setAnalysisResult(refinedResult); 
+      setAnalysisResult(refinedResult);
       toast({
         title: "Analysis Refined (Phase 2)",
-        description: "The case analysis has been updated with your clarifications. New strategy suggestions will be generated.",
+        description: "The case analysis has been updated with your clarifications. New strategy suggestions will be generated. The AI may also provide further clarifying questions.",
       });
-      
+
       await triggerStrategySuggestion(
-        getCurrentFullNarrative(), 
+        getCurrentFullNarrative(),
         form.getValues("caseCategory"),
         refinedResult.dueProcessViolationScore,
         refinedResult.relevantLaws
       );
       // Clarifications are now part of getCurrentFullNarrative(), so we don't clear the form's caseDetails, but we do clear the clarifications input field
-      setClarifications(""); 
+      setClarifications("");
     }
     setIsRefiningAnalysis(false);
   };
@@ -399,7 +399,7 @@ export default function CaseAnalysisPage() {
       });
     } else {
       setFilingDecisionResult(result);
-      setIsFilingDecisionDialogOpen(true); 
+      setIsFilingDecisionDialogOpen(true);
     }
     setIsFilingDecisionLoading(false);
   };
@@ -449,7 +449,7 @@ export default function CaseAnalysisPage() {
       toast({ title: "Refinement from Feedback Failed", description: finalRefinedResult.error, variant: "destructive" });
     } else {
       setAnalysisResult(finalRefinedResult);
-      toast({ title: "Analysis Refined (Phase 4)", description: "Case analysis updated based on your feedback to the AI's summary." });
+      toast({ title: "Analysis Refined (Phase 4)", description: "Case analysis updated based on your feedback to the AI's summary. The AI may also provide further clarifying questions below." });
       await triggerStrategySuggestion(
         getCurrentFullNarrative(), // Narrative remains the same
         form.getValues("caseCategory"),
@@ -461,7 +461,7 @@ export default function CaseAnalysisPage() {
     }
     setIsRefiningFromFeedback(false);
   };
-  
+
   const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore, form.getValues("caseCategory")) : null;
 
   return (
@@ -472,7 +472,7 @@ export default function CaseAnalysisPage() {
             <Scale /> Intelligent Case Analysis Engine
             </CardTitle>
           <CardDescription>
-            Provide initial details about your case (Phase 1). You can then refine the analysis by providing clarifications (Phase 2), and further refine by reviewing and correcting the AI's summary of its understanding (Phase 4).
+            Provide initial details about your case (Phase 1). The AI may then ask clarifying questions. You can answer these and provide more information (Phase 2). Finally, you can review the AI's summary of its understanding and offer corrections (Phase 4).
             Case details entered here can be saved and referenced in other parts of the app.
             This tool is for informational purposes. <strong>It does not provide legal advice.</strong> All AI-generated suggestions should be reviewed by a qualified legal professional. Avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
@@ -574,7 +574,7 @@ export default function CaseAnalysisPage() {
             <CardHeader>
               <CardTitle className="text-xl">Analysis Results</CardTitle>
               <CardDescription>
-                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. 
+                The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional.
                 The "Case Law Recommender" aspect (conceptually) finds relevant cases based on your facts, to help you back your claims.
                 For more insight into how these suggestions are generated and the factors influencing them, please see the "Confidence Score" and "Due Process Violation Assessment" sections below.
               </CardDescription>
@@ -646,9 +646,9 @@ export default function CaseAnalysisPage() {
                     <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive dark:text-destructive">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
-                    <div className="text-xs text-muted-foreground mt-3"> 
+                    <div className="text-xs text-muted-foreground mt-3">
                         <p>Examples of what this might mean:</p>
-                        <div className="list-disc pl-4 mt-1"> 
+                        <div className="list-disc pl-4 mt-1">
                             <div><strong>Low Risk:</strong> Input suggests standard procedures were likely followed.</div>
                             <div><strong>Moderate Risk:</strong> Input indicates potential concerns (e.g., about notice, hearing opportunity) that warrant closer examination by a legal professional.</div>
                             <div><strong>High Risk:</strong> Input suggests multiple or severe potential violations (e.g., lack of legal representation in a serious criminal matter, clear denial of a hearing). Immediate consultation with a lawyer is strongly advised.</div>
@@ -711,7 +711,7 @@ export default function CaseAnalysisPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {(isStrategyLoading || isRefiningAnalysis || isRefiningFromFeedback) && ( 
+                  {(isStrategyLoading || isRefiningAnalysis || isRefiningFromFeedback) && (
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="mr-2 h-6 w-6 animate-spin text-accent" />
                       <p className="text-accent">{(isRefiningAnalysis || isRefiningFromFeedback) ? "Refining analysis and generating new strategies..." : "Generating strategy suggestions..."}</p>
@@ -746,7 +746,7 @@ export default function CaseAnalysisPage() {
                       </Alert>
                     </div>
                   )}
-                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && !analysisResult && ( 
+                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && !analysisResult && (
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Suggestions Appear Here</AlertTitle>
                        <AlertDescription>
@@ -754,7 +754,7 @@ export default function CaseAnalysisPage() {
                        </AlertDescription>
                      </Alert>
                   )}
-                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && analysisResult && ( 
+                   {!isStrategyLoading && !isRefiningAnalysis && !isRefiningFromFeedback && !strategyResult && analysisResult && (
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Awaiting Strategy Suggestions</AlertTitle>
                        <AlertDescription>
@@ -822,35 +822,39 @@ export default function CaseAnalysisPage() {
                 Phase 2: Provide Clarifications to Refine Analysis
               </CardTitle>
               <CardDescription>
-                If the initial analysis isn't quite right, or if you have more details, provide them here. The AI will use your original narrative and these clarifications to provide a refined analysis. 
+                If the initial analysis isn't quite right, or if you have more details, provide them here. The AI may have suggested specific questions below based on its initial analysis. Answering these can help the AI provide a more refined analysis.
                 This tool does not provide legal advice. If you've logged events in the <Link href="/timeline-event-log" className="text-primary hover:underline">Timeline & Event Log</Link>, you can use that information to answer these clarifying questions.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">Example Clarifying Points:</AlertTitle>
-                <AlertDescription>
-                  <ul className="list-disc pl-5 text-sm">
-                    <li>"Regarding the incident on May 5th, I forgot to mention there was a witness named John Doe."</li>
-                    <li>"The document I received did not have a judge's signature."</li>
-                    <li>"Can you consider that I was not read my Miranda rights?"</li>
-                  </ul>
-                </AlertDescription>
-              </Alert>
+              {analysisResult?.clarifyingQuestions && analysisResult.clarifyingQuestions.length > 0 && (
+                <Alert variant="default" className="border-primary bg-primary/5">
+                  <MessageCircleQuestion className="h-5 w-5 text-primary" />
+                  <AlertTitle className="font-semibold text-primary">AI Suggested Clarifying Questions:</AlertTitle>
+                  <AlertDescription>
+                    The AI has suggested the following questions to help refine its understanding. Please consider these as you provide your clarifications:
+                    <ul className="list-disc pl-5 mt-2 text-sm">
+                      {analysisResult.clarifyingQuestions.map((q, index) => (
+                        <li key={index}>{q}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
               <Label htmlFor="clarificationsInput" className="sr-only">Your clarifications for the AI</Label>
               <Textarea
                 id="clarificationsInput"
                 value={clarifications}
                 onChange={(e) => setClarifications(e.target.value)}
-                placeholder="Enter any clarifications, corrections, or additional details here to refine the AI's understanding..."
+                placeholder="Enter any clarifications, corrections, or additional details here to refine the AI's understanding. Address the AI's questions above if provided..."
                 rows={5}
                 aria-label="Your clarifications for the AI"
                 disabled={!analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
               />
             </CardContent>
             <CardFooter>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleSubmitClarifications}
                 disabled={!analysisResult || isLoading || isRefiningAnalysis || !clarifications.trim() || isSummarizing || isRefiningFromFeedback}
               >
@@ -946,8 +950,8 @@ export default function CaseAnalysisPage() {
               />
             </CardContent>
             <CardFooter>
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 onClick={handleSubmitFeedbackOnSummary}
                 disabled={!aiCaseSummary || !userFeedbackOnSummary.trim() || isSummarizing || isRefiningFromFeedback || isLoading || isRefiningAnalysis}
               >
@@ -968,3 +972,5 @@ export default function CaseAnalysisPage() {
     </div>
   );
 }
+
+    

@@ -3,7 +3,7 @@
 'use server';
 
 /**
- * @fileOverview This flow refines the case analysis based on original details and new user clarifications.
+ * @fileOverview This flow refines the case analysis based on original details and new user clarifications, potentially asking further questions.
  *
  * - refineCaseAnalysisWithClarification - A function that takes original case details, clarifications, and category, then returns a refined analysis.
  * - RefineCaseAnalysisInput - The input type for the function.
@@ -26,7 +26,7 @@ export type RefineCaseAnalysisInput = z.infer<typeof RefineCaseAnalysisInputSche
 
 // DocumentTypeEnum should be consistent with other flows
 const DocumentTypeEnum = z.enum([
-  "motion", "affidavit", "complaint", 
+  "motion", "affidavit", "complaint",
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
@@ -45,6 +45,7 @@ const RefineCaseAnalysisOutputSchema = z.object({
   dueProcessViolationScore: z
     .string()
     .describe('A qualitative assessment of potential due process violation risks based on the refined input. Consider common due process elements like notice, opportunity to be heard, right to counsel (if criminal), impartial decision-maker etc. If details are sparse, indicate that a more thorough review is needed.'),
+  clarifyingQuestions: z.array(z.string()).optional().describe('After incorporating these clarifications, a list of 1-2 new specific questions if ambiguities still remain or if new key questions arise that would further improve the analysis. If the analysis is now sufficiently clear, an empty array can be returned.'),
 });
 export type RefineCaseAnalysisOutput = z.infer<typeof RefineCaseAnalysisOutputSchema>;
 
@@ -63,6 +64,7 @@ Then, provide a *refined* analysis:
 2. Suggest types of legal documents that might be appropriate from the allowed list: 'motion', 'affidavit', 'complaint', 'motionForBailReduction', 'discoveryRequest', 'petitionForExpungement', 'foiaRequest', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend', 'tpoChallengeResponse'.
 3. Provide a new confidence score (0-1) for your *refined* legal suggestions.
 4. Provide a *refined* 'Due Process Violation Score' (e.g., "Low Risk", "Moderate Risk", "High Risk", "Indeterminate").
+5. After incorporating these clarifications, if ambiguities still remain or if new key questions arise that would further improve the analysis, formulate 1-2 new specific clarifying questions for the user. These questions should pinpoint remaining gaps. If the analysis is now sufficiently clear, return an empty array for clarifyingQuestions.
 
 Original Case Details:
 {{{originalCaseDetails}}}
@@ -91,3 +93,5 @@ const refineCaseAnalysisFlow = ai.defineFlow(
     return output;
   }
 );
+
+    

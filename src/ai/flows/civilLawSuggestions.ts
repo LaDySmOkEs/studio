@@ -3,9 +3,9 @@
 'use server';
 
 /**
- * @fileOverview This flow suggests relevant civil case laws and document types based on user-provided case details.
+ * @fileOverview This flow suggests relevant civil case laws, document types, and clarifying questions based on user-provided case details.
  *
- * - civilLawSuggestions - A function that takes case details as input and returns suggested civil case laws and document types.
+ * - civilLawSuggestions - A function that takes case details as input and returns suggested civil case laws, document types, and clarifying questions.
  * - CivilLawSuggestionsInput - The input type for the civilLawSuggestions function.
  * - CivilLawSuggestionsOutput - The return type for the civilLawSuggestions function (structurally same as SuggestRelevantLawsOutput).
  */
@@ -21,7 +21,7 @@ const CivilLawSuggestionsInputSchema = z.object({
 export type CivilLawSuggestionsInput = z.infer<typeof CivilLawSuggestionsInputSchema>;
 
 const DocumentTypeEnum = z.enum([
-  "motion", "affidavit", "complaint", 
+  "motion", "affidavit", "complaint",
   "motionForBailReduction", "discoveryRequest", "petitionForExpungement",
   "foiaRequest",
   "civilCoverSheet", "summons", "motionToQuash", "motionToDismiss",
@@ -40,6 +40,7 @@ const CivilLawSuggestionsOutputSchema = z.object({
   dueProcessViolationScore: z
     .string()
     .describe('A qualitative assessment of potential due process violation risks in a civil context, such as issues with service of process, opportunity to be heard, or biased adjudication. e.g., "Moderate Risk: Allegation of improper service of summons.", "Low Risk: Standard civil procedures appear followed based on input." If details are sparse, indicate that a more thorough review is needed.'),
+  clarifyingQuestions: z.array(z.string()).optional().describe('A list of 2-3 specific questions the AI has for the user to help clarify ambiguous points or gather missing information crucial for a more accurate civil law analysis. If the information is very clear and sufficient, an empty array can be returned.'),
 });
 export type CivilLawSuggestionsOutput = z.infer<typeof CivilLawSuggestionsOutputSchema>;
 
@@ -56,6 +57,7 @@ const prompt = ai.definePrompt({
 2. Suggest types of legal documents that might be appropriate. Consider from this list: 'motion', 'affidavit', 'complaint', 'civilCoverSheet', 'summons', 'motionToQuash', 'motionToDismiss', 'inFormaPauperisApplication', 'declarationOfNextFriend', 'tpoChallengeResponse'. You may also suggest 'foiaRequest' if relevant for obtaining information from government entities.
 3. Provide a confidence score (0-1) for your legal suggestions.
 4. Provide a 'Due Process Violation Score'. This should be a qualitative assessment of potential due process violation risks in a civil context (e.g., "Low Risk", "Moderate Risk: Potential issue with notice of hearing", "High Risk: Concerns about biased decision-maker and lack of opportunity to present evidence."). Analyze the severity and volume of potential violations suggested by the case details. Consider elements like proper service of process, adequate notice of hearings, opportunity to be heard, and impartial adjudication. If details are too sparse to make a determination, state that explicitly in the score (e.g., "Indeterminate: Insufficient details to assess specific due process risks.").
+5. Based on the details provided, if there are ambiguities or missing pieces of information that, if clarified, would significantly improve your civil law analysis, formulate 2-3 specific clarifying questions for the user. Focus on aspects critical for civil procedure or substantive claims. If the information is very clear and sufficient, you can return an empty array for clarifyingQuestions.
 
 Case Details:
 {{{caseDetails}}}
@@ -76,6 +78,6 @@ const civilLawSuggestionsFlow = ai.defineFlow(
     return output! as CivilLawSuggestionsOutput; // Ensure correct typing
   }
 );
-
+    
 
     
