@@ -13,6 +13,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+// Updated ProceedingTypeEnum to include criminal options
 const ProceedingTypeEnum = z.enum([
   "SMALL_CLAIMS_PLAINTIFF",
   "SMALL_CLAIMS_DEFENDANT",
@@ -23,6 +24,11 @@ const ProceedingTypeEnum = z.enum([
   "TRAFFIC_TICKET_DEFENSE",
   "GENERAL_CIVIL_TRIAL_PLAINTIFF",
   "GENERAL_CIVIL_TRIAL_DEFENDANT",
+  "CRIMINAL_ARRAIGNMENT_DEFENDANT",
+  "CRIMINAL_BAIL_HEARING_DEFENDANT",
+  "CRIMINAL_PLEA_HEARING_DEFENDANT",
+  "CRIMINAL_MOTION_HEARING_DEFENSE",
+  "CRIMINAL_TRIAL_DEFENSE",
 ]);
 
 const GenerateMockTrialScriptInputSchema = z.object({
@@ -37,6 +43,8 @@ const ScriptStepSchema = z.object({
   lineOrPrompt: z.string().describe("The dialogue for AI roles, or a prompt for the user if isUserInput is true."),
   isUserInput: z.boolean().optional().default(false).describe("True if this step requires input from the user. If true, lineOrPrompt is a prompt for the user."),
 });
+export type GenerateMockTrialScriptStep = z.infer<typeof ScriptStepSchema>;
+
 
 const GenerateMockTrialScriptOutputSchema = z.object({
   steps: z.array(ScriptStepSchema).describe("An array of steps representing the mock trial script. Should be between 7 and 12 steps total."),
@@ -71,7 +79,7 @@ Instructions for the script:
     *   'lineOrPrompt': The dialogue or a question. If 'isUserInput' is true, this should be a clear prompt for what "You (as {{{userRoleInProceeding}}})" should say or respond to.
     *   'isUserInput': Set to true ONLY for steps where "You (as {{{userRoleInProceeding}}})" needs to provide a response or statement. Otherwise, it's false.
 4.  Ensure there are at least 2-3 steps where 'isUserInput' is true for "You (as {{{userRoleInProceeding}}})".
-5.  The dialogue should be simplified for a mock simulation, focusing on common interactions and procedural points.
+5.  The dialogue should be simplified for a mock simulation, focusing on common interactions and procedural points. If the proceedingType suggests a criminal context (e.g., CRIMINAL_ARRAIGNMENT_DEFENDANT, CRIMINAL_BAIL_HEARING_DEFENDANT, CRIMINAL_PLEA_HEARING_DEFENDANT, CRIMINAL_MOTION_HEARING_DEFENSE, CRIMINAL_TRIAL_DEFENSE), incorporate elements typical to those proceedings, such as discussion of rights, plea entry, bail arguments, or examination of witnesses, but keep it concise.
 6.  The total number of steps in the 'steps' array should be between 7 and 12.
 
 Example of a step where the user provides input:
@@ -112,3 +120,6 @@ const generateMockTrialScriptFlow = ai.defineFlow(
     return { steps: validatedSteps };
   }
 );
+
+
+    

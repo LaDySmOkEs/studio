@@ -12,7 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Gavel, AlertTriangle, ScrollText, MessageCircle, Loader2, Info, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { handleGenerateMockTrialScriptAction } from "./actions";
-import type { GenerateMockTrialScriptInput, GenerateMockTrialScriptOutput, GenerateMockTrialScriptStep } from "@/ai/flows/generateMockTrialScript"; // Assuming GenerateMockTrialScriptStep is exported type for a step
+import type { GenerateMockTrialScriptInput, GenerateMockTrialScriptOutput } from "@/ai/flows/generateMockTrialScript"; // Assuming GenerateMockTrialScriptStep is exported type for a step
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const LOCAL_STORAGE_KEY_CASE_ANALYSIS = "dueProcessAICaseAnalysisData";
@@ -22,6 +22,7 @@ interface StoredCaseData {
   caseCategory: "general" | "criminal" | "civil";
 }
 
+// Updated PROCEEDING_TYPES to include criminal options
 const PROCEEDING_TYPES = [
   { value: "SMALL_CLAIMS_PLAINTIFF", label: "Small Claims (I am Plaintiff)", userRole: "Plaintiff" },
   { value: "SMALL_CLAIMS_DEFENDANT", label: "Small Claims (I am Defendant)", userRole: "Defendant" },
@@ -32,17 +33,34 @@ const PROCEEDING_TYPES = [
   { value: "TRAFFIC_TICKET_DEFENSE", label: "Traffic Ticket Challenge (I am Defendant)", userRole: "Defendant" },
   { value: "GENERAL_CIVIL_TRIAL_PLAINTIFF", label: "General Civil Trial (I am Plaintiff)", userRole: "Plaintiff" },
   { value: "GENERAL_CIVIL_TRIAL_DEFENDANT", label: "General Civil Trial (I am Defendant)", userRole: "Defendant" },
+  { value: "CRIMINAL_ARRAIGNMENT_DEFENDANT", label: "Criminal Arraignment (I am Defendant)", userRole: "Defendant" },
+  { value: "CRIMINAL_BAIL_HEARING_DEFENDANT", label: "Bail Hearing (I am Defendant)", userRole: "Defendant" },
+  { value: "CRIMINAL_PLEA_HEARING_DEFENDANT", label: "Plea Hearing (I am Defendant)", userRole: "Defendant" },
+  { value: "CRIMINAL_MOTION_HEARING_DEFENSE", label: "Criminal Motion Hearing (I am Defense)", userRole: "Defense Counsel" }, // Or "Defendant" if Pro Se focus
+  { value: "CRIMINAL_TRIAL_DEFENSE", label: "Criminal Trial (I am Defense/Defendant)", userRole: "Defendant" },
 ];
+
+interface TranscriptEntry {
+  role: string;
+  line: string;
+}
+
+interface ScriptStep {
+  role: string;
+  lineOrPrompt: string;
+  isUserInput?: boolean;
+}
+
 
 export default function MockTrialPage() {
   const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
   const [selectedProceedingType, setSelectedProceedingType] = useState<string>("");
   
-  const [generatedScript, setGeneratedScript] = useState<GenerateMockTrialScriptStep[] | null>(null);
+  const [generatedScript, setGeneratedScript] = useState<ScriptStep[] | null>(null);
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [currentUserInput, setCurrentUserInput] = useState("");
-  const [transcript, setTranscript] = useState<{ role: string; line: string }[]>([]);
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   
   const { toast } = useToast();
 
@@ -84,7 +102,10 @@ export default function MockTrialPage() {
 
     const input: GenerateMockTrialScriptInput = {
       caseNarrative: storedCaseSummary,
-      proceedingType: proceedingDetail.value as any, // Cast as AI flow enum type expects specific string literals
+      // The type assertion `as any` might be needed if the enum in the AI flow is very specific
+      // and Zod's .enum doesn't perfectly align with a simple string type from the array.
+      // Ideally, the AI flow's enum would be derived from a shared constant if possible.
+      proceedingType: proceedingDetail.value as any, 
       userRoleInProceeding: proceedingDetail.userRole,
     };
 
@@ -93,8 +114,7 @@ export default function MockTrialPage() {
     if ('error' in result) {
       toast({ title: "Script Generation Failed", description: result.error, variant: "destructive" });
     } else if (result.steps && result.steps.length > 0) {
-      setGeneratedScript(result.steps);
-      // Initialize with the first line if it's not user input
+      setGeneratedScript(result.steps as ScriptStep[]); // Cast to ensure type compatibility
       if (!result.steps[0].isUserInput) {
         setTranscript([{ role: result.steps[0].role, line: result.steps[0].lineOrPrompt }]);
       }
@@ -116,15 +136,6 @@ export default function MockTrialPage() {
     if (currentScriptItem.isUserInput) {
       newTranscript.push({ role: `You (as ${PROCEEDING_TYPES.find(p=>p.value === selectedProceedingType)?.userRole || 'User'})`, line: currentUserInput.trim() || "(No response provided)" });
       setCurrentUserInput("");
-    } else {
-      // If the current line is an AI line and it's not already the last item in transcript (to avoid duplicates on first load)
-      if (newTranscript.length === 0 || newTranscript[newTranscript.length - 1].line !== currentScriptItem.lineOrPrompt || newTranscript[newTranscript.length -1].role !== currentScriptItem.role) {
-         // This condition is tricky for the very first AI line if it was pre-added. Let's ensure it's not a user input step.
-         // Add if it's not a user input and the current step's dialogue isn't already the last thing in the transcript
-         if (transcript.length === currentStep) { // Only add AI line if we are advancing to it
-            newTranscript.push({ role: currentScriptItem.role, line: currentScriptItem.lineOrPrompt });
-         }
-      }
     }
     
     setTranscript(newTranscript);
@@ -134,8 +145,6 @@ export default function MockTrialPage() {
     if (nextStepIndex < generatedScript.length) {
       const nextScriptItem = generatedScript[nextStepIndex];
       if (!nextScriptItem.isUserInput) {
-        // If next is also AI, add it immediately to transcript. UI will show it.
-        // This creates an effect of AI speaking, then prompting user if next.
          setTranscript(prev => [...prev, { role: nextScriptItem.role, line: nextScriptItem.lineOrPrompt }]);
       }
     } else {
@@ -147,7 +156,7 @@ export default function MockTrialPage() {
   const userPrompt = currentScriptItem?.isUserInput ? currentScriptItem.lineOrPrompt : "";
 
   let buttonText = "Generate Personalized Mock Trial";
-  let buttonAction = handleGenerateScript;
+  let buttonAction: () => void = handleGenerateScript; // Ensure buttonAction has a default or correct type
   let buttonDisabled = isGeneratingScript || !storedCaseSummary || !selectedProceedingType;
 
   if (generatedScript) {
@@ -213,7 +222,7 @@ export default function MockTrialPage() {
           </div>
 
           <Button onClick={buttonAction} disabled={buttonDisabled} className="w-full sm:w-auto">
-            {isGeneratingScript ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (generatedScript && currentStep < generatedScript.length) ? null : <Brain className="mr-2 h-4 w-4" />}
+            {isGeneratingScript ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (generatedScript && currentScriptItem) ? null : <Brain className="mr-2 h-4 w-4" />}
             {isGeneratingScript ? "Generating Script..." : buttonText}
           </Button>
           {generatedScript && (
@@ -237,6 +246,12 @@ export default function MockTrialPage() {
                       <strong>{entry.role}:</strong> {entry.line}
                     </div>
                   ))}
+                   {/* Display current AI line if it's not user's turn and it hasn't been added by handleNextStepOrSubmit's auto-add logic */}
+                  {!currentScriptItem?.isUserInput && currentScriptItem && transcript.length > 0 && transcript[transcript.length -1].line !== currentScriptItem.lineOrPrompt && (
+                     <div className="text-sm text-foreground">
+                        <strong>{currentScriptItem.role}:</strong> {currentScriptItem.lineOrPrompt}
+                    </div>
+                  )}
                 </ScrollArea>
 
                 {currentScriptItem?.isUserInput && currentStep < generatedScript.length && (
@@ -264,6 +279,15 @@ export default function MockTrialPage() {
                       </AlertDescription>
                     </Alert>
                 )}
+                 {currentStep >= generatedScript.length && (
+                    <Alert variant="default" className="border-green-500 bg-green-500/10">
+                        <Info className="h-5 w-5 text-green-600" />
+                        <AlertTitle className="font-semibold text-green-700">Simulation Ended</AlertTitle>
+                        <AlertDescription>
+                            You have reached the end of this mock trial. Click "Start New Simulation" to try again or choose a different proceeding.
+                        </AlertDescription>
+                    </Alert>
+                )}
 
               </CardContent>
             </Card>
@@ -282,11 +306,4 @@ export default function MockTrialPage() {
   );
 }
 
-// Helper type (could be in a types file if more broadly used)
-declare global {
-    interface GenerateMockTrialScriptStep {
-        role: string;
-        lineOrPrompt: string;
-        isUserInput?: boolean;
-    }
-}
+    
