@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const JURISDICTIONS_FILTER_OPTIONS = [
-  { value: "", label: "All Jurisdictions" },
+  { value: "all_jurisdictions", label: "All Jurisdictions" },
   { value: "federal", label: "Federal (US)" },
   { value: "ca", label: "California" },
   { value: "tx", label: "Texas" },
@@ -23,7 +23,7 @@ const JURISDICTIONS_FILTER_OPTIONS = [
 ];
 
 const LEGAL_ISSUE_AREAS_FILTER_OPTIONS = [
-  { value: "", label: "All Legal Issues" },
+  { value: "all_issues", label: "All Legal Issues" },
   { value: "civil_rights", label: "Civil Rights" },
   { value: "criminal_law", label: "Criminal Law" },
   { value: "family_law", label: "Family Law" },
@@ -115,7 +115,7 @@ const ALL_RESOURCES: LegalResource[] = [
   {
     id: "due_process_checklist_link",
     title: "Due Process Checklist (Internal App Tool)",
-    type: "template_link", // Or "guide"
+    type: "template_link", 
     description: "Use the app's Due Process Checklist to think through common procedural elements for various legal situations like criminal arraignments or administrative hearings.",
     jurisdiction: ["all_states"],
     issueArea: ["due_process", "criminal_law", "court_procedure"],
@@ -157,14 +157,15 @@ export default function LegalLibraryPage() {
         );
       }
 
-      if (selectedJurisdiction && selectedJurisdiction !== "all_states") {
-        resources = resources.filter(res => res.jurisdiction.includes(selectedJurisdiction) || res.jurisdiction.includes("all_states"));
-      } else if (selectedJurisdiction === "all_states") {
-         resources = resources.filter(res => res.jurisdiction.includes("all_states"));
+      if (selectedJurisdiction && selectedJurisdiction !== "all_jurisdictions") {
+        if (selectedJurisdiction === "all_states") {
+          resources = resources.filter(res => res.jurisdiction.includes("all_states"));
+        } else {
+          resources = resources.filter(res => res.jurisdiction.includes(selectedJurisdiction) || res.jurisdiction.includes("all_states"));
+        }
       }
 
-
-      if (selectedLegalIssue) {
+      if (selectedLegalIssue && selectedLegalIssue !== "all_issues") {
         resources = resources.filter(res => res.issueArea.includes(selectedLegalIssue));
       }
       
@@ -178,7 +179,7 @@ export default function LegalLibraryPage() {
   }, [searchTerm, selectedJurisdiction, selectedLegalIssue, performSearchAndFilter]);
 
   const handleSearchButtonClick = () => {
-     performSearchAndFilter(); // Explicitly call on button click if needed for UX, though useEffect handles it
+     performSearchAndFilter(); 
      toast({
       title: "Library Searched",
       description: `Displaying results for your query. Found ${filteredResources.length} item(s).`,
