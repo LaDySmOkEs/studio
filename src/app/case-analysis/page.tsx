@@ -20,10 +20,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-import { handleCaseAnalysisAction, handleSuggestStrategiesAction, handleSuggestFilingDecisionAction } from "./actions";
+import { handleCaseAnalysisAction, handleSuggestStrategiesAction, handleSuggestFilingDecisionAction, handleRefineAnalysisAction } from "./actions";
 import type { SuggestLegalStrategiesInput, SuggestLegalStrategiesOutput } from "@/ai/flows/suggestLegalStrategies";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 import type { SuggestFilingDecisionHelperInput, SuggestFilingDecisionHelperOutput } from "@/ai/flows/suggestFilingDecisionHelper";
+import type { RefineCaseAnalysisInput } from "@/ai/flows/refineCaseAnalysisWithClarification";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,14 +80,14 @@ const getConfidenceDetails = (score: number, caseCategory: "general" | "criminal
     return {
       level: `Moderate Confidence (${roundedScore}%)`,
       explanation: `The AI has moderate confidence. The suggestions are likely relevant, but providing more specific information could improve accuracy.${criminalCaution}`,
-      nextSteps: "Review suggestions carefully. Enhanced disclaimers apply. Consider using the 'Guided Clarification' or 'Document Upload' sections below to provide more details. Consulting a legal professional is strongly advised.",
+      nextSteps: "Review suggestions carefully. Enhanced disclaimers apply. Consider using the 'Provide Clarifications' or 'Document Upload' sections below to provide more details. Consulting a legal professional is strongly advised.",
       colorClass: "text-yellow-600",
     };
   } else if (roundedScore >= 50) {
     return {
       level: `Low Confidence (${roundedScore}%)`,
       explanation: `The AI has low confidence. The initial information may be too general or lack specific legal keywords. Suggestions provided are broad.${criminalCaution}`,
-      nextSteps: "It is highly recommended to provide more details through the 'Guided Clarification', 'Document Upload', or 'Structured Verification' sections. Stronger attorney recommendations apply. Seeking advice from a legal professional is critical.",
+      nextSteps: "It is highly recommended to provide more details through the 'Provide Clarifications', 'Document Upload', or 'Structured Verification' sections. Stronger attorney recommendations apply. Seeking advice from a legal professional is critical.",
       colorClass: "text-orange-600",
     };
   } else {
@@ -117,6 +119,7 @@ export default function CaseAnalysisPage() {
   const { toast } = useToast();
 
   const [clarifications, setClarifications] = useState("");
+  const [isRefiningAnalysis, setIsRefiningAnalysis] = useState(false);
   const [feedback, setFeedback] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
@@ -216,27 +219,33 @@ export default function CaseAnalysisPage() {
       }
 
       // Call strategy suggestion flow
-      setIsStrategyLoading(true);
-      const strategyInput: SuggestLegalStrategiesInput = {
-        caseDetails: data.caseDetails,
-        caseCategory: data.caseCategory,
-        dueProcessViolationAssessment: result.dueProcessViolationScore,
-        relevantLaws: result.relevantLaws,
-      };
-      const strategies = await handleSuggestStrategiesAction(strategyInput);
-      if ('error' in strategies) {
-        toast({
-          title: "Strategy Suggestion Failed",
-          description: strategies.error,
-          variant: "destructive",
-        });
-      } else {
-        setStrategyResult(strategies);
-      }
-      setIsStrategyLoading(false);
+      await triggerStrategySuggestion(data.caseDetails, data.caseCategory, result.dueProcessViolationScore, result.relevantLaws);
       setIsLoading(false);
     }
   };
+
+  const triggerStrategySuggestion = async (caseDetails: string, caseCategory: "general" | "criminal" | "civil", dueProcessViolationAssessment: string, relevantLaws: string) => {
+    setIsStrategyLoading(true);
+    setStrategyResult(null); // Clear previous strategy results
+    const strategyInput: SuggestLegalStrategiesInput = {
+      caseDetails,
+      caseCategory,
+      dueProcessViolationAssessment,
+      relevantLaws,
+    };
+    const strategies = await handleSuggestStrategiesAction(strategyInput);
+    if ('error' in strategies) {
+      toast({
+        title: "Strategy Suggestion Failed",
+        description: strategies.error,
+        variant: "destructive",
+      });
+    } else {
+      setStrategyResult(strategies);
+    }
+    setIsStrategyLoading(false);
+  };
+
 
   const clearStoredCaseDetails = (showToast = true) => {
     try {
@@ -248,6 +257,7 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(null); 
       setStrategyResult(null);
       setFilingDecisionResult(null);
+      setClarifications("");
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -277,11 +287,59 @@ export default function CaseAnalysisPage() {
 
   const handlePlaceholderSubmit = (phaseName: string) => {
     toast({
-      title: `Conceptual: ${phaseName}`,
-      description: "This feature is a placeholder. In a full version, this action would trigger further AI processing and potentially refine analysis or learn from feedback.",
+      title: `${phaseName} (Conceptual)`,
+      description: "This feature is a placeholder. In a full version, this action would trigger further AI processing.",
       duration: 5000,
     });
   };
+  
+  const handleSubmitClarifications = async () => {
+    if (!analysisResult || !form.getValues("caseDetails") || !clarifications.trim()) {
+      toast({
+        title: "Cannot Refine Analysis",
+        description: "An initial analysis must be complete and clarifications must be provided.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRefiningAnalysis(true);
+    setStrategyResult(null); // Clear old strategy
+    setFilingDecisionResult(null); // Clear old filing decision help
+
+    const input: RefineCaseAnalysisInput = {
+      originalCaseDetails: form.getValues("caseDetails"),
+      clarifications: clarifications,
+      caseCategory: form.getValues("caseCategory"),
+    };
+
+    const refinedResult = await handleRefineAnalysisAction(input);
+
+    if ('error' in refinedResult) {
+      setError(refinedResult.error);
+      toast({
+        title: "Refinement Failed",
+        description: refinedResult.error,
+        variant: "destructive",
+      });
+    } else {
+      setAnalysisResult(refinedResult); // Update main analysis result
+      toast({
+        title: "Analysis Refined",
+        description: "The case analysis has been updated with your clarifications. New strategy suggestions will be generated.",
+      });
+      // Automatically trigger new strategy suggestions based on refined analysis
+      await triggerStrategySuggestion(
+        form.getValues("caseDetails") + "\n\nClarifications:\n" + clarifications, // Combine original and clarifications for strategy context
+        form.getValues("caseCategory"),
+        refinedResult.dueProcessViolationScore,
+        refinedResult.relevantLaws
+      );
+      setClarifications(""); // Clear the textarea
+    }
+    setIsRefiningAnalysis(false);
+  };
+
 
   const handleRequestFilingDecision = async () => {
     if (!analysisResult) {
@@ -328,7 +386,7 @@ export default function CaseAnalysisPage() {
             <Scale /> Intelligent Case Analysis Engine
             </CardTitle>
           <CardDescription>
-            Provide initial details about your case (Phase 1). After initial analysis, conceptual steps for clarification, document upload, and verification will be shown.
+            Provide initial details about your case (Phase 1). After initial analysis, you can provide clarifications (Phase 2).
             Case details entered here can be saved and referenced in other parts of the app (e.g., Document Generator).
             This tool is for informational purposes and to assist with organizing your thoughts. <strong>It does not provide legal advice.</strong> All AI-generated suggestions, including any assessment of due process, should be reviewed by a qualified legal professional. Case details submitted are processed by an AI model; please avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
@@ -381,7 +439,7 @@ export default function CaseAnalysisPage() {
               />
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+              <Button type="submit" disabled={isLoading || isRefiningAnalysis} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -428,7 +486,7 @@ export default function CaseAnalysisPage() {
         <div className="space-y-6 mt-6">
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-xl">Initial Analysis Results</CardTitle>
+              <CardTitle className="text-xl">Analysis Results</CardTitle>
               <CardDescription>
                 The following suggestions are AI-generated and for informational purposes only. They do not constitute legal advice and must be reviewed by a qualified legal professional. 
                 The "Case Law Recommender" aspect (conceptually) finds relevant cases based on your facts, to help you back your claims.
@@ -474,7 +532,7 @@ export default function CaseAnalysisPage() {
                             <li><strong>Clarity and Specificity:</strong> How clearly and specifically you describe your situation, including the use of relevant legal terms.</li>
                             <li><strong>Information Completeness:</strong> The amount of detail provided about key facts, parties, dates, and actions.</li>
                             <li><strong>Evidence Indication:</strong> Mention or (conceptual) presence of supporting documents (e.g., contracts, notices, police reports).</li>
-                            <li><strong>Consistency:</strong> The internal consistency of your narrative and (conceptual) follow-up information.</li>
+                            <li><strong>Consistency:</strong> The internal consistency of your narrative and follow-up information.</li>
                             <li><strong>Case Complexity Indicators:</strong> Factors that might suggest a straightforward or a more complex legal issue.</li>
                           </ul>
                           <p className="pt-1">A higher score generally suggests a clearer match to known legal patterns and precedents within the AI's knowledge base. A lower score may indicate that the information is too general, ambiguous, or falls outside common patterns the AI is trained on. This score is for informational purposes and not a guarantee of legal outcomes or the sole basis for legal decisions. Its primary aim is to provide transparency into the AI's initial assessment.</p>
@@ -546,7 +604,7 @@ export default function CaseAnalysisPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleRequestFilingDecision}
-                      disabled={isFilingDecisionLoading || !analysisResult}
+                      disabled={isFilingDecisionLoading || !analysisResult || isRefiningAnalysis}
                       className="mt-4"
                       aria-label="Help me decide what to file"
                     >
@@ -563,17 +621,17 @@ export default function CaseAnalysisPage() {
                     <Brain className="w-5 h-5 text-accent" /> AI Suggested Strategies & Motions
                     </CardTitle>
                     <CardDescription>
-                    Based on the initial analysis and due process assessment, the AI suggests specific legal strategies or motions.
+                    Based on the analysis and due process assessment, the AI suggests specific legal strategies or motions.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {isStrategyLoading && (
+                  {(isStrategyLoading || isRefiningAnalysis) && ( // Show loader if strategy loading OR analysis is refining
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="mr-2 h-6 w-6 animate-spin text-accent" />
-                      <p className="text-accent">Generating strategy suggestions...</p>
+                      <p className="text-accent">{isRefiningAnalysis ? "Refining analysis and generating new strategies..." : "Generating strategy suggestions..."}</p>
                     </div>
                   )}
-                  {!isStrategyLoading && strategyResult && (
+                  {!isStrategyLoading && !isRefiningAnalysis && strategyResult && (
                     <div className="space-y-4">
                       <div>
                         <h4 className="font-semibold">Suggested Strategies:</h4>
@@ -602,7 +660,7 @@ export default function CaseAnalysisPage() {
                       </Alert>
                     </div>
                   )}
-                   {!isStrategyLoading && !strategyResult && !analysisResult && ( // Before any analysis
+                   {!isStrategyLoading && !isRefiningAnalysis && !strategyResult && !analysisResult && ( // Before any analysis
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Suggestions Appear Here</AlertTitle>
                        <AlertDescription>
@@ -610,7 +668,7 @@ export default function CaseAnalysisPage() {
                        </AlertDescription>
                      </Alert>
                   )}
-                   {!isStrategyLoading && !strategyResult && analysisResult && ( // Analysis done, but strategy failed or not yet loaded
+                   {!isStrategyLoading && !isRefiningAnalysis && !strategyResult && analysisResult && ( // Analysis done, but strategy failed or not yet loaded
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Awaiting Strategy Suggestions</AlertTitle>
                        <AlertDescription>
@@ -670,42 +728,54 @@ export default function CaseAnalysisPage() {
           )}
 
 
-          {/* Phase 2: Guided Clarification (Conceptual) */}
+          {/* Phase 2: Guided Clarification */}
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-accent" />
-                Conceptual Phase 2: Guided Clarification
+                Phase 2: Provide Clarifications to Refine Analysis
               </CardTitle>
               <CardDescription>
-                In a more advanced system, the AI might ask follow-up questions to refine its understanding. Your responses here would help improve accuracy. This tool does not provide legal advice.
-                If you've logged events in the <Link href="/timeline-event-log" className="text-primary hover:underline">Timeline & Event Log</Link>, you can use that information to answer these clarifying questions.
+                If the initial analysis isn't quite right, or if you have more details, provide them here. The AI will use your original narrative and these clarifications to provide a refined analysis. 
+                This tool does not provide legal advice. If you've logged events in the <Link href="/timeline-event-log" className="text-primary hover:underline">Timeline & Event Log</Link>, you can use that information to answer these clarifying questions.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">Example Clarifying Questions:</AlertTitle>
+                <AlertTitle className="font-semibold text-accent">Example Clarifying Points:</AlertTitle>
                 <AlertDescription>
                   <ul className="list-disc pl-5 text-sm">
-                    <li>"Could you provide specific dates or a timeline for the events you described?"</li>
-                    <li>"Who are the main parties involved, and what are their relationships to each other?"</li>
-                    <li>"Were there any specific damages, injuries, or losses incurred? If so, please detail them."</li>
+                    <li>"Regarding the incident on May 5th, I forgot to mention there was a witness named John Doe."</li>
+                    <li>"The document I received did not have a judge's signature."</li>
+                    <li>"Can you consider that I was not read my Miranda rights?"</li>
                   </ul>
                 </AlertDescription>
               </Alert>
-              <Label htmlFor="clarificationsInput" className="sr-only">Your answers to potential clarifying questions</Label>
+              <Label htmlFor="clarificationsInput" className="sr-only">Your clarifications for the AI</Label>
               <Textarea
                 id="clarificationsInput"
                 value={clarifications}
                 onChange={(e) => setClarifications(e.target.value)}
-                placeholder="Your answers to potential clarifying questions..."
+                placeholder="Enter any clarifications, corrections, or additional details here to refine the AI's understanding..."
                 rows={5}
-                aria-label="Your answers to potential clarifying questions"
+                aria-label="Your clarifications for the AI"
+                disabled={!analysisResult || isLoading || isRefiningAnalysis}
               />
             </CardContent>
             <CardFooter>
-              <Button variant="outline" onClick={() => handlePlaceholderSubmit("Guided Clarification")}>
-                Submit Clarifications (Conceptual)
+              <Button 
+                variant="outline" 
+                onClick={handleSubmitClarifications}
+                disabled={!analysisResult || isLoading || isRefiningAnalysis || !clarifications.trim()}
+              >
+                {isRefiningAnalysis ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Refining Analysis...
+                  </>
+                ) : (
+                  "Submit Clarifications & Refine Analysis"
+                )}
               </Button>
             </CardFooter>
           </Card>
@@ -796,3 +866,4 @@ export default function CaseAnalysisPage() {
 
 
     
+

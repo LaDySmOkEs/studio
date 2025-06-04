@@ -26,6 +26,12 @@ import {
   type SuggestFilingDecisionHelperOutput
 } from "@/ai/flows/suggestFilingDecisionHelper";
 
+import {
+  refineCaseAnalysisWithClarification,
+  type RefineCaseAnalysisInput,
+  // RefineCaseAnalysisOutput is structurally the same as SuggestRelevantLawsOutput
+} from "@/ai/flows/refineCaseAnalysisWithClarification";
+
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 // The output type remains consistent across all flows, now including dueProcessViolationScore
@@ -81,5 +87,20 @@ export async function handleSuggestFilingDecisionAction(input: SuggestFilingDeci
       return { error: "Invalid input for filing decision: " + error.errors.map(e => e.message).join(", ") };
     }
     return { error: error instanceof Error ? error.message : "An unknown error occurred while suggesting filing decisions." };
+  }
+}
+
+export async function handleRefineAnalysisAction(input: RefineCaseAnalysisInput): Promise<SuggestRelevantLawsOutput | { error: string }> {
+  try {
+    // Input for refineCaseAnalysisWithClarification is RefineCaseAnalysisInput
+    // Output is RefineCaseAnalysisOutput, which is structurally same as SuggestRelevantLawsOutput
+    const result = await refineCaseAnalysisWithClarification(input);
+    return result;
+  } catch (error) {
+    console.error("Error in AI analysis refinement:", error);
+    if (error instanceof z.ZodError) {
+      return { error: "Invalid input for refinement: " + error.errors.map(e => e.message).join(", ") };
+    }
+    return { error: error instanceof Error ? error.message : "An unknown error occurred while refining analysis." };
   }
 }

@@ -7,4 +7,5 @@ import '@/ai/flows/criminalLawSuggestions.ts';
 import '@/ai/flows/civilLawSuggestions.ts';
 import '@/ai/flows/suggestLegalStrategies.ts';
 import '@/ai/flows/suggestFilingDecisionHelper.ts';
+import '@/ai/flows/refineCaseAnalysisWithClarification.ts';
 
