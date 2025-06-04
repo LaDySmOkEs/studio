@@ -373,7 +373,7 @@ export default function CaseAnalysisPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive-foreground dark:text-destructive-foreground/90">
+                    <p className="text-sm font-medium p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive dark:text-destructive">
                         {analysisResult.dueProcessViolationScore || "No specific assessment provided."}
                     </p>
                     <div className="text-xs text-muted-foreground mt-3"> 
