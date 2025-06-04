@@ -78,11 +78,11 @@ export default function DueProcessChecklistPage() {
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <ListChecks className="w-7 h-7 text-primary" />
-            Due Process Checklist Builder (Conceptual)
+            Interactive Due Process Checklists
           </CardTitle>
           <CardDescription>
-            This tool provides general checklists to help you think about common due process elements and legal claims.
-            These are for informational purposes only, not exhaustive, and not legal advice. Procedures vary greatly by jurisdiction and the specific facts of your case.
+            Use these interactive checklists to think through common due process elements and key considerations for various legal claims and situations.
+            This tool is for informational and organizational purposes. It is not exhaustive and does not constitute legal advice. Procedures vary greatly by jurisdiction and the specific facts of your case.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -90,7 +90,8 @@ export default function DueProcessChecklistPage() {
             <AlertTriangle className="h-5 w-5 text-accent" />
             <AlertTitle className="font-semibold text-accent">Important Note</AlertTitle>
             <AlertDescription>
-              The checkboxes below are for your personal reference and to guide your thinking. Their state is not saved.
+              The checkboxes below are for your personal reference to guide your thinking and preparation.
+              Their state is managed by your browser and is not saved permanently or sent to any server. If you refresh the page or close your browser, your selections will be lost.
               Always consult with a qualified legal professional for advice tailored to your specific situation.
             </AlertDescription>
           </Alert>
