@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,9 +20,22 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-import { handleCaseAnalysisAction, handleSuggestStrategiesAction } from "./actions";
+import { handleCaseAnalysisAction, handleSuggestStrategiesAction, handleSuggestFilingDecisionAction } from "./actions";
 import type { SuggestLegalStrategiesInput, SuggestLegalStrategiesOutput } from "@/ai/flows/suggestLegalStrategies";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
+import type { SuggestFilingDecisionHelperInput, SuggestFilingDecisionHelperOutput } from "@/ai/flows/suggestFilingDecisionHelper";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
 
@@ -88,6 +101,9 @@ export default function CaseAnalysisPage() {
   const [analysisResult, setAnalysisResult] = useState<SuggestRelevantLawsOutput | null>(null);
   const [strategyResult, setStrategyResult] = useState<SuggestLegalStrategiesOutput | null>(null);
   const [isStrategyLoading, setIsStrategyLoading] = useState(false);
+  const [filingDecisionResult, setFilingDecisionResult] = useState<SuggestFilingDecisionHelperOutput | null>(null);
+  const [isFilingDecisionLoading, setIsFilingDecisionLoading] = useState(false);
+  const [isFilingDecisionDialogOpen, setIsFilingDecisionDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -134,6 +150,7 @@ export default function CaseAnalysisPage() {
     setError(null);
     setAnalysisResult(null);
     setStrategyResult(null);
+    setFilingDecisionResult(null);
     setClarifications("");
     setSelectedFileName(null);
     setFeedback("");
@@ -184,7 +201,6 @@ export default function CaseAnalysisPage() {
           description: strategies.error,
           variant: "destructive",
         });
-        // We don't nullify strategyResult here so previous successful results aren't cleared on a subsequent failure of this part.
       } else {
         setStrategyResult(strategies);
       }
@@ -202,6 +218,7 @@ export default function CaseAnalysisPage() {
       });
       setAnalysisResult(null); 
       setStrategyResult(null);
+      setFilingDecisionResult(null);
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -235,6 +252,41 @@ export default function CaseAnalysisPage() {
       description: "This feature is a placeholder. In a full version, this action would trigger further AI processing and potentially refine analysis or learn from feedback.",
       duration: 5000,
     });
+  };
+
+  const handleRequestFilingDecision = async () => {
+    if (!analysisResult) {
+      toast({
+        title: "Analysis Required",
+        description: "Please perform an initial case analysis first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsFilingDecisionLoading(true);
+    setFilingDecisionResult(null);
+
+    const input: SuggestFilingDecisionHelperInput = {
+      caseDetails: form.getValues("caseDetails"),
+      caseCategory: form.getValues("caseCategory"),
+      relevantLaws: analysisResult.relevantLaws,
+      dueProcessViolationScore: analysisResult.dueProcessViolationScore,
+      suggestedDocumentTypes: analysisResult.suggestedDocumentTypes,
+    };
+
+    const result = await handleSuggestFilingDecisionAction(input);
+
+    if ('error' in result) {
+      toast({
+        title: "Filing Decision Help Failed",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      setFilingDecisionResult(result);
+      setIsFilingDecisionDialogOpen(true); // Open dialog on success
+    }
+    setIsFilingDecisionLoading(false);
   };
   
   const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore, form.getValues("caseCategory")) : null;
@@ -443,18 +495,16 @@ export default function CaseAnalysisPage() {
                         </li>
                       ))}
                     </ul>
-                     <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toast({
-                            title: "Conceptual Feature: AI Filing Decider",
-                            description: "In a more advanced system, clicking this would trigger an AI to analyze your case further and provide more specific advice on exactly what to file and when. This feature is conceptual for now.",
-                            duration: 7000,
-                        })}
-                        className="mt-4"
-                        aria-label="Help me decide what to file (Conceptual)"
-                        >
-                        <Brain className="mr-2 h-4 w-4" /> Help Me Decide What to File (Conceptual)
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRequestFilingDecision}
+                      disabled={isFilingDecisionLoading || !analysisResult}
+                      className="mt-4"
+                      aria-label="Help me decide what to file"
+                    >
+                      {isFilingDecisionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Brain className="mr-2 h-4 w-4" />}
+                      Help Me Decide What to File
                     </Button>
                   </CardContent>
                 </Card>
@@ -505,7 +555,7 @@ export default function CaseAnalysisPage() {
                       </Alert>
                     </div>
                   )}
-                   {!isStrategyLoading && !strategyResult && !analysisResult && (
+                   {!isStrategyLoading && !strategyResult && !analysisResult && ( // Before any analysis
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Suggestions Appear Here</AlertTitle>
                        <AlertDescription>
@@ -513,7 +563,7 @@ export default function CaseAnalysisPage() {
                        </AlertDescription>
                      </Alert>
                   )}
-                   {!isStrategyLoading && !strategyResult && analysisResult && (
+                   {!isStrategyLoading && !strategyResult && analysisResult && ( // Analysis done, but strategy failed or not yet loaded
                      <Alert variant="default" className="bg-accent/10">
                        <AlertTitle className="font-semibold text-accent">Awaiting Strategy Suggestions</AlertTitle>
                        <AlertDescription>
@@ -526,6 +576,50 @@ export default function CaseAnalysisPage() {
 
             </CardContent>
           </Card>
+
+          {filingDecisionResult && (
+            <AlertDialog open={isFilingDecisionDialogOpen} onOpenChange={setIsFilingDecisionDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-primary" /> AI Filing Decision Helper
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Based on your case analysis, here's some guidance on what you might consider filing next. This is not legal advice.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="space-y-3 py-4">
+                  <div>
+                    <h4 className="font-semibold">Top Suggested Document Types to Consider:</h4>
+                    {filingDecisionResult.topSuggestions.length > 0 ? (
+                      <ul className="list-disc pl-5 text-sm space-y-1">
+                        {filingDecisionResult.topSuggestions.map((docType, index) => (
+                          <li key={index}>{getDocumentDisplayName(docType)}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No specific top suggestions at this time.</p>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">AI's Reasoning & Advice:</h4>
+                    <p className="text-sm whitespace-pre-wrap">{filingDecisionResult.filingAdvice}</p>
+                  </div>
+                   <Alert variant="default" className="bg-accent/10 mt-2">
+                    <AlertTriangle className="h-4 w-4 text-accent" />
+                    <AlertTitle className="font-semibold text-accent">Important Disclaimer</AlertTitle>
+                    <AlertDescription className="text-xs">
+                      This AI-generated advice is for informational purposes only and does not constitute legal advice. Always consult with a qualified legal professional for guidance specific to your situation.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogAction onClick={() => setIsFilingDecisionDialogOpen(false)}>Got it</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
 
           {/* Phase 2: Guided Clarification (Conceptual) */}
           <Card className="shadow-md">
@@ -650,3 +744,6 @@ export default function CaseAnalysisPage() {
 
     
 
+
+
+    
