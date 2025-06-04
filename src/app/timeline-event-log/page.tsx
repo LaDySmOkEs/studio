@@ -179,11 +179,10 @@ export default function TimelineEventLogPage() {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <CalendarClock className="w-7 h-7 text-primary" /> Due Process Timeline Visualization
+              <CalendarClock className="w-7 h-7 text-primary" /> Due Process Timeline &amp; Event Log
             </CardTitle>
             <CardDescription>
-              Graphically log and visualize important dates, events, and procedural steps related to your case. 
-              This tool helps organize your case timeline. Entries are stored locally in your browser for this prototype.
+              Log important dates, events, and procedural steps related to your case. This tool serves as a visual aid to organize your case timeline chronologically. Entries are stored locally in your browser.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -259,7 +258,7 @@ export default function TimelineEventLogPage() {
         {events.length > 0 && (
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>Case Timeline Visualization</CardTitle>
+              <CardTitle>Case Timeline</CardTitle>
               <CardDescription>Review your logged events below, sorted by event date (most recent first). Each event is shown with its type and an icon.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -373,7 +372,7 @@ export default function TimelineEventLogPage() {
             )}
              <Alert variant="default" className="border-accent bg-accent/10 mt-4">
                 <AlertTriangle className="h-4 w-4 text-accent" />
-                <AlertTitle className="font-semibold">Important Note & Disclaimer</AlertTitle>
+                <AlertTitle className="font-semibold">Important Note &amp; Disclaimer</AlertTitle>
                 <AlertDescription>
                   The AI analysis provides general observations based on the event types and descriptions you log. It is not legal advice and does not assess legal validity or procedural correctness.
                   Its purpose is to help you identify patterns or significant events in your timeline for further review. Always consult with a qualified legal professional for advice on your specific case.
@@ -385,3 +384,4 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
+
