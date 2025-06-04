@@ -108,6 +108,14 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    font-family: Arial, Helvetica, sans-serif; /* Keep existing font */
+    @apply bg-background text-foreground; /* Keep existing theme applies */
+    
+    /* Add new background properties */
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJjdXJyZW50Q29sb3IiIG9wYWNpdHk9IjAuMDUiPjxyZWN0IHg9IjE1IiB5PSI1NSIgd2lkdGg9IjcwIiBoZWlnaHQ9IjEyIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiByeD0iMiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIxOCIgeT0iNTciIHdpZHRoPSI2NCIgaGVpZ2h0PSIzIiBmaWxsLW9wYWNpdHk9IjAuMyIvPjxyZWN0IHg9IjcwIiB5PSI1NSIgd2lkdGg9IjMiIGhlaWdodD0iMTIiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iMTUiIHk9IjY4IiB3aWR0aD0iNzAiIGhlaWdodD0iMTIiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjIiByeD0iMiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIxOCIgeT0iNzAiIHdpZHRoPSI2NCIgaGVpZ2h0PSIzIiBmaWxsLW9wYWNpdHk9IjAuMyIvPjxyZWN0IHg9IjcwIiB5PSI2OCIgd2lkdGg9IjMiIGhlaWdodD0iMTIiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iNDIuNSIgeT0iNDAiIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSIgcng9IjEiLz48cmVjdCB4PSI0OCIgeT0iMTUiIHdpZHRoPSI0IiBoZWlnaHQ9IjI1Ii8+PHJlY3QgeD0iMTAiIHk9IjEyIiB3aWR0aD0iODAiIGhlaWdodD0iNCIgcng9IjEiLz48cGF0aCBkPSJNIDIwIDE2IEwgMjAgMjUgTCAzMCA0NSBMIDEwIDQ1IFoiLz48cGF0aCBkPSJNIDgwIDE2IEwgODAgMjUgTCA3MCA0NSBMIDkwIDQ1IFoiLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: 50vmin; /* scales with the smaller viewport dimension */
   }
 }
