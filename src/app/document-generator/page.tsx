@@ -21,7 +21,8 @@ type DocumentType =
   | "foiaRequest" 
   | "civilCoverSheet" | "summons" | "motionToQuash" | "motionToDismiss" 
   | "inFormaPauperisApplication" | "declarationOfNextFriend"
-  | "tpoChallengeResponse" // Added new type
+  | "tpoChallengeResponse"
+  | "settlementAgreement" // Added new type
   | "";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData"; // Same key as in CaseAnalysisPage
@@ -568,6 +569,66 @@ ____________________________
 
 (Consider attaching exhibits like relevant text messages, emails, photos, or declarations from witnesses, if allowed by your court's rules for this type of response/motion. Label them Exhibit A, Exhibit B, etc.)
 `,
+settlementAgreement: `SETTLEMENT AGREEMENT AND RELEASE (Generic Example)
+**IMPORTANT: This is a very generic template. Settlement agreements are legally binding contracts and should be drafted or reviewed by an attorney to ensure they accurately reflect your understanding and protect your rights.**
+
+This Settlement Agreement and Release ("Agreement") is entered into as of [Date of Agreement], by and between:
+
+1.  **[Your Full Name / Your Company Name]** ("Party A"), located at [Your Address], and
+2.  **[Other Party's Full Name / Other Party's Company Name]** ("Party B"), located at [Other Party's Address].
+
+Party A and Party B are collectively referred to as the "Parties."
+
+RECITALS
+WHEREAS, a dispute has arisen between the Parties concerning [Briefly describe the nature of the dispute, e.g., "a car accident that occurred on [Date]," or "allegations of breach of contract dated [Date]," or "Case Name: [Case Name], Case Number: [Case Number], pending in [Court Name]"] (the "Dispute");
+WHEREAS, the Parties desire to fully and finally resolve all claims, differences, and causes of action related to the Dispute upon the terms and conditions set forth in this Agreement, without any admission of liability by any Party;
+
+NOW, THEREFORE, in consideration of the mutual covenants and promises contained herein, and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the Parties agree as follows:
+
+1.  **Settlement Payment (if applicable):**
+    [Choose one or modify as needed:]
+    (a) Within [Number] days of the execution of this Agreement, Party B shall pay to Party A the sum of [Dollar Amount in words] ($[Dollar Amount in numbers]) (the "Settlement Amount"). This payment shall be made by [Method of payment, e.g., certified check, wire transfer to [Account Details]].
+    (b) [If no payment, state: "No monetary payment is being made by either Party under this Agreement." Or describe non-monetary consideration.]
+
+2.  **Release of Claims by Party A:**
+    Upon [Choose one: "receipt of the Settlement Amount by Party A" / "execution of this Agreement by all Parties"], Party A, on behalf of themselves and their heirs, executors, administrators, successors, and assigns, hereby fully and forever releases and discharges Party B, and its [if Party B is a company: officers, directors, employees, agents, insurers, successors, and assigns], from any and all claims, demands, actions, causes of action, liabilities, damages, costs, expenses, and attorneys' fees, of whatever kind or nature, whether known or unknown, suspected or unsuspected, asserted or unasserted, which Party A ever had, now has, or hereafter can, shall, or may have against Party B, arising from or in any way related to the Dispute.
+
+3.  **Release of Claims by Party B (if applicable - for mutual release):**
+    Upon [Choose one: "payment of the Settlement Amount by Party B" / "execution of this Agreement by all Parties"], Party B, on behalf of themselves and their heirs, executors, administrators, successors, and assigns, hereby fully and forever releases and discharges Party A, and its [if Party A is a company: officers, directors, employees, agents, insurers, successors, and assigns], from any and all claims, demands, actions, causes of action, liabilities, damages, costs, expenses, and attorneys' fees, of whatever kind or nature, whether known or unknown, suspected or unsuspected, asserted or unasserted, which Party B ever had, now has, or hereafter can, shall, or may have against Party A, arising from or in any way related to the Dispute.
+    [If only one party is releasing claims, delete the inapplicable section.]
+
+4.  **Dismissal of Litigation (if applicable):**
+    Within [Number] days of [Choose one: "receipt of the Settlement Amount by Party A" / "execution of this Agreement by all Parties"], the Parties shall jointly file (or Party A shall file) a Stipulation of Dismissal with Prejudice of the lawsuit styled [Case Name], Case Number [Case Number], pending in [Court Name]. Each party shall bear its own costs and attorneys' fees.
+
+5.  **No Admission of Liability:**
+    This Agreement is a compromise of disputed claims and is not to be construed as an admission of liability or wrongdoing by any Party. The Parties enter into this Agreement to avoid further litigation and expense.
+
+6.  **Confidentiality (Optional - modify or delete if not applicable):**
+    The Parties agree to keep the terms and conditions of this Agreement confidential and shall not disclose them to any third party, except as may be required by law, to their attorneys, accountants, or financial advisors, or to enforce the terms of this Agreement.
+
+7.  **Governing Law:**
+    This Agreement shall be governed by and construed in accordance with the laws of the State of [Your State / Relevant State].
+
+8.  **Entire Agreement:**
+    This Agreement constitutes the entire understanding between the Parties with respect to the subject matter hereof and supersedes all prior discussions, negotiations, and agreements, whether oral or written.
+
+9.  **Binding Effect:**
+    This Agreement shall be binding upon and inure to the benefit of the Parties and their respective heirs, executors, administrators, successors, and assigns.
+
+10. **Counterparts:**
+    This Agreement may be executed in one or more counterparts, each ofwhich shall be deemed an original, but all of which together shall constitute one and the same instrument. Electronic signatures shall be deemed as effective as original signatures.
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the date first written above.
+
+PARTY A:                                     PARTY B:
+
+____________________________                 ____________________________
+[Your Typed Full Name / Company Name]        [Other Party's Typed Full Name / Company Name]
+
+By: _________________________ (if company)  By: _________________________ (if company)
+Name: _______________________                Name: _______________________
+Title: ________________________               Title: ________________________
+`,
 };
 
 const US_STATES = [
@@ -661,7 +722,7 @@ export default function DocumentGeneratorPage() {
     if (docType && DOCUMENT_TEMPLATES[docType]) {
       let template = DOCUMENT_TEMPLATES[docType];
 
-      if (docType !== "foiaRequest") { // FOIA requests are typically not court-specific in the same way
+      if (docType !== "foiaRequest" && docType !== "settlementAgreement") { // FOIA & Settlement are not court-specific in same way
         let effectiveCourtName = "[NAME OF COURT - e.g., UNITED STATES DISTRICT COURT FOR THE DISTRICT OF [Your District]]"; // Default for complaint
         if (docType !== "complaint" && docType !== "civilCoverSheet") { // Civil Cover Sheet also uses more detailed court name
           effectiveCourtName = "[Court Name]"; // Default for other docs
@@ -699,7 +760,11 @@ export default function DocumentGeneratorPage() {
         template = template.replace(/\[County\/District\]/g, selectedCity || "[County/District]");
         template = template.replace(/under the laws of the State of \[Your State\]/g, `under the laws of the State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[Your State]' : "[Your State]"}`);
         template = template.replace(/\[State\]/g, selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[State]' : "[State]"); // General placeholder for state
+      } else if (docType === "settlementAgreement") {
+         // Handle state replacement for governing law in settlement agreements
+        template = template.replace(/the State of \[Your State \/ Relevant State\]/g, `the State of ${selectedState ? US_STATES.find(s => s.value === selectedState)?.label || '[Your State / Relevant State]' : "[Your State / Relevant State]"}`);
       }
+
 
       setGeneratedDocument(template);
     } else if (!selectedDocument) {
@@ -735,6 +800,7 @@ export default function DocumentGeneratorPage() {
       case 'inFormaPauperisApplication': return "Application to Proceed In Forma Pauperis (IFP)";
       case 'declarationOfNextFriend': return "Declaration of Next Friend";
       case 'tpoChallengeResponse': return "Temporary Protective Order (TPO) Challenge/Response";
+      case 'settlementAgreement': return "Settlement Agreement (Generic)";
       default:
         // Add spaces before capital letters and capitalize first letter
         return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
@@ -748,7 +814,7 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA requests). 
+            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA or Settlement Agreements). 
             Then, choose a document type to generate a template. The system uses AI-driven suggestions (from Case Analysis) and your saved case summary (if available) to provide context. 
             Conceptual future enhancements include AI-powered "Smart Form Filling" (extracting data from your case summary or uploads to populate templates, suggesting legal phrasing), "Evidence-to-Complaint" generation, and support for highly "Custom Pleadings."
             Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
@@ -846,6 +912,7 @@ export default function DocumentGeneratorPage() {
                 <SelectItem value="petitionForExpungement">{getDocumentDisplayName("petitionForExpungement")}</SelectItem>
                 <SelectItem value="foiaRequest">{getDocumentDisplayName("foiaRequest")}</SelectItem>
                 <SelectItem value="tpoChallengeResponse">{getDocumentDisplayName("tpoChallengeResponse")}</SelectItem>
+                <SelectItem value="settlementAgreement">{getDocumentDisplayName("settlementAgreement")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -887,7 +954,7 @@ export default function DocumentGeneratorPage() {
           <CardContent>
             <p className="text-sm text-muted-foreground space-y-2">
               Ensure you replace all bracketed placeholders like "[Your Name]" with your specific information.
-              The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable (except for FOIA requests). Check these carefully.
+              The jurisdictional details (State, City/County/Division, Court Level) you selected have been pre-filled where applicable (except for FOIA requests and Settlement Agreements). Check these carefully.
               <br />
               For templates like "Civil Cover Sheet" and "Summons," these are generic examples. **Most courts require you to use their specific, official forms.** Always obtain the correct forms from your court's website or clerk's office.
               <br />
@@ -896,6 +963,8 @@ export default function DocumentGeneratorPage() {
               For "Petition for Expungement," "Application to Proceed In Forma Pauperis (IFP)," and "Temporary Protective Order (TPO) Challenge/Response," legal requirements and specific forms vary significantly by jurisdiction; these templates are general starting points and require careful review of your specific state's laws and court rules.
               <br />
               The "Freedom of Information Act (FOIA) Request" template is for requesting records from U.S. federal government agencies. State-level public records laws (often called "Sunshine Laws" or similar) have different procedures and request formats.
+              <br />
+              The "Settlement Agreement (Generic)" template is a very general starting point. Settlement agreements are legally binding and often complex. This template should be carefully reviewed and customized, ideally with the assistance of an attorney, to ensure it accurately reflects the terms of your specific agreement and protects your interests. Key areas like releases of claims and confidentiality should be tailored to your situation.
               <br />
               <strong>Disclaimer:</strong> These templates are for informational purposes only and do not constitute legal advice. Always verify requirements with your local court rules (or relevant agency for FOIA) and consult a qualified legal professional before using or submitting any legal document.
             </p>
