@@ -19,6 +19,12 @@ import {
   type SuggestLegalStrategiesOutput 
 } from "@/ai/flows/suggestLegalStrategies";
 
+import { 
+  suggestFilingDecisionHelper, 
+  type SuggestFilingDecisionHelperInput, 
+  type SuggestFilingDecisionHelperOutput 
+} from "@/ai/flows/suggestFilingDecisionHelper";
+
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 // The output type remains consistent across all flows, now including dueProcessViolationScore
@@ -61,5 +67,18 @@ export async function handleSuggestStrategiesAction(input: SuggestLegalStrategie
   } catch (error) {
     console.error("Error in AI strategy suggestion:", error);
     return { error: error instanceof Error ? error.message : "An unknown error occurred while suggesting strategies." };
+  }
+}
+
+export async function handleSuggestFilingDecisionAction(input: SuggestFilingDecisionHelperInput): Promise<SuggestFilingDecisionHelperOutput | { error: string }> {
+  try {
+    const result = await suggestFilingDecisionHelper(input);
+    return result;
+  } catch (error) {
+    console.error("Error in AI filing decision suggestion:", error);
+    if (error instanceof z.ZodError) {
+      return { error: "Invalid input for filing decision: " + error.errors.map(e => e.message).join(", ") };
+    }
+    return { error: error instanceof Error ? error.message : "An unknown error occurred while suggesting filing decisions." };
   }
 }
