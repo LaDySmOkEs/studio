@@ -35,6 +35,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
@@ -134,7 +143,27 @@ export default function CaseAnalysisPage() {
           toast({
             title: "Previous Case Data Loaded",
             description: "Your previously entered case details and category have been loaded.",
-            action: ( <Button variant="ghost" size="sm" onClick={() => clearStoredCaseDetails(true)}> <Trash2 className="mr-2 h-4 w-4" /> Clear Data </Button> ),
+            action: (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm"> <Trash2 className="mr-2 h-4 w-4" /> Clear Data </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action will permanently delete your saved case details (narrative and category) from your browser's local storage. You will need to re-enter them if you want to use them again.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => clearStoredCaseDetails(true)}>
+                      Yes, Clear Data
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ),
           });
         }
       }
@@ -362,9 +391,27 @@ export default function CaseAnalysisPage() {
                   "Analyze Case & Save Details"
                 )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => clearStoredCaseDetails(true)} className="w-full sm:w-auto" aria-label="Clear stored case details from browser">
-                 <Trash2 className="mr-2 h-4 w-4" /> Clear Stored Details
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" aria-label="Clear stored case details from browser">
+                    <Trash2 className="mr-2 h-4 w-4" /> Clear Stored Details
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action will permanently delete your saved case details (narrative and category) from your browser's local storage. You will need to re-enter them if you want to use them again.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => clearStoredCaseDetails(true)}>
+                      Yes, Clear Data
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardFooter>
           </form>
         </Form>
@@ -578,16 +625,16 @@ export default function CaseAnalysisPage() {
           </Card>
 
           {filingDecisionResult && (
-            <AlertDialog open={isFilingDecisionDialogOpen} onOpenChange={setIsFilingDecisionDialogOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center gap-2">
+            <Dialog open={isFilingDecisionDialogOpen} onOpenChange={setIsFilingDecisionDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
                     <Brain className="w-5 h-5 text-primary" /> AI Filing Decision Helper
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
+                  </DialogTitle>
+                  <DialogDescription>
                     Based on your case analysis, here's some guidance on what you might consider filing next. This is not legal advice.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
+                  </DialogDescription>
+                </DialogHeader>
                 <div className="space-y-3 py-4">
                   <div>
                     <h4 className="font-semibold">Top Suggested Document Types to Consider:</h4>
@@ -613,11 +660,13 @@ export default function CaseAnalysisPage() {
                     </AlertDescription>
                   </Alert>
                 </div>
-                <AlertDialogFooter>
-                  <AlertDialogAction onClick={() => setIsFilingDecisionDialogOpen(false)}>Got it</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button">Got it</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           )}
 
 
