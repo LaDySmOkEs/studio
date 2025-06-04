@@ -1,4 +1,3 @@
-
 // src/ai/flows/refineAnalysisFromSummaryFeedback.ts
 'use server';
 
@@ -13,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const RefineFromFeedbackInputSchema = z.object({
+const RefineFromFeedbackInputSchema = z.object({
   fullCaseNarrative: z.string().describe('The complete narrative of the case, including original details and any previous clarifications.'),
   aiGeneratedSummary: z.string().describe("The AI's summary of its understanding of the case, which the user has reviewed."),
   userFeedbackOnSummary: z.string().describe("The user's corrections, additions, or feedback on the AI's summary."),
@@ -31,7 +30,7 @@ const DocumentTypeEnum = z.enum([
 ]);
 
 // Output schema is the same as SuggestRelevantLawsOutput for consistency
-export const RefinedAnalysisOutputSchema = z.object({
+const RefinedAnalysisOutputSchema = z.object({
   relevantLaws: z
     .string()
     .describe('A list of relevant case laws suggested by the AI, refined based on user feedback to the AI summary.'),

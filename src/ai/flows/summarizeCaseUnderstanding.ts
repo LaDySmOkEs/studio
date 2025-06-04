@@ -1,4 +1,3 @@
-
 // src/ai/flows/summarizeCaseUnderstanding.ts
 'use server';
 
@@ -13,14 +12,14 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SummarizeCaseInputSchema = z.object({
+const SummarizeCaseInputSchema = z.object({
   fullCaseNarrative: z.string().describe('The complete narrative of the case, including original details and any clarifications.'),
   relevantLaws: z.string().describe('The relevant laws previously identified by the AI.'),
   dueProcessViolationScore: z.string().describe('The due process violation assessment previously provided by the AI.'),
 });
 export type SummarizeCaseInput = z.infer<typeof SummarizeCaseInputSchema>;
 
-export const CaseSummaryOutputSchema = z.object({
+const CaseSummaryOutputSchema = z.object({
   summaryText: z.string().describe("A concise summary of the AI's understanding of the key facts, main legal issues, and due process concerns."),
 });
 export type CaseSummaryOutput = z.infer<typeof CaseSummaryOutputSchema>;
