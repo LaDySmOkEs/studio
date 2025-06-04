@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle, MessageSquare, MessageCircleQuestion } from "lucide-react";
+import { Loader2, Lightbulb, FileText, Scale, HelpCircle, UploadCloud, Verified, Edit, Info, ShieldAlert, Trash2, ArrowRight, Brain, AlertTriangle, MessageSquare, MessageCircleQuestion, FileUp } from "lucide-react";
 import type { SuggestRelevantLawsOutput } from "@/ai/flows/suggest-relevant-laws";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -112,7 +112,6 @@ const getConfidenceDetails = (score: number, caseCategory: "general" | "criminal
 
 const getDocumentDisplayName = (docType: string): string => {
     if (!docType) return "";
-    // Add spaces before capital letters and capitalize first letter
     return docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
 };
 
@@ -131,7 +130,6 @@ export default function CaseAnalysisPage() {
   const [clarifications, setClarifications] = useState("");
   const [isRefiningAnalysis, setIsRefiningAnalysis] = useState(false);
 
-  // For Phase 4
   const [aiCaseSummary, setAiCaseSummary] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [userFeedbackOnSummary, setUserFeedbackOnSummary] = useState("");
@@ -139,6 +137,8 @@ export default function CaseAnalysisPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [documentSummary, setDocumentSummary] = useState("");
+  const [isFilePreparedForSummary, setIsFilePreparedForSummary] = useState(false);
 
 
   const form = useForm<CaseAnalysisFormValues>({
@@ -188,16 +188,17 @@ export default function CaseAnalysisPage() {
       }
     } catch (e) {
       console.error("Failed to load or parse case data from localStorage", e);
-      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear corrupted data
+      localStorage.removeItem(LOCAL_STORAGE_KEY); 
     }
   }, [form, toast]);
 
   const getCurrentFullNarrative = () => {
     const originalDetails = form.getValues("caseDetails");
+    let narrative = originalDetails;
     if (clarifications.trim()) {
-      return `${originalDetails}\n\nFurther User Clarifications (Phase 2):\n${clarifications}`;
+      narrative += `\n\nFurther User Clarifications (Phase 2):\n${clarifications}`;
     }
-    return originalDetails;
+    return narrative;
   };
 
   const onSubmit: SubmitHandler<CaseAnalysisFormValues> = async (data) => {
@@ -210,6 +211,8 @@ export default function CaseAnalysisPage() {
     setAiCaseSummary(null);
     setUserFeedbackOnSummary("");
     setSelectedFileName(null);
+    setDocumentSummary("");
+    setIsFilePreparedForSummary(false);
 
     const result = await handleCaseAnalysisAction(data);
 
@@ -283,6 +286,11 @@ export default function CaseAnalysisPage() {
       setClarifications("");
       setAiCaseSummary(null);
       setUserFeedbackOnSummary("");
+      setSelectedFileName(null);
+      setDocumentSummary("");
+      setIsFilePreparedForSummary(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -305,18 +313,87 @@ export default function CaseAnalysisPage() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFileName(event.target.files[0].name);
+      setIsFilePreparedForSummary(false); // Reset if new file is chosen
+      setDocumentSummary(""); // Clear old summary
     } else {
       setSelectedFileName(null);
+      setIsFilePreparedForSummary(false);
     }
   };
 
-  const handlePlaceholderSubmit = (phaseName: string) => {
+  const handlePrepareDocumentForSummary = () => {
+    if (!selectedFileName) {
+      toast({
+        title: "No Document Selected",
+        description: "Please select a document first using the 'Choose File' button.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsFilePreparedForSummary(true);
     toast({
-      title: `${phaseName} (Conceptual)`,
-      description: "This feature is a placeholder. In a full version, this action would trigger further AI processing.",
-      duration: 5000,
+      title: `Document Ready for Summary: ${selectedFileName}`,
+      description: "Please provide a summary of its key contents in the textarea below.",
     });
   };
+
+  const handleSubmitDocumentSummary = async () => {
+    if (!analysisResult || !form.getValues("caseDetails") || !selectedFileName || !documentSummary.trim()) {
+      toast({
+        title: "Cannot Submit Document Summary",
+        description: "An initial analysis must be complete, a document prepared, and a summary provided.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRefiningAnalysis(true);
+    setStrategyResult(null);
+    setFilingDecisionResult(null);
+    setAiCaseSummary(null);
+    setUserFeedbackOnSummary("");
+
+    const docSummaryText = `[Summary for document: ${selectedFileName}]:\n${documentSummary}`;
+    const combinedClarifications = `${docSummaryText}\n\n${clarifications.trim() ? `Previous Clarifications (Phase 2):\n${clarifications}` : ''}`.trim();
+
+    const input: RefineCaseAnalysisInput = {
+      originalCaseDetails: form.getValues("caseDetails"),
+      clarifications: combinedClarifications,
+      caseCategory: form.getValues("caseCategory"),
+    };
+
+    const refinedResult = await handleRefineAnalysisAction(input);
+
+    if ('error' in refinedResult) {
+      setError(refinedResult.error);
+      toast({
+        title: "Refinement with Document Summary Failed",
+        description: refinedResult.error,
+        variant: "destructive",
+      });
+    } else {
+      setAnalysisResult(refinedResult);
+      toast({
+        title: "Analysis Refined (Phase 3 - Document Summary)",
+        description: `The case analysis has been updated with insights from your summary of '${selectedFileName}'. New strategy suggestions will be generated. The AI may also provide further clarifying questions.`,
+      });
+      
+      await triggerStrategySuggestion(
+        `${form.getValues("caseDetails")}\n\n${combinedClarifications}`, // Pass the full narrative including the new summary
+        form.getValues("caseCategory"),
+        refinedResult.dueProcessViolationScore,
+        refinedResult.relevantLaws
+      );
+      
+      setDocumentSummary("");
+      setSelectedFileName(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setIsFilePreparedForSummary(false);
+      // setClarifications(""); // Decide if Phase 2 clarifications should also be cleared here or kept separate. Let's keep them for now.
+    }
+    setIsRefiningAnalysis(false);
+  };
+
 
   const handleSubmitClarifications = async () => {
     if (!analysisResult || !form.getValues("caseDetails") || !clarifications.trim()) {
@@ -331,8 +408,8 @@ export default function CaseAnalysisPage() {
     setIsRefiningAnalysis(true);
     setStrategyResult(null);
     setFilingDecisionResult(null);
-    setAiCaseSummary(null); // Clear previous summary if any
-    setUserFeedbackOnSummary(""); // Clear feedback on summary
+    setAiCaseSummary(null); 
+    setUserFeedbackOnSummary(""); 
 
     const input: RefineCaseAnalysisInput = {
       originalCaseDetails: form.getValues("caseDetails"),
@@ -362,8 +439,7 @@ export default function CaseAnalysisPage() {
         refinedResult.dueProcessViolationScore,
         refinedResult.relevantLaws
       );
-      // Clarifications are now part of getCurrentFullNarrative(), so we don't clear the form's caseDetails, but we do clear the clarifications input field
-      setClarifications("");
+      // setClarifications(""); // User might want to add more clarifications based on new AI questions
     }
     setIsRefiningAnalysis(false);
   };
@@ -412,7 +488,7 @@ export default function CaseAnalysisPage() {
     setIsSummarizing(true);
     setAiCaseSummary(null);
     const input: SummarizeCaseInput = {
-      fullCaseNarrative: getCurrentFullNarrative(),
+      fullCaseNarrative: getCurrentFullNarrative(), // This now includes phase 2 clarifications if any
       relevantLaws: analysisResult.relevantLaws,
       dueProcessViolationScore: analysisResult.dueProcessViolationScore,
     };
@@ -435,8 +511,11 @@ export default function CaseAnalysisPage() {
     setStrategyResult(null);
     setFilingDecisionResult(null);
 
+    const currentNarrativeForFeedback = `${form.getValues("caseDetails")}${clarifications.trim() ? `\n\nUser Clarifications (Phase 2):\n${clarifications}` : ''}${documentSummary.trim() && selectedFileName ? `\n\nUser Summary for Document (${selectedFileName}):\n${documentSummary}` : ''}`.trim();
+
+
     const input: RefineFromFeedbackInput = {
-      fullCaseNarrative: getCurrentFullNarrative(),
+      fullCaseNarrative: currentNarrativeForFeedback,
       aiGeneratedSummary: aiCaseSummary,
       userFeedbackOnSummary: userFeedbackOnSummary,
       caseCategory: form.getValues("caseCategory"),
@@ -451,18 +530,19 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(finalRefinedResult);
       toast({ title: "Analysis Refined (Phase 4)", description: "Case analysis updated based on your feedback to the AI's summary. The AI may also provide further clarifying questions below." });
       await triggerStrategySuggestion(
-        getCurrentFullNarrative(), // Narrative remains the same
+        currentNarrativeForFeedback, 
         form.getValues("caseCategory"),
         finalRefinedResult.dueProcessViolationScore,
         finalRefinedResult.relevantLaws
       );
-      setAiCaseSummary(null); // Clear summary and feedback for next potential cycle
+      setAiCaseSummary(null); 
       setUserFeedbackOnSummary("");
     }
     setIsRefiningFromFeedback(false);
   };
 
   const confidenceDetails = analysisResult ? getConfidenceDetails(analysisResult.confidenceScore, form.getValues("caseCategory")) : null;
+  const isAnyLoading = isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback || isStrategyLoading || isFilingDecisionLoading;
 
   return (
     <div className="space-y-6">
@@ -472,7 +552,7 @@ export default function CaseAnalysisPage() {
             <Scale /> Intelligent Case Analysis Engine
             </CardTitle>
           <CardDescription>
-            Provide initial details about your case (Phase 1). The AI may then ask clarifying questions. You can answer these and provide more information (Phase 2). Finally, you can review the AI's summary of its understanding and offer corrections (Phase 4).
+            Provide initial details about your case (Phase 1). The AI may then ask clarifying questions. You can answer these and provide more information (Phase 2), incorporate document summaries (Phase 3), and review the AI's summary of its understanding and offer corrections (Phase 4).
             Case details entered here can be saved and referenced in other parts of the app.
             This tool is for informational purposes. <strong>It does not provide legal advice.</strong> All AI-generated suggestions should be reviewed by a qualified legal professional. Avoid submitting highly sensitive personal identifiable information.
           </CardDescription>
@@ -486,7 +566,7 @@ export default function CaseAnalysisPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel htmlFor="caseCategorySelect">Case Category</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value} disabled={isAnyLoading}>
                       <FormControl>
                         <SelectTrigger id="caseCategorySelect" aria-describedby="caseCategory-message" aria-label="Case Category">
                           <SelectValue placeholder="Select a case category" />
@@ -517,6 +597,7 @@ export default function CaseAnalysisPage() {
                         {...field}
                         aria-describedby="caseDetails-message"
                         aria-label="Case details input"
+                        disabled={isAnyLoading}
                       />
                     </FormControl>
                     <FormMessage id="caseDetails-message" />
@@ -525,7 +606,7 @@ export default function CaseAnalysisPage() {
               />
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2">
-              <Button type="submit" disabled={isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback} className="w-full sm:w-auto">
+              <Button type="submit" disabled={isAnyLoading} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -537,7 +618,7 @@ export default function CaseAnalysisPage() {
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full sm:w-auto" aria-label="Clear stored case details from browser">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" aria-label="Clear stored case details from browser" disabled={isAnyLoading}>
                     <Trash2 className="mr-2 h-4 w-4" /> Clear Stored Details
                   </Button>
                 </AlertDialogTrigger>
@@ -690,7 +771,7 @@ export default function CaseAnalysisPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleRequestFilingDecision}
-                      disabled={isFilingDecisionLoading || !analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
+                      disabled={isAnyLoading}
                       className="mt-4"
                       aria-label="Help me decide what to file"
                     >
@@ -849,14 +930,14 @@ export default function CaseAnalysisPage() {
                 placeholder="Enter any clarifications, corrections, or additional details here to refine the AI's understanding. Address the AI's questions above if provided..."
                 rows={5}
                 aria-label="Your clarifications for the AI"
-                disabled={!analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
+                disabled={!analysisResult || isAnyLoading}
               />
             </CardContent>
             <CardFooter>
               <Button
                 variant="outline"
                 onClick={handleSubmitClarifications}
-                disabled={!analysisResult || isLoading || isRefiningAnalysis || !clarifications.trim() || isSummarizing || isRefiningFromFeedback}
+                disabled={!analysisResult || isAnyLoading || !clarifications.trim()}
               >
                 {isRefiningAnalysis ? (
                   <>
@@ -870,38 +951,75 @@ export default function CaseAnalysisPage() {
             </CardFooter>
           </Card>
 
-          {/* Phase 3: Document Upload (Conceptual) */}
+          {/* Phase 3: Incorporate Document Summary */}
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
-                <UploadCloud className="w-5 h-5 text-accent" />
-                Conceptual Phase 3: Document Upload & Analysis
+                <FileUp className="w-5 h-5 text-accent" />
+                Phase 3: Incorporate Document Summary
               </CardTitle>
               <CardDescription>
-                You could upload relevant documents (e.g., police reports, contracts) for AI analysis to extract key info and verify details. If you've organized items in the <Link href="/evidence-compiler" className="text-primary hover:underline">Evidence Compiler</Link>, you might conceptually upload relevant ones here. This tool does not provide legal advice.
+                Select a document (e.g., police report, contract) and provide a summary of its key contents. This summary will be used by the AI to further refine the case analysis.
+                If you've organized items in the <Link href="/evidence-compiler" className="text-primary hover:underline">Evidence Compiler</Link>, you might select a relevant one here. This tool does not provide legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                <Alert variant="default" className="border-accent bg-accent/10">
-                <AlertTitle className="font-semibold text-accent">How Document Analysis Would Work:</AlertTitle>
+                <AlertTitle className="font-semibold text-accent">How This Document Summary Integration Works:</AlertTitle>
                 <AlertDescription>
-                  In a full version, uploaded documents would be analyzed using techniques like OCR (Optical Character Recognition) and content analysis. This helps extract key information, confirm details from your narrative, and further refine the case assessment and confidence score.
+                  Instead of direct AI analysis of document content (which would require OCR and complex processing), you provide a summary of the document. The AI then incorporates your summary into its overall case understanding to refine its suggestions.
                 </AlertDescription>
               </Alert>
-              <Label htmlFor="conceptualDocumentUploadInput" className="sr-only">Conceptual document upload</Label>
+              <Label htmlFor="documentUploadInputForSummary">1. Choose Document</Label>
               <Input
-                id="conceptualDocumentUploadInput"
+                id="documentUploadInputForSummary"
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                aria-label="Conceptual document upload"
+                aria-label="Choose document to summarize"
+                disabled={!analysisResult || isAnyLoading}
                 />
-              {selectedFileName && <p className="text-xs text-muted-foreground mt-1">Selected: {selectedFileName}</p>}
+              {selectedFileName && <p className="text-xs text-muted-foreground mt-1">Selected for summary: {selectedFileName}</p>}
+              
+              <Button 
+                variant="outline" 
+                onClick={handlePrepareDocumentForSummary}
+                disabled={!analysisResult || !selectedFileName || isAnyLoading}
+                className="w-full sm:w-auto"
+              >
+                Prepare Document for Summary
+              </Button>
+
+              {isFilePreparedForSummary && (
+                <div className="space-y-2 pt-2">
+                  <Label htmlFor="documentSummaryTextarea" className="font-semibold">2. Provide Summary for: {selectedFileName}</Label>
+                  <Textarea
+                    id="documentSummaryTextarea"
+                    value={documentSummary}
+                    onChange={(e) => setDocumentSummary(e.target.value)}
+                    placeholder={`Enter a concise summary of the key points, facts, or issues contained in '${selectedFileName}' that are relevant to your case...`}
+                    rows={5}
+                    aria-label={`Summary for document ${selectedFileName}`}
+                    disabled={isAnyLoading}
+                  />
+                </div>
+              )}
             </CardContent>
             <CardFooter>
-              <Button variant="outline" onClick={() => handlePlaceholderSubmit("Document Upload & Analysis")}>
-                Upload and Analyze Documents (Conceptual)
+              <Button 
+                variant="default"
+                onClick={handleSubmitDocumentSummary}
+                disabled={!analysisResult || !isFilePreparedForSummary || !documentSummary.trim() || isAnyLoading}
+              >
+                {isRefiningAnalysis ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting Summary & Refining...
+                  </>
+                ) : (
+                  "Submit Summary & Refine Analysis"
+                )}
               </Button>
             </CardFooter>
           </Card>
@@ -921,7 +1039,7 @@ export default function CaseAnalysisPage() {
               <Button
                 variant="outline"
                 onClick={handleRequestAiSummary}
-                disabled={!analysisResult || isLoading || isRefiningAnalysis || isSummarizing || isRefiningFromFeedback}
+                disabled={!analysisResult || isAnyLoading}
                 className="mb-4"
               >
                 {isSummarizing ? (
@@ -946,14 +1064,14 @@ export default function CaseAnalysisPage() {
                 placeholder="After reviewing the AI's summary above, enter your specific corrections, additions, or feedback here..."
                 rows={5}
                 aria-label="Your corrections or feedback on the AI's summary"
-                disabled={!aiCaseSummary || isSummarizing || isRefiningFromFeedback || isLoading || isRefiningAnalysis}
+                disabled={!aiCaseSummary || isAnyLoading}
               />
             </CardContent>
             <CardFooter>
               <Button
                 variant="default"
                 onClick={handleSubmitFeedbackOnSummary}
-                disabled={!aiCaseSummary || !userFeedbackOnSummary.trim() || isSummarizing || isRefiningFromFeedback || isLoading || isRefiningAnalysis}
+                disabled={!aiCaseSummary || !userFeedbackOnSummary.trim() || isAnyLoading}
               >
                 {isRefiningFromFeedback ? (
                   <>
