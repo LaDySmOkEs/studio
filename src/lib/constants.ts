@@ -1,4 +1,3 @@
-
 // src/lib/constants.ts
 import { Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, type LucideIcon } from "lucide-react";
 
@@ -85,4 +84,3 @@ export const NAV_ITEMS: NavItem[] = [
     icon: HelpCircle,
   },
 ];
-
