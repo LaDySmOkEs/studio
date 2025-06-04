@@ -11,3 +11,4 @@ import '@/ai/flows/refineCaseAnalysisWithClarification.ts';
 import '@/ai/flows/summarizeCaseUnderstanding.ts';
 import '@/ai/flows/refineAnalysisFromSummaryFeedback.ts';
 import '@/ai/flows/analyzeTimelineEvents.ts';
+import '@/ai/flows/generateMockTrialScript.ts';

@@ -2,153 +2,167 @@
 // src/app/mock-trial/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Gavel, AlertTriangle, ScrollText, MessageCircle } from "lucide-react";
+import { Gavel, AlertTriangle, ScrollText, MessageCircle, Loader2, Info, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { handleGenerateMockTrialScriptAction } from "./actions";
+import type { GenerateMockTrialScriptInput, GenerateMockTrialScriptOutput, GenerateMockTrialScriptStep } from "@/ai/flows/generateMockTrialScript"; // Assuming GenerateMockTrialScriptStep is exported type for a step
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const MOCK_SCENARIOS = [
-  { value: "small_claims", label: "Small Claims Hearing (Plaintiff)" },
-  { value: "eviction_defense", label: "Eviction Defense Hearing (Tenant)" },
-  { value: "traffic_ticket", label: "Traffic Ticket Challenge" },
-  { value: "civil_litigation_plaintiff", label: "Civil Litigation (e.g., Contract Dispute - Plaintiff)" },
+const LOCAL_STORAGE_KEY_CASE_ANALYSIS = "dueProcessAICaseAnalysisData";
+
+interface StoredCaseData {
+  caseDetails: string;
+  caseCategory: "general" | "criminal" | "civil";
+}
+
+const PROCEEDING_TYPES = [
+  { value: "SMALL_CLAIMS_PLAINTIFF", label: "Small Claims (I am Plaintiff)", userRole: "Plaintiff" },
+  { value: "SMALL_CLAIMS_DEFENDANT", label: "Small Claims (I am Defendant)", userRole: "Defendant" },
+  { value: "EVICTION_HEARING_TENANT", label: "Eviction Hearing (I am Tenant)", userRole: "Tenant" },
+  { value: "EVICTION_HEARING_LANDLORD", label: "Eviction Hearing (I am Landlord)", userRole: "Landlord" },
+  { value: "CIVIL_MOTION_MOVANT", label: "Civil Motion Hearing (I am filing/arguing for the motion)", userRole: "Movant" },
+  { value: "CIVIL_MOTION_RESPONDENT", label: "Civil Motion Hearing (I am opposing the motion)", userRole: "Respondent" },
+  { value: "TRAFFIC_TICKET_DEFENSE", label: "Traffic Ticket Challenge (I am Defendant)", userRole: "Defendant" },
+  { value: "GENERAL_CIVIL_TRIAL_PLAINTIFF", label: "General Civil Trial (I am Plaintiff)", userRole: "Plaintiff" },
+  { value: "GENERAL_CIVIL_TRIAL_DEFENDANT", label: "General Civil Trial (I am Defendant)", userRole: "Defendant" },
 ];
 
-const MOCK_SCRIPT_STEPS = {
-  small_claims: [
-    { role: "Judge", line: "This is the case of [Your Name] versus [Opponent Name]. Plaintiff, please begin with your opening statement. Briefly explain what your claim is and what you are asking the court for." },
-    { role: "User", prompt: "Your opening statement (Explain your claim and what you seek):" },
-    { role: "Judge", line: "Thank you. Now, plaintiff, please present your evidence and call your first witness, if any." },
-    { role: "User", prompt: "How you present your first piece of evidence or call a witness:" },
-    { role: "Judge", line: "Defendant, you may now cross-examine the witness or respond to the evidence." },
-    { role: "System", line: "(Opponent's turn to respond - click Next Step to continue simulation)" },
-    { role: "User", prompt: "Click Next Step to proceed after opponent's conceptual turn." },
-    { role: "Judge", line: "Plaintiff, do you have further evidence or witnesses?" },
-    { role: "User", prompt: "Your response and further presentation (if any):" },
-    { role: "Judge", line: "We will now hear from the defendant. Defendant, your opening statement, please." },
-    { role: "System", line: "(Opponent's turn to present their case - click Next Step to continue simulation)" },
-    { role: "User", prompt: "Click Next Step to proceed after opponent's conceptual turn." },
-    { role: "Judge", line: "Plaintiff, you may now make your closing argument. Summarize your case and why you believe the court should rule in your favor." },
-    { role: "User", prompt: "Your closing argument:" },
-    { role: "Judge", line: "Thank you. The court will take this matter under advisement and issue a ruling. (End of Simulation)" },
-  ],
-  eviction_defense: [
-    { role: "Judge", line: "This is an eviction proceeding, [Landlord Name] versus [Your Name]. Tenant, the landlord claims [reason for eviction, e.g., non-payment of rent]. What is your response?" },
-    { role: "User", prompt: "Your initial response to the claim:" },
-    { role: "Judge", line: "Do you have any evidence to support your position, such as rent receipts, photos of conditions, or communication with the landlord?" },
-    { role: "User", prompt: "How you present your evidence:" },
-    { role: "Judge", line: "Landlord, do you have a response to the tenant's evidence or further arguments?" },
-    { role: "System", line: "(Landlord's turn to respond - click Next Step to continue simulation)" },
-    { role: "User", prompt: "Click Next Step to proceed after Landlord's conceptual turn." },
-    { role: "Judge", line: "Tenant, do you have anything further to add or any rebuttal?" },
-    { role: "User", prompt: "Your further points or rebuttal:" },
-    { role: "Judge", line: "The court will consider the arguments and evidence. (End of Simulation)" },
-  ],
-   traffic_ticket: [
-    { role: "Officer/Prosecutor", line: "Your Honor, on [Date], at approximately [Time], I observed the defendant's vehicle, [Vehicle Description], at [Location] traveling at [Speed] in a [Posted Speed Limit] zone. I initiated a traffic stop and issued citation number [Citation Number] for speeding." },
-    { role: "Judge", line: "Thank you, Officer. Defendant, do you have any questions for the officer regarding their testimony?" },
-    { role: "User", prompt: "Your questions for the officer, if any (e.g., 'Officer, can you confirm the method used to determine my speed?'):" },
-    { role: "Officer/Prosecutor", line: "(Officer responds to your questions - click Next Step)" },
-    { role: "User", prompt: "Click Next Step to proceed after officer's conceptual response." },
-    { role: "Judge", line: "Defendant, you've heard the officer's testimony. You may now present your case. Why do you believe you are not guilty of this citation?" },
-    { role: "User", prompt: "Your explanation or defense:" },
-    { role: "Judge", line: "Do you have any evidence to present, such as photos, diagrams, or dashcam footage?" },
-    { role: "User", prompt: "How you present your evidence (if any):" },
-    { role: "Officer/Prosecutor", line: "(May respond to your evidence or make a closing statement - click Next Step)" },
-     { role: "User", prompt: "Click Next Step to proceed after prosecutor's conceptual turn." },
-    { role: "Judge", line: "Defendant, do you have a closing statement? Briefly summarize why you believe the citation should be dismissed." },
-    { role: "User", prompt: "Your closing statement:" },
-    { role: "Judge", line: "The court will make a decision. (End of Simulation)" },
-  ],
-  civil_litigation_plaintiff: [
-    { role: "Judge", line: "Court is in session. This is case number [Case Number], [Your Name] versus [Defendant Name]. Plaintiff, are you ready to proceed with your opening statement regarding your claim for [e.g., breach of contract]?" },
-    { role: "User", prompt: "Your opening statement (briefly explain your claim, what happened, and what you are seeking):" },
-    { role: "Judge", line: "Thank you. Plaintiff, you may now call your first witness or present your first piece of evidence." },
-    { role: "User", prompt: "How you call your first witness (e.g., 'I call [Witness Name] to the stand.') or present evidence (e.g., 'I would like to submit Plaintiff's Exhibit 1, the contract.'):" },
-    { role: "Judge", line: "Defendant, you may cross-examine the witness after direct examination, or object to evidence presented." },
-    { role: "System", line: "(Conceptual turn: Witness testifies, then opponent cross-examines or responds to evidence - click Next Step)" },
-    { role: "User", prompt: "Click Next Step to proceed after conceptual witness testimony and cross-examination." },
-    { role: "Judge", line: "Plaintiff, do you have further witnesses or evidence to present at this time?" },
-    { role: "User", prompt: "Your response (e.g., 'Yes, Your Honor, I call [Next Witness].' or 'No further evidence at this time, Your Honor.'):" },
-    { role: "Judge", line: "Very well. After the plaintiff rests their case, the defendant will have an opportunity to present their case." },
-    { role: "System", line: "(Conceptual turn: Opponent presents their case - witnesses, evidence - click Next Step)" },
-    { role: "User", prompt: "Click Next Step to proceed after opponent's conceptual case presentation." },
-    { role: "Judge", line: "Plaintiff, you may now present your closing argument. Please summarize the key points of your case and why the court should find in your favor." },
-    { role: "User", prompt: "Your closing argument:" },
-    { role: "Judge", line: "Thank you. Defendant, your closing argument." },
-    { role: "System", line: "(Conceptual turn: Opponent gives closing argument - click Next Step)" },
-    { role: "User", prompt: "Click Next Step to proceed after opponent's conceptual closing argument." },
-    { role: "Judge", line: "The court has heard all arguments and evidence. I will take this matter under advisement and issue a written ruling. (End of Simulation)" },
-  ],
-};
-
 export default function MockTrialPage() {
-  const [selectedScenario, setSelectedScenario] = useState<keyof typeof MOCK_SCRIPT_STEPS | "">("");
+  const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
+  const [selectedProceedingType, setSelectedProceedingType] = useState<string>("");
+  
+  const [generatedScript, setGeneratedScript] = useState<GenerateMockTrialScriptStep[] | null>(null);
+  const [isGeneratingScript, setIsGeneratingScript] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [userResponse, setUserResponse] = useState("");
+  const [currentUserInput, setCurrentUserInput] = useState("");
   const [transcript, setTranscript] = useState<{ role: string; line: string }[]>([]);
+  
   const { toast } = useToast();
 
-  const handleScenarioChange = (value: string) => {
-    const scenarioKey = value as keyof typeof MOCK_SCRIPT_STEPS;
-    setSelectedScenario(scenarioKey);
-    setCurrentStep(0);
-    setUserResponse("");
-    if (scenarioKey && MOCK_SCRIPT_STEPS[scenarioKey]?.length > 0) {
-      setTranscript([{ role: MOCK_SCRIPT_STEPS[scenarioKey][0].role, line: MOCK_SCRIPT_STEPS[scenarioKey][0].line }]);
-    } else {
-      setTranscript([]);
+  useEffect(() => {
+    try {
+      const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY_CASE_ANALYSIS);
+      if (storedDataString) {
+        const storedData: StoredCaseData = JSON.parse(storedDataString);
+        setStoredCaseSummary(storedData.caseDetails);
+      }
+    } catch (e) {
+      console.error("Failed to load or parse case data from localStorage", e);
+      toast({ title: "Error", description: "Could not load stored case summary.", variant: "destructive" });
     }
+  }, [toast]);
+
+  const handleGenerateScript = async () => {
+    if (!storedCaseSummary) {
+      toast({ title: "Case Summary Needed", description: "Please provide case details in the Case Analysis section first.", variant: "destructive" });
+      return;
+    }
+    if (!selectedProceedingType) {
+      toast({ title: "Proceeding Type Needed", description: "Please select the type of proceeding you want to simulate.", variant: "destructive" });
+      return;
+    }
+
+    setIsGeneratingScript(true);
+    setGeneratedScript(null);
+    setTranscript([]);
+    setCurrentStep(0);
+    setCurrentUserInput("");
+
+    const proceedingDetail = PROCEEDING_TYPES.find(p => p.value === selectedProceedingType);
+    if (!proceedingDetail) {
+        toast({ title: "Error", description: "Invalid proceeding type selected.", variant: "destructive"});
+        setIsGeneratingScript(false);
+        return;
+    }
+
+    const input: GenerateMockTrialScriptInput = {
+      caseNarrative: storedCaseSummary,
+      proceedingType: proceedingDetail.value as any, // Cast as AI flow enum type expects specific string literals
+      userRoleInProceeding: proceedingDetail.userRole,
+    };
+
+    const result = await handleGenerateMockTrialScriptAction(input);
+
+    if ('error' in result) {
+      toast({ title: "Script Generation Failed", description: result.error, variant: "destructive" });
+    } else if (result.steps && result.steps.length > 0) {
+      setGeneratedScript(result.steps);
+      // Initialize with the first line if it's not user input
+      if (!result.steps[0].isUserInput) {
+        setTranscript([{ role: result.steps[0].role, line: result.steps[0].lineOrPrompt }]);
+      }
+    } else {
+      toast({ title: "Script Generation Issue", description: "The AI generated an empty or invalid script. Please try again or rephrase your case summary.", variant: "destructive" });
+    }
+    setIsGeneratingScript(false);
   };
 
-  const handleNextStep = () => {
-    if (!selectedScenario) return;
-    const scenarioScript = MOCK_SCRIPT_STEPS[selectedScenario];
+  const handleNextStepOrSubmit = () => {
+    if (!generatedScript || currentStep >= generatedScript.length) {
+      toast({ title: "Simulation Ended", description: "You have reached the end of this mock trial."});
+      return;
+    }
+
+    const currentScriptItem = generatedScript[currentStep];
     let newTranscript = [...transcript];
 
-    if (scenarioScript[currentStep]?.role === "User") {
-      newTranscript.push({ role: "You", line: userResponse || "(No response provided / Skipped)" });
-    }
-    
-    const nextStepIndex = currentStep + 1;
-
-    if (nextStepIndex < scenarioScript.length) {
-      setCurrentStep(nextStepIndex);
-      newTranscript.push({ role: scenarioScript[nextStepIndex].role, line: scenarioScript[nextStepIndex].line });
-      setUserResponse(""); 
+    if (currentScriptItem.isUserInput) {
+      newTranscript.push({ role: `You (as ${PROCEEDING_TYPES.find(p=>p.value === selectedProceedingType)?.userRole || 'User'})`, line: currentUserInput.trim() || "(No response provided)" });
+      setCurrentUserInput("");
     } else {
-      // This is the last step, or beyond.
-      if (scenarioScript[currentStep]?.role !== "User" && transcript.length > 0 && transcript[transcript.length - 1].line !== scenarioScript[scenarioScript.length - 1].line) {
-        // If the last actual script line wasn't a user prompt and hasn't been added, add it.
-        // This handles cases where the last line is from Judge/System and "End Simulation" is effectively the action for it.
-         if (transcript[transcript.length -1].line !== scenarioScript[scenarioScript.length-1].line && scenarioScript[scenarioScript.length-1].role !== "User") {
-           newTranscript.push({ role: scenarioScript[scenarioScript.length-1].role, line: scenarioScript[scenarioScript.length-1].line });
+      // If the current line is an AI line and it's not already the last item in transcript (to avoid duplicates on first load)
+      if (newTranscript.length === 0 || newTranscript[newTranscript.length - 1].line !== currentScriptItem.lineOrPrompt || newTranscript[newTranscript.length -1].role !== currentScriptItem.role) {
+         // This condition is tricky for the very first AI line if it was pre-added. Let's ensure it's not a user input step.
+         // Add if it's not a user input and the current step's dialogue isn't already the last thing in the transcript
+         if (transcript.length === currentStep) { // Only add AI line if we are advancing to it
+            newTranscript.push({ role: currentScriptItem.role, line: currentScriptItem.lineOrPrompt });
          }
       }
-      toast({ title: "Simulation Ended", description: "You have reached the end of this mock scenario." });
-      // Consider disabling the button here or changing its text to "Restart"
     }
+    
     setTranscript(newTranscript);
+    const nextStepIndex = currentStep + 1;
+    setCurrentStep(nextStepIndex);
+
+    if (nextStepIndex < generatedScript.length) {
+      const nextScriptItem = generatedScript[nextStepIndex];
+      if (!nextScriptItem.isUserInput) {
+        // If next is also AI, add it immediately to transcript. UI will show it.
+        // This creates an effect of AI speaking, then prompting user if next.
+         setTranscript(prev => [...prev, { role: nextScriptItem.role, line: nextScriptItem.lineOrPrompt }]);
+      }
+    } else {
+      toast({ title: "Simulation Ended", description: "You have reached the end of this mock trial."});
+    }
   };
+  
+  const currentScriptItem = generatedScript && currentStep < generatedScript.length ? generatedScript[currentStep] : null;
+  const userPrompt = currentScriptItem?.isUserInput ? currentScriptItem.lineOrPrompt : "";
 
-  const scenarioScript = selectedScenario ? MOCK_SCRIPT_STEPS[selectedScenario] : [];
-  const isUserTurn = scenarioScript.length > 0 && currentStep < scenarioScript.length && scenarioScript[currentStep]?.role === "User";
-  // Check if the very last line of the script has been added to the transcript
-  const isLastLineTranscribed = transcript.length > 0 && scenarioScript.length > 0 && transcript[transcript.length-1].line === scenarioScript[scenarioScript.length-1].line;
+  let buttonText = "Generate Personalized Mock Trial";
+  let buttonAction = handleGenerateScript;
+  let buttonDisabled = isGeneratingScript || !storedCaseSummary || !selectedProceedingType;
 
-
-  let buttonText = "Next Step";
-  if (isUserTurn) {
-    buttonText = "Submit Response";
-  } else if (isLastLineTranscribed && currentStep >= scenarioScript.length -1) {
-     buttonText = "End Simulation";
-  } else if (scenarioScript.length > 0 && currentStep >= scenarioScript.length -1 && scenarioScript[scenarioScript.length-1].role !== "User") {
-     buttonText = "Show Final Message & End";
+  if (generatedScript) {
+    if (currentStep >= generatedScript.length) {
+      buttonText = "Simulation Ended";
+      buttonDisabled = true;
+    } else if (currentScriptItem?.isUserInput) {
+      buttonText = "Submit & Continue";
+      buttonAction = handleNextStepOrSubmit;
+      buttonDisabled = false; 
+    } else {
+      buttonText = "Continue to Next Step";
+      buttonAction = handleNextStepOrSubmit;
+      buttonDisabled = false;
+    }
   }
 
 
@@ -157,64 +171,101 @@ export default function MockTrialPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Gavel className="w-7 h-7 text-primary" /> Mock Trial Simulator
+            <Gavel className="w-7 h-7 text-primary" /> Personalized Mock Trial Simulator
           </CardTitle>
           <CardDescription>
-            Practice basic court procedures for common scenarios by stepping through a scripted interaction. 
-            This tool helps demystify courtroom dynamics, especially if you are representing yourself (pro per / in propria persona) or wish to be a more informed participant. 
-            Select a scenario, read the prompts, type your responses where indicated, and click "Submit Response" or "Next Step" to proceed.
-            This is a simplified simulation and NOT legal advice or a substitute for understanding your specific court's rules.
+            Use your case narrative to generate a personalized mock trial script. Practice responding to common court interactions based on your specific situation. This tool helps demystify courtroom dynamics. This is a simulation and NOT legal advice.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {storedCaseSummary ? (
+            <Card className="bg-muted/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Context</CardTitle>
+                <CardDescription className="text-xs">This summary from Case Analysis will be used to generate the mock trial script.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea value={storedCaseSummary} readOnly rows={3} className="text-sm bg-background cursor-default h-auto" aria-label="Stored case summary" />
+              </CardContent>
+            </Card>
+          ) : (
+            <Alert variant="default" className="border-primary bg-primary/5">
+              <Info className="h-5 w-5 text-primary" />
+              <AlertTitle className="font-semibold text-primary">Case Details Needed</AlertTitle>
+              <AlertDescription>
+                Please go to the "Case Analysis" page and enter your case details first. This summary will be used to generate your personalized mock trial.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div>
-            <Label htmlFor="scenario-select">Select a Mock Trial Scenario</Label>
-            <Select onValueChange={handleScenarioChange} value={selectedScenario}>
-              <SelectTrigger id="scenario-select" aria-label="Select mock trial scenario">
-                <SelectValue placeholder="Choose a scenario..." />
+            <Label htmlFor="proceeding-type-select">Select Type of Proceeding to Simulate</Label>
+            <Select onValueChange={setSelectedProceedingType} value={selectedProceedingType} disabled={!storedCaseSummary || isGeneratingScript || !!generatedScript}>
+              <SelectTrigger id="proceeding-type-select" aria-label="Select proceeding type">
+                <SelectValue placeholder="Choose a proceeding type..." />
               </SelectTrigger>
               <SelectContent>
-                {MOCK_SCENARIOS.map(scenario => (
-                  <SelectItem key={scenario.value} value={scenario.value}>{scenario.label}</SelectItem>
+                {PROCEEDING_TYPES.map(pt => (
+                  <SelectItem key={pt.value} value={pt.value}>{pt.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {selectedScenario && scenarioScript.length > 0 && (
-            <Card className="border-primary">
+          <Button onClick={buttonAction} disabled={buttonDisabled} className="w-full sm:w-auto">
+            {isGeneratingScript ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (generatedScript && currentStep < generatedScript.length) ? null : <Brain className="mr-2 h-4 w-4" />}
+            {isGeneratingScript ? "Generating Script..." : buttonText}
+          </Button>
+          {generatedScript && (
+             <Button variant="outline" onClick={() => { setGeneratedScript(null); setTranscript([]); setCurrentStep(0); setSelectedProceedingType(""); }} disabled={isGeneratingScript}>
+                Start New Simulation
+            </Button>
+          )}
+
+          {generatedScript && (
+            <Card className="border-primary mt-6">
               <CardHeader>
-                <CardTitle className="text-xl">Trial Simulation: {MOCK_SCENARIOS.find(s => s.value === selectedScenario)?.label}</CardTitle>
+                <CardTitle className="text-xl">Simulation: {PROCEEDING_TYPES.find(s => s.value === selectedProceedingType)?.label}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ScrollArea className="h-80 overflow-y-auto p-3 bg-muted/50 rounded-md space-y-2 border">
-                  <h3 className="text-sm font-semibold mb-2 sticky top-0 bg-muted/50 py-1 z-10 flex items-center gap-1"><ScrollText className="w-4 h-4"/>Transcript</h3>
+                  <h3 className="text-sm font-semibold mb-2 sticky top-0 bg-muted/50 py-1 z-10 flex items-center gap-1">
+                    <ScrollText className="w-4 h-4"/>Transcript
+                  </h3>
                   {transcript.map((entry, index) => (
-                    <div key={index} className={`text-sm ${entry.role === "You" ? "text-blue-600 dark:text-blue-400 font-medium" : entry.role === "User" ? "hidden" : "text-foreground"}`}>
-                      {entry.role !== "System" && <strong>{entry.role}:</strong>} {entry.line.startsWith("(Conceptual turn") || entry.line.startsWith("Click Next Step") ? <span className="italic text-muted-foreground">{entry.line}</span> : entry.line}
+                    <div key={index} className={`text-sm ${entry.role.startsWith("You") ? "text-blue-600 dark:text-blue-400 font-medium" : "text-foreground"}`}>
+                      <strong>{entry.role}:</strong> {entry.line}
                     </div>
                   ))}
                 </ScrollArea>
 
-                {isUserTurn && scenarioScript[currentStep]?.prompt && (
+                {currentScriptItem?.isUserInput && currentStep < generatedScript.length && (
                   <div className="space-y-2">
-                    <Label htmlFor="user-response" className="font-semibold flex items-center gap-1"><MessageCircle className="w-4 h-4"/>{scenarioScript[currentStep].prompt}</Label>
+                    <Label htmlFor="user-response" className="font-semibold flex items-center gap-1">
+                      <MessageCircle className="w-4 h-4"/>{userPrompt}
+                    </Label>
                     <Textarea
                       id="user-response"
-                      value={userResponse}
-                      onChange={(e) => setUserResponse(e.target.value)}
+                      value={currentUserInput}
+                      onChange={(e) => setCurrentUserInput(e.target.value)}
                       placeholder="Type your response here..."
                       rows={5}
                       aria-label="Your response in the mock trial"
+                      className="border-primary focus:ring-primary"
                     />
                   </div>
                 )}
+                {!currentScriptItem?.isUserInput && currentScriptItem && currentStep < generatedScript.length && (
+                   <Alert variant="default" className="border-accent bg-accent/5">
+                      <Info className="h-5 w-5 text-accent" />
+                      <AlertTitle className="font-semibold text-accent">Next: {currentScriptItem.role} speaks</AlertTitle>
+                      <AlertDescription>
+                       Click "Continue to Next Step" to see their dialogue.
+                      </AlertDescription>
+                    </Alert>
+                )}
+
               </CardContent>
-              <CardFooter>
-                <Button onClick={handleNextStep} disabled={!selectedScenario || (isLastLineTranscribed && currentStep >= scenarioScript.length -1 && buttonText === "End Simulation")}>
-                  {buttonText}
-                </Button>
-              </CardFooter>
             </Card>
           )}
         </CardContent>
@@ -224,11 +275,18 @@ export default function MockTrialPage() {
         <AlertTriangle className="h-5 w-5 text-accent" />
         <AlertTitle className="font-semibold text-accent">Important Disclaimer</AlertTitle>
         <AlertDescription>
-          This mock trial simulator is a highly simplified tool for practice only. Actual court proceedings are complex, vary significantly by jurisdiction and case type, and involve specific rules of evidence and procedure. This simulation does not cover all aspects of a trial and should not be used as a substitute for legal research, understanding local court rules, or consultation with a qualified attorney.
+          This mock trial simulator uses AI to generate scripts based on your input. It is a simplified tool for practice and familiarization. Actual court proceedings are complex and vary significantly. This simulation does not constitute legal advice and should not replace consultation with a qualified attorney.
         </AlertDescription>
       </Alert>
     </div>
   );
 }
 
-    
+// Helper type (could be in a types file if more broadly used)
+declare global {
+    interface GenerateMockTrialScriptStep {
+        role: string;
+        lineOrPrompt: string;
+        isUserInput?: boolean;
+    }
+}
