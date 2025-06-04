@@ -1,6 +1,6 @@
 
 // src/lib/constants.ts
-import { Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, Route, ClipboardList, type LucideIcon } from "lucide-react";
+import { Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, Route, ClipboardList, MessageSquareQuote, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -23,6 +23,11 @@ export const NAV_ITEMS: NavItem[] = [
     title: "Document Generator",
     href: "/document-generator",
     icon: FileText,
+  },
+   {
+    title: "Communication Coach",
+    href: "/courtroom-communication-coach",
+    icon: MessageSquareQuote,
   },
   {
     title: "Rights Recorder",
