@@ -1,9 +1,10 @@
 // src/app/subscription/page.tsx
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PlanFeature = ({ children }: { children: React.ReactNode }) => (
@@ -28,6 +29,14 @@ export default function SubscriptionPage() {
     <div className="space-y-8">
       <Card className="shadow-lg border-primary border-2">
         <CardHeader className="text-center">
+          <div className="flex justify-start w-full mb-4">
+            <Link href="/case-analysis" passHref>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Return to Case Analysis
+              </Button>
+            </Link>
+          </div>
           <CardTitle className="text-3xl font-bold">Choose Your Plan</CardTitle>
           <CardDescription className="text-lg">
             Unlock powerful AI legal assistance with our flexible subscription options.
