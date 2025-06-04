@@ -138,7 +138,6 @@ export default function MockTrialPage() {
 
   const scenarioScript = selectedScenario ? MOCK_SCRIPT_STEPS[selectedScenario] : [];
   const isUserTurn = scenarioScript.length > 0 && currentStep < scenarioScript.length && scenarioScript[currentStep]?.role === "User";
-  const isSimulationEndReached = scenarioScript.length > 0 && currentStep >= scenarioScript.length -1 && !isUserTurn;
   // Check if the very last line of the script has been added to the transcript
   const isLastLineTranscribed = transcript.length > 0 && scenarioScript.length > 0 && transcript[transcript.length-1].line === scenarioScript[scenarioScript.length-1].line;
 
@@ -148,7 +147,7 @@ export default function MockTrialPage() {
     buttonText = "Submit Response";
   } else if (isLastLineTranscribed && currentStep >= scenarioScript.length -1) {
      buttonText = "End Simulation";
-  } else if (currentStep >= scenarioScript.length -1 && scenarioScript[scenarioScript.length-1].role !== "User") {
+  } else if (scenarioScript.length > 0 && currentStep >= scenarioScript.length -1 && scenarioScript[scenarioScript.length-1].role !== "User") {
      buttonText = "Show Final Message & End";
   }
 
@@ -231,3 +230,5 @@ export default function MockTrialPage() {
     </div>
   );
 }
+
+    
