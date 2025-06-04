@@ -13,6 +13,12 @@ import { criminalLawSuggestions } from "@/ai/flows/criminalLawSuggestions";
 import type { CivilLawSuggestionsInput } from "@/ai/flows/civilLawSuggestions"; // CivilLawSuggestionsOutput is structurally same as SuggestRelevantLawsOutput
 import { civilLawSuggestions } from "@/ai/flows/civilLawSuggestions";
 
+import { 
+  suggestLegalStrategies, 
+  type SuggestLegalStrategiesInput, 
+  type SuggestLegalStrategiesOutput 
+} from "@/ai/flows/suggestLegalStrategies";
+
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 // The output type remains consistent across all flows, now including dueProcessViolationScore
@@ -45,5 +51,15 @@ export async function handleCaseAnalysisAction(data: CaseAnalysisFormValues): Pr
       return { error: "Invalid input: " + error.errors.map(e => e.message).join(", ") };
     }
     return { error: error instanceof Error ? error.message : "An unknown error occurred." };
+  }
+}
+
+export async function handleSuggestStrategiesAction(input: SuggestLegalStrategiesInput): Promise<SuggestLegalStrategiesOutput | { error: string }> {
+  try {
+    const result = await suggestLegalStrategies(input);
+    return result;
+  } catch (error) {
+    console.error("Error in AI strategy suggestion:", error);
+    return { error: error instanceof Error ? error.message : "An unknown error occurred while suggesting strategies." };
   }
 }

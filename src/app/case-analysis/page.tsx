@@ -20,7 +20,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-import { handleCaseAnalysisAction } from "./actions";
+import { handleCaseAnalysisAction, handleSuggestStrategiesAction } from "./actions";
+import type { SuggestLegalStrategiesInput, SuggestLegalStrategiesOutput } from "@/ai/flows/suggestLegalStrategies";
 import { formSchema, type CaseAnalysisFormValues } from "./schemas";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
@@ -85,6 +86,8 @@ const getDocumentDisplayName = (docType: string): string => {
 export default function CaseAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<SuggestRelevantLawsOutput | null>(null);
+  const [strategyResult, setStrategyResult] = useState<SuggestLegalStrategiesOutput | null>(null);
+  const [isStrategyLoading, setIsStrategyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -130,6 +133,7 @@ export default function CaseAnalysisPage() {
     setIsLoading(true);
     setError(null);
     setAnalysisResult(null);
+    setStrategyResult(null);
     setClarifications("");
     setSelectedFileName(null);
     setFeedback("");
@@ -143,6 +147,7 @@ export default function CaseAnalysisPage() {
         description: result.error,
         variant: "destructive",
       });
+      setIsLoading(false);
     } else {
       setAnalysisResult(result);
       try {
@@ -163,8 +168,29 @@ export default function CaseAnalysisPage() {
           variant: "destructive",
         });
       }
+
+      // Call strategy suggestion flow
+      setIsStrategyLoading(true);
+      const strategyInput: SuggestLegalStrategiesInput = {
+        caseDetails: data.caseDetails,
+        caseCategory: data.caseCategory,
+        dueProcessViolationAssessment: result.dueProcessViolationScore,
+        relevantLaws: result.relevantLaws,
+      };
+      const strategies = await handleSuggestStrategiesAction(strategyInput);
+      if ('error' in strategies) {
+        toast({
+          title: "Strategy Suggestion Failed",
+          description: strategies.error,
+          variant: "destructive",
+        });
+        // We don't nullify strategyResult here so previous successful results aren't cleared on a subsequent failure of this part.
+      } else {
+        setStrategyResult(strategies);
+      }
+      setIsStrategyLoading(false);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const clearStoredCaseDetails = (showToast = true) => {
@@ -174,7 +200,8 @@ export default function CaseAnalysisPage() {
         caseDetails: "",
         caseCategory: "general",
       });
-      setAnalysisResult(null); // Also clear current analysis results from display
+      setAnalysisResult(null); 
+      setStrategyResult(null);
       if (showToast) {
         toast({
           title: "Stored Case Data Cleared",
@@ -369,7 +396,7 @@ export default function CaseAnalysisPage() {
                       Due Process Violation Assessment
                     </CardTitle>
                      <CardDescription>
-                      This is a conceptual AI assessment of potential due process concerns (e.g., issues with notice, opportunity to be heard, right to counsel if criminal, Miranda issues, inadequate representation). It considers the severity and volume of potential issues mentioned in your case narrative. It is <strong>not a legal determination</strong>.
+                      This AI assessment identifies potential due process concerns (e.g., issues with notice, opportunity to be heard, right to counsel if criminal, Miranda issues, inadequate representation) based on your case narrative. It considers the severity and volume of potential issues mentioned. It is <strong>not a legal determination</strong>.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -436,24 +463,64 @@ export default function CaseAnalysisPage() {
               <Card className="shadow-md mt-6 border-accent">
                 <CardHeader>
                     <CardTitle className="text-xl flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-accent" /> AI Suggested Strategies & Motions (Conceptual)
+                    <Brain className="w-5 h-5 text-accent" /> AI Suggested Strategies & Motions
                     </CardTitle>
                     <CardDescription>
-                    Based on the initial analysis and due process assessment, a more advanced AI could suggest specific legal strategies or motions (e.g., "Motion to Suppress," "Entrapment defense considerations"). This is a conceptual feature.
+                    Based on the initial analysis and due process assessment, the AI suggests specific legal strategies or motions.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Alert variant="default" className="bg-accent/10">
-                    <AlertTitle className="font-semibold text-accent">Example AI Suggestions (Conceptual):</AlertTitle>
-                    <AlertDescription>
-                        <ul className="list-disc pl-5 text-sm mt-1">
-                        <li>If 'High Risk' Due Process Violation related to search and seizure: "Consider researching a 'Motion to Suppress Evidence' based on potential Fourth Amendment violations."</li>
-                        <li>If case details imply coercion for a confession: "Explore if an 'Entrapment' defense or issues with voluntariness of statements are relevant."</li>
-                        <li>If inadequate notice for a hearing is indicated: "Review procedures for 'Motion to Vacate Order' due to improper notice."</li>
-                        </ul>
-                        <p className="mt-2 text-xs"><strong>Disclaimer:</strong> These are highly simplified examples. Actual legal strategy is complex and requires professional legal advice.</p>
-                    </AlertDescription>
-                    </Alert>
+                  {isStrategyLoading && (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="mr-2 h-6 w-6 animate-spin text-accent" />
+                      <p className="text-accent">Generating strategy suggestions...</p>
+                    </div>
+                  )}
+                  {!isStrategyLoading && strategyResult && (
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold">Suggested Strategies:</h4>
+                        {strategyResult.suggestedStrategies.length > 0 ? (
+                          <ul className="list-disc pl-5 text-sm space-y-1">
+                            {strategyResult.suggestedStrategies.map((strategy, index) => <li key={index}>{strategy}</li>)}
+                          </ul>
+                        ) : <p className="text-sm text-muted-foreground">No specific strategies suggested.</p>}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Suggested Motions:</h4>
+                        {strategyResult.suggestedMotions.length > 0 ? (
+                          <ul className="list-disc pl-5 text-sm space-y-1">
+                            {strategyResult.suggestedMotions.map((motion, index) => <li key={index}>{motion}</li>)}
+                          </ul>
+                        ) : <p className="text-sm text-muted-foreground">No specific motions suggested.</p>}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Reasoning:</h4>
+                        <p className="text-sm whitespace-pre-wrap">{strategyResult.reasoning}</p>
+                      </div>
+                      <Alert variant="default" className="bg-accent/10 mt-3">
+                        <AlertTriangle className="h-4 w-4 text-accent" />
+                        <AlertTitle className="font-semibold text-accent">Disclaimer</AlertTitle>
+                        <AlertDescription className="text-xs">{strategyResult.disclaimer}</AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
+                   {!isStrategyLoading && !strategyResult && !analysisResult && (
+                     <Alert variant="default" className="bg-accent/10">
+                       <AlertTitle className="font-semibold text-accent">Suggestions Appear Here</AlertTitle>
+                       <AlertDescription>
+                           After the initial case analysis is complete, AI-suggested strategies and motions will be displayed in this section.
+                       </AlertDescription>
+                     </Alert>
+                  )}
+                   {!isStrategyLoading && !strategyResult && analysisResult && (
+                     <Alert variant="default" className="bg-accent/10">
+                       <AlertTitle className="font-semibold text-accent">Awaiting Strategy Suggestions</AlertTitle>
+                       <AlertDescription>
+                           AI-suggested strategies and motions are being processed or were not generated.
+                       </AlertDescription>
+                     </Alert>
+                  )}
                 </CardContent>
               </Card>
 
@@ -582,3 +649,4 @@ export default function CaseAnalysisPage() {
     
 
     
+
