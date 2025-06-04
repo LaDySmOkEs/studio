@@ -10,3 +10,4 @@ import '@/ai/flows/suggestFilingDecisionHelper.ts';
 import '@/ai/flows/refineCaseAnalysisWithClarification.ts';
 import '@/ai/flows/summarizeCaseUnderstanding.ts';
 import '@/ai/flows/refineAnalysisFromSummaryFeedback.ts';
+import '@/ai/flows/analyzeTimelineEvents.ts';

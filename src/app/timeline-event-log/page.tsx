@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { 
   CalendarClock, Trash2, AlertTriangle, Info, FileText, Gavel, UserX, 
-  DollarSign, Mail, Clock, Shield, Paperclip, Landmark, ClipboardList, type LucideIcon
+  DollarSign, Mail, Clock, Shield, Paperclip, Landmark, ClipboardList, type LucideIcon, Loader2, Brain
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +27,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { handleAnalyzeTimelineAction } from "./actions"; 
+import type { TimelineEventsInput, TimelineAnalysisOutput } from "@/ai/flows/analyzeTimelineEvents";
+
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
 
@@ -71,6 +74,9 @@ export default function TimelineEventLogPage() {
   const [currentEventDescription, setCurrentEventDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
+
+  const [timelineAnalysisResult, setTimelineAnalysisResult] = useState<TimelineAnalysisOutput | null>(null);
+  const [isAnalyzingTimeline, setIsAnalyzingTimeline] = useState(false);
 
   const { toast } = useToast();
 
@@ -119,6 +125,7 @@ export default function TimelineEventLogPage() {
       description: `"${newEvent.type}" on ${new Date(newEvent.date).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' })} has been added to your timeline.`,
     });
     setIsSubmitting(false);
+    setTimelineAnalysisResult(null); // Clear previous analysis if new event is added
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -128,7 +135,43 @@ export default function TimelineEventLogPage() {
       description: "The event has been removed from your timeline.",
       variant: "destructive",
     });
+    setTimelineAnalysisResult(null); // Clear previous analysis if event is deleted
   };
+
+  const triggerTimelineAnalysis = async () => {
+    if (events.length === 0) {
+      toast({
+        title: "No Events to Analyze",
+        description: "Please log some events before analyzing the timeline.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsAnalyzingTimeline(true);
+    setTimelineAnalysisResult(null);
+
+    const analysisInput: TimelineEventsInput = {
+      events: events.map(e => ({ date: e.date, type: e.type, description: e.description })),
+    };
+
+    const result = await handleAnalyzeTimelineAction(analysisInput);
+
+    if ('error' in result) {
+      toast({
+        title: "Timeline Analysis Failed",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      setTimelineAnalysisResult(result);
+      toast({
+        title: "Timeline Analysis Complete",
+        description: "AI has provided insights on your timeline.",
+      });
+    }
+    setIsAnalyzingTimeline(false);
+  };
+
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -275,6 +318,7 @@ export default function TimelineEventLogPage() {
                     <Button variant="outline" size="sm" className="w-full" onClick={() => {
                         setEvents([]);
                         toast({ title: "All Events Cleared", description: "All logged events have been cleared from the timeline.", variant: "destructive" });
+                        setTimelineAnalysisResult(null); // Clear analysis when all events are cleared
                     }}
                     aria-label="Clear entire timeline"
                     >
@@ -290,31 +334,49 @@ export default function TimelineEventLogPage() {
         <Card className="shadow-md sticky top-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Info className="w-6 h-6 text-accent" /> Timeline Analysis (Conceptual)
+              <Brain className="w-6 h-6 text-accent" /> AI Timeline Analysis
             </CardTitle>
+            <CardDescription>
+              Get AI-powered insights on your logged timeline events.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <p className="text-muted-foreground">
-              This log helps you organize and visualize key dates and events in your case. Keeping a detailed and accurate timeline is crucial for understanding case progression and preparing for legal proceedings.
-            </p>
-            <div>
-              <h4 className="font-semibold text-primary">How AI Could Enhance This Timeline (Conceptual)</h4>
-              <p className="text-muted-foreground">
-                In a more advanced system, AI could analyze this timeline to:
-              </p>
-              <ul className="list-disc pl-5 mt-1 text-muted-foreground space-y-1">
-                <li>Identify potential procedural issues, such as missed deadlines or unusually long delays between critical events (e.g., for speedy trial considerations).</li>
-                <li>Flag missing common procedural steps based on the type of case and logged events.</li>
-                <li>Cross-reference events with jurisdictional rules (e.g., typical timeframes for responses, statutory limitations).</li>
-                <li><strong>Visually highlight</strong> potential irregularities or important deadlines directly on the timeline display for easier identification.</li>
-              </ul>
-            </div>
-             <Alert variant="default" className="border-accent bg-accent/10">
+            <Button 
+              onClick={triggerTimelineAnalysis} 
+              disabled={isAnalyzingTimeline || events.length === 0}
+              className="w-full"
+            >
+              {isAnalyzingTimeline ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyzing...</>
+              ) : (
+                "Analyze Timeline with AI"
+              )}
+            </Button>
+
+            {timelineAnalysisResult && !isAnalyzingTimeline && (
+              <div className="mt-4 space-y-3">
+                <div>
+                  <h4 className="font-semibold text-primary">Analysis Summary:</h4>
+                  <p className="text-muted-foreground whitespace-pre-wrap">{timelineAnalysisResult.analysisSummary}</p>
+                </div>
+                {timelineAnalysisResult.potentialFocusAreas && timelineAnalysisResult.potentialFocusAreas.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-primary">Potential Focus Areas:</h4>
+                    <ul className="list-disc pl-5 text-muted-foreground space-y-1">
+                      {timelineAnalysisResult.potentialFocusAreas.map((area, index) => (
+                        <li key={index}>{area}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+             <Alert variant="default" className="border-accent bg-accent/10 mt-4">
                 <AlertTriangle className="h-4 w-4 text-accent" />
-                <AlertTitle className="font-semibold">Important Note &amp; Disclaimer</AlertTitle>
+                <AlertTitle className="font-semibold">Important Note & Disclaimer</AlertTitle>
                 <AlertDescription>
-                  The AI analysis described above is conceptual for this prototype. This tool currently only helps you log and visualize events with icons.
-                  Always verify procedural requirements, timelines, and any potential violations with a qualified legal professional. This log is for personal organization and does not constitute legal advice.
+                  The AI analysis provides general observations based on the event types and descriptions you log. It is not legal advice and does not assess legal validity or procedural correctness.
+                  Its purpose is to help you identify patterns or significant events in your timeline for further review. Always consult with a qualified legal professional for advice on your specific case.
                 </AlertDescription>
             </Alert>
           </CardContent>
@@ -323,4 +385,3 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
-    
