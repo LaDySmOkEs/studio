@@ -41,14 +41,15 @@ export default function HelpFaqPage() {
                 AI Transparency and How Suggestions Are Made
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-3">
-                <p>DUE PROCESS AI utilizes advanced artificial intelligence (AI) models, specifically Large Language Models (LLMs), to provide suggestions and analyze information related to legal contexts. Here’s a general overview of how it works and our commitment to transparency:</p>
+                <p>DUE PROCESS AI utilizes advanced artificial intelligence (AI) models, specifically Large Language Models (LLMs) accessed via Genkit, to provide suggestions and analyze information related to legal contexts. Here’s a general overview of how it works and our commitment to transparency:</p>
                 
                 <div>
-                  <h4 className="font-semibold text-foreground/90">How the AI Works (Conceptual):</h4>
+                  <h4 className="font-semibold text-foreground/90">How the AI Works:</h4>
                   <ul className="list-disc pl-5 space-y-1 mt-1">
-                    <li><strong>Pattern Recognition:</strong> The AI is trained on a vast dataset of legal texts, case law, statutes, and other relevant documents. It learns to identify patterns, correlations, and common structures within this data.</li>
+                    <li><strong>General LLM Knowledge:</strong> The AI is powered by a general-purpose Large Language Model. These models are trained on a vast and diverse dataset of text and code, which includes a wide range of publicly available legal texts, case law, statutes, and other documents. It learns to identify patterns, correlations, and common structures within this data.</li>
+                    <li><strong>No Custom Fine-Tuning or Private Database:</strong> For this application, the LLM is *not* specifically fine-tuned by us on a private, curated legal corpus, nor does the application currently implement a custom Retrieval-Augmented Generation (RAG) system to query a dedicated, real-time legal database that we host or maintain.</li>
                     <li><strong>Input Processing:</strong> When you provide information (e.g., case details in the Case Analysis feature), the AI processes this input to extract key terms, facts, and context.</li>
-                    <li><strong>Generating Suggestions:</strong> Based on the patterns it has learned, the AI generates suggestions (e.g., relevant laws, document types, potential due process concerns). This is a probabilistic process; the AI predicts what is most likely to be relevant based on its training.</li>
+                    <li><strong>Generating Suggestions:</strong> Based on the patterns it has learned from its general training, the AI generates suggestions (e.g., relevant laws, document types, potential due process concerns). This is a probabilistic process; the AI predicts what is most likely to be relevant based on its training data.</li>
                     <li><strong>Not Human Understanding:</strong> It's crucial to understand that the AI does not "understand" law or your specific situation in the way a human lawyer does. It doesn't have personal experiences, consciousness, or the ability to apply nuanced legal judgment to unique factual scenarios. Its outputs are based on the data it was trained on.</li>
                   </ul>
                 </div>
@@ -56,9 +57,10 @@ export default function HelpFaqPage() {
                 <div>
                   <h4 className="font-semibold text-foreground/90">Our Commitment to Transparency:</h4>
                   <ul className="list-disc pl-5 space-y-1 mt-1">
-                    <li><strong>Confidence Scores:</strong> In features like Case Analysis, we provide a "Confidence Score." This score is an AI-generated estimate of how well the provided information aligns with patterns the AI recognizes. The "How is this score determined?" section within Case Analysis offers more detail on the factors influencing this score.</li>
+                    <li><strong>Confidence Scores:</strong> In features like Case Analysis, we provide a "Confidence Score." This score is an AI-generated estimate of how well the provided information aligns with patterns the AI recognizes from its general training. It reflects the AI's confidence in its *own suggestions*, not a prediction of your case's outcome. The "How is this score determined?" section within Case Analysis offers more detail.</li>
                     <li><strong>Clear Disclaimers:</strong> We consistently emphasize that DUE PROCESS AI is an informational tool and not a substitute for professional legal advice. All AI-generated outputs must be reviewed by a qualified legal professional.</li>
-                    <li><strong>Conceptual Features:</strong> Many advanced AI capabilities (like dynamic follow-up questions or OCR analysis) are presented as "conceptual" in this prototype to clearly distinguish current functionality from future possibilities.</li>
+                    <li><strong>Conceptual Features:</strong> Many advanced AI capabilities (like dynamic follow-up questions or detailed OCR analysis) are presented as "conceptual" in this prototype to clearly distinguish current functionality from future possibilities.</li>
+                    <li><strong>Nature of Legal Library:</strong> The "Legal Library" page provides a curated list of links to external, authoritative sources and some static summaries. It is not a comprehensive, real-time database hosted by the app.</li>
                     <li><strong>No Guarantees:</strong> The AI's suggestions are not infallible and should not be taken as definitive legal conclusions or predictions of case outcomes.</li>
                   </ul>
                 </div>
