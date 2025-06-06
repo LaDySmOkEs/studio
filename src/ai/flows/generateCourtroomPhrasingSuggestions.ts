@@ -31,7 +31,7 @@ const StatementContextEnum = z.enum([
   "OTHER_COURTROOM_STATEMENT"
 ]);
 
-// Input schema updated: keyPointsOrTopic is required, userDraftStatement is optional.
+// Input schema: keyPointsOrTopic is required, userDraftStatement is optional.
 const GenerateCourtroomPhrasingInputSchema = z.object({
   keyPointsOrTopic: z.string().min(10, { message: "Please describe the key points you want to make or the topic of your statement (at least 10 characters)." }).describe("The key points the user wants to convey or the general topic of the statement to be made in court."),
   userDraftStatement: z.string().optional().describe("The user's own draft of the statement, if they want the AI to critique and improve it based on the keyPointsOrTopic."),
@@ -46,7 +46,7 @@ const SuggestedPhrasingSchema = z.object({
   rationale: z.string().optional().describe("A brief explanation for why this statement is effective or appropriate."),
 });
 
-// Output schema updated: originalStatementCritique is now optional.
+// Output schema: originalStatementCritique is now optional.
 const GenerateCourtroomPhrasingOutputSchema = z.object({
   originalStatementCritique: z.string().optional().describe("If the user provided a 'userDraftStatement', this field contains the AI's critique of that draft in relation to the 'keyPointsOrTopic' and 'statementContext'."),
   suggestedPhrasings: z.array(SuggestedPhrasingSchema).min(1).max(3).describe("1 to 3 AI-generated statements. If a 'userDraftStatement' was provided, these are improved versions. Otherwise, they are generated from scratch based on 'keyPointsOrTopic'."),
@@ -110,17 +110,30 @@ const generateCourtroomPhrasingSuggestionsFlow = ai.defineFlow(
     outputSchema: GenerateCourtroomPhrasingOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    if (!output) {
+    const {output: rawOutput} = await prompt(input);
+    if (!rawOutput) {
       throw new Error("AI failed to generate phrasing suggestions.");
     }
-    // Ensure originalStatementCritique is omitted if no user draft was provided and AI returns empty string.
-    if (!input.userDraftStatement && output.originalStatementCritique === "") {
-        // If using Zod transforms or .optional().nullable() this might not be needed
-        // but explicitly deleting helps ensure clean output if AI sends empty string.
-        const { originalStatementCritique, ...restOutput } = output;
-        return restOutput as GenerateCourtroomPhrasingOutput;
+
+    // Explicitly construct the return object to ensure it's plain data
+    let finalCritique: string | undefined = rawOutput.originalStatementCritique;
+
+    if (!input.userDraftStatement) {
+      // If no draft was provided, ensure critique is undefined,
+      // regardless of whether AI returned null or empty string.
+      finalCritique = undefined;
     }
-    return output;
+    
+    const result: GenerateCourtroomPhrasingOutput = {
+      originalStatementCritique: finalCritique,
+      suggestedPhrasings: rawOutput.suggestedPhrasings.map(p => ({
+        phrasing: p.phrasing,
+        rationale: p.rationale,
+      })),
+      generalTips: rawOutput.generalTips,
+    };
+    
+    return result;
   }
 );
+
