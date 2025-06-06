@@ -38,7 +38,7 @@ const STATEMENT_CONTEXT_OPTIONS = [
 
 export default function CourtroomCommunicationCoachPage() {
   const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
-  const [userStatement, setUserStatement] = useState("");
+  const [keyPointsOrTopic, setKeyPointsOrTopic] = useState(""); // Changed from userStatement
   const [statementContext, setStatementContext] = useState<string>("");
   
   const [suggestionsOutput, setSuggestionsOutput] = useState<GenerateCourtroomPhrasingOutput | null>(null);
@@ -62,8 +62,8 @@ export default function CourtroomCommunicationCoachPage() {
 
   const handleGenerateSuggestions = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!userStatement.trim()) {
-      toast({ title: "Statement Required", description: "Please enter the statement you wish to refine.", variant: "destructive"});
+    if (!keyPointsOrTopic.trim()) { // Changed from userStatement
+      toast({ title: "Key Points/Topic Required", description: "Please enter the key points or topic for your statement.", variant: "destructive"});
       return;
     }
     if (!statementContext) {
@@ -76,8 +76,8 @@ export default function CourtroomCommunicationCoachPage() {
     setError(null);
 
     const input: GenerateCourtroomPhrasingInput = {
-      userStatement,
-      statementContext: statementContext as any, // Zod enum in flow will validate
+      keyPointsOrTopic, // Changed from userStatement
+      statementContext: statementContext as any, 
       caseSummary: storedCaseSummary || undefined,
     };
 
@@ -88,7 +88,7 @@ export default function CourtroomCommunicationCoachPage() {
       toast({ title: "Suggestion Generation Failed", description: result.error, variant: "destructive" });
     } else {
       setSuggestionsOutput(result);
-      toast({ title: "Phrasing Suggestions Generated", description: "Review the AI's feedback and suggestions below." });
+      toast({ title: "AI Statements Generated", description: "Review the AI's suggested statements and tips below." });
     }
     setIsGeneratingSuggestions(false);
   };
@@ -101,8 +101,8 @@ export default function CourtroomCommunicationCoachPage() {
             <MessageSquareQuote className="w-7 h-7 text-primary" /> Courtroom Communication Coach
           </CardTitle>
           <CardDescription>
-            Refine how you articulate your points for court. Enter what you plan to say and the context, and the AI will offer suggestions for clarity, formality, and impact. 
-            While this tool focuses on text, practice saying the suggested phrasings aloud. Actual audio recording and feedback are conceptual future goals.
+            Describe the key points or topic for your statement and select the context. The AI will generate potential statements and offer communication tips. 
+            Practice saying the suggested phrasings aloud. Actual audio recording and feedback are conceptual future goals.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleGenerateSuggestions}>
@@ -120,21 +120,21 @@ export default function CourtroomCommunicationCoachPage() {
             )}
 
             <div>
-              <Label htmlFor="user-statement-textarea">What do you want to say or ask in court?*</Label>
+              <Label htmlFor="key-points-topic-textarea">What key points do you want to make, or what is the topic of your statement?*</Label> {/* Changed label */}
               <Textarea
-                id="user-statement-textarea"
-                value={userStatement}
-                onChange={(e) => setUserStatement(e.target.value)}
-                placeholder="e.g., I believe the evidence clearly shows my client was not present..."
+                id="key-points-topic-textarea"
+                value={keyPointsOrTopic} // Changed from userStatement
+                onChange={(e) => setKeyPointsOrTopic(e.target.value)} // Changed from setUserStatement
+                placeholder="e.g., 'Need to argue for dismissal due to lack of evidence,' or 'Question witness about their presence at the scene.'" // Changed placeholder
                 rows={5}
                 required
                 className="min-h-[100px]"
-                aria-label="Your intended statement or question for court"
+                aria-label="Key points or topic of your intended statement"
               />
             </div>
 
             <div>
-              <Label htmlFor="statement-context-select">In what context will you say this?*</Label>
+              <Label htmlFor="statement-context-select">In what context will this statement be made?*</Label>
               <Select onValueChange={setStatementContext} value={statementContext} required>
                 <SelectTrigger id="statement-context-select" aria-label="Select statement context">
                   <SelectValue placeholder="Choose a context..." />
@@ -150,7 +150,7 @@ export default function CourtroomCommunicationCoachPage() {
           <CardFooter>
             <Button type="submit" disabled={isGeneratingSuggestions} className="w-full sm:w-auto">
               {isGeneratingSuggestions ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Brain className="mr-2 h-4 w-4" />}
-              Get Phrasing Suggestions
+              Generate AI Statements
             </Button>
           </CardFooter>
         </form>
@@ -159,7 +159,7 @@ export default function CourtroomCommunicationCoachPage() {
       {error && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error Generating Suggestions</AlertTitle>
+          <AlertTitle>Error Generating Statements</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -167,17 +167,13 @@ export default function CourtroomCommunicationCoachPage() {
       {suggestionsOutput && (
         <Card className="shadow-md mt-6 border-primary">
           <CardHeader>
-            <CardTitle className="text-xl">AI Feedback & Suggestions</CardTitle>
-            <CardDescription>Review the AI's critique of your original statement and its suggestions for alternative phrasings and general tips.</CardDescription>
+            <CardTitle className="text-xl">AI-Generated Statements &amp; Communication Tips</CardTitle>
+            <CardDescription>Review the AI's generated statements, their rationales, and general tips for your chosen context.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* originalStatementCritique removed */}
             <div>
-              <h4 className="font-semibold text-md text-primary">Critique of Your Original Statement:</h4>
-              <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-md whitespace-pre-wrap">{suggestionsOutput.originalStatementCritique}</p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-md text-primary">Suggested Phrasings:</h4>
+              <h4 className="font-semibold text-md text-primary">AI-Generated Statements:</h4>
               <ScrollArea className="max-h-[300px] pr-3">
                 <ul className="space-y-3">
                   {suggestionsOutput.suggestedPhrasings.map((item, index) => (
@@ -222,24 +218,23 @@ export default function CourtroomCommunicationCoachPage() {
                 <CardTitle>How to Use the Communication Coach</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>This tool helps you refine your language for court appearances:</p>
+                <p>This tool helps you craft language for court appearances:</p>
                 <ul className="list-decimal pl-5 space-y-1">
-                    <li><strong>Enter Your Statement:</strong> Type what you plan to say or ask in the first text box.</li>
+                    <li><strong>Describe Key Points/Topic:</strong> Enter the main ideas you want to convey or the general subject of your statement in the text box.</li>
                     <li><strong>Select Context:</strong> Choose the situation where you'll be speaking from the dropdown (e.g., "Addressing the Judge," "Cross-Examination").</li>
-                    <li><strong>Get Suggestions:</strong> Click the button. The AI will analyze your input and provide a critique, alternative phrasings, and general tips.</li>
-                    <li><strong>Practice Aloud:</strong> Say the suggested phrasings out loud to build confidence and fluency.</li>
+                    <li><strong>Get AI Statements:</strong> Click the button. The AI will generate 1-3 potential statements for you, along with rationales and general communication tips.</li>
+                    <li><strong>Review & Practice:</strong> Select the statement that best fits your needs, adapt it if necessary, and practice saying it aloud to build confidence and fluency.</li>
                 </ul>
                  <Alert variant="default" className="border-accent bg-accent/10 mt-4">
                     <AlertTriangle className="h-4 w-4 text-accent" />
                     <AlertTitle className="font-semibold">Not Legal Advice</AlertTitle>
                     <AlertDescription>
-                        The suggestions provided are for communication improvement only and do not constitute legal advice on the substance of your case. Always consult a qualified attorney for legal guidance.
+                        The statements and tips provided are for communication assistance only and do not constitute legal advice on the substance of your case. Always consult a qualified attorney for legal guidance.
                     </AlertDescription>
                 </Alert>
             </CardContent>
          </Card>
         )}
-
     </div>
   );
 }
