@@ -23,16 +23,20 @@ interface StoredCaseData {
 }
 
 const STATEMENT_CONTEXT_OPTIONS = [
-  { value: "ADDRESSING_JUDGE", label: "Addressing the Judge" },
-  { value: "OPENING_STATEMENT", label: "Making an Opening Statement" },
+  { value: "ADDRESSING_JUDGE", label: "Addressing the Judge (General)" },
+  { value: "OPENING_STATEMENT", label: "Making an Opening Statement (Trial)" },
+  { value: "CLOSING_ARGUMENT", label: "Making a Closing Argument (Trial)" },
   { value: "DIRECT_EXAMINATION", label: "Questioning My Witness (Direct Examination)" },
   { value: "CROSS_EXAMINATION", label: "Questioning Opponent's Witness (Cross-Examination)" },
   { value: "MAKING_OBJECTION", label: "Making an Objection" },
+  { value: "RESPONDING_TO_OBJECTION", label: "Responding to an Objection Made by Opponent" },
+  { value: "ARGUING_MOTION", label: "Arguing a Pre-Trial or In-Trial Motion" },
   { value: "PRESENTING_EVIDENCE", label: "Presenting Evidence/Exhibit" },
-  { value: "CLOSING_ARGUMENT", label: "Making a Closing Argument" },
   { value: "RESPONDING_TO_QUESTION_FROM_JUDGE", label: "Responding to a Question from the Judge" },
+  { value: "PLEA_OR_SENTENCING_STATEMENT", label: "Making a Plea or Sentencing Statement (Defendant)" },
   { value: "NEGOTIATION_WITH_OPPOSING_COUNSEL", label: "Negotiation with Opposing Counsel (or party)" },
-  { value: "OTHER_COURTROOM_STATEMENT", label: "Other Courtroom Statement" },
+  { value: "MEDIATION_OPENING_STATEMENT", label: "Mediation: Opening Statement / Presenting Your Position" },
+  { value: "OTHER_COURTROOM_STATEMENT", label: "Other Courtroom Statement (Specify Topic Clearly)" },
 ];
 
 

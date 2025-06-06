@@ -17,13 +17,17 @@ import {z} from 'genkit';
 const StatementContextEnum = z.enum([
   "ADDRESSING_JUDGE",
   "OPENING_STATEMENT",
+  "CLOSING_ARGUMENT",
   "DIRECT_EXAMINATION", // Questioning my witness
   "CROSS_EXAMINATION",  // Questioning opponent's witness
   "MAKING_OBJECTION",
+  "RESPONDING_TO_OBJECTION",
+  "ARGUING_MOTION",
   "PRESENTING_EVIDENCE",
-  "CLOSING_ARGUMENT",
   "RESPONDING_TO_QUESTION_FROM_JUDGE",
+  "PLEA_OR_SENTENCING_STATEMENT",
   "NEGOTIATION_WITH_OPPOSING_COUNSEL",
+  "MEDIATION_OPENING_STATEMENT",
   "OTHER_COURTROOM_STATEMENT"
 ]);
 
@@ -70,7 +74,7 @@ This statement will be made in the following context: {{{statementContext}}}
 For additional context, here is a summary of the user's case:
 "{{{caseSummary}}}"
 {{#if caseCategory}}
-The case category is: {{{caseCategory}}}. Please consider this category.
+The case category is: {{{caseCategory}}}. Please consider this category when formulating suggestions. For example, statements in a criminal defense context might differ in tone or focus from a civil plaintiff context.
 {{/if}}
 {{/if}}
 
@@ -93,6 +97,9 @@ Focus on creating practical, actionable statements and advice. Avoid legal advic
 Ensure your output strictly adheres to the defined schema.
 If the key points/topic are very vague (and no draft is provided), try to generate helpful general statements for the context, or note that more specificity would yield better results in the rationale.
 For contexts like OPENING_STATEMENT or CLOSING_ARGUMENT, if the topic is broad, generate a concise key segment or introductory/concluding phrases.
+If the context is 'PLEA_OR_SENTENCING_STATEMENT', assume the user is the defendant and tailor suggestions accordingly (e.g., expressing remorse if appropriate for the key points, highlighting mitigating factors).
+If the context is 'ARGUING_MOTION', suggestions should be persuasive and focused on legal standards and facts supporting/opposing the motion as per the key points.
+If the context is 'RESPONDING_TO_OBJECTION', suggestions should be concise and address the legal basis of the objection (e.g., relevance, hearsay).
 `,
 });
 
@@ -109,7 +116,10 @@ const generateCourtroomPhrasingSuggestionsFlow = ai.defineFlow(
     }
     // Ensure originalStatementCritique is omitted if no user draft was provided and AI returns empty string.
     if (!input.userDraftStatement && output.originalStatementCritique === "") {
-        delete output.originalStatementCritique;
+        // If using Zod transforms or .optional().nullable() this might not be needed
+        // but explicitly deleting helps ensure clean output if AI sends empty string.
+        const { originalStatementCritique, ...restOutput } = output;
+        return restOutput as GenerateCourtroomPhrasingOutput;
     }
     return output;
   }
