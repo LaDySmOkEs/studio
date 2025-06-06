@@ -15,5 +15,6 @@ import '@/ai/flows/generateMockTrialScript.ts';
 import '@/ai/flows/generateProceduralRoadmap.ts';
 import '@/ai/flows/generateCourtroomPhrasingSuggestions.ts';
 import '@/ai/flows/generateNegotiationAdvice.ts';
+import '@/ai/flows/interactiveLegalAssistant.ts';
 
     

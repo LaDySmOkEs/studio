@@ -12,7 +12,9 @@ import { Bot, User, Send, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea"; // For displaying stored case summary
+import { Textarea } from "@/components/ui/textarea"; 
+import { getAIResponseAction } from "./actions";
+import type { InteractiveAssistantInput } from "@/ai/flows/interactiveLegalAssistant";
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
 
@@ -37,7 +39,6 @@ export default function InteractiveAssistantPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load stored case summary from localStorage
     try {
       const storedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedDataString) {
@@ -71,35 +72,23 @@ export default function InteractiveAssistantPage() {
     setInputValue("");
     setIsLoading(true);
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const actionInput: InteractiveAssistantInput = {
+        userQuery: trimmedInput,
+        caseContext: storedCaseSummary || undefined,
+    };
 
+    const result = await getAIResponseAction(actionInput);
     let aiResponseText = "";
-    const lowerCaseInput = trimmedInput.toLowerCase();
 
-    if (lowerCaseInput.includes("evicted") || lowerCaseInput.includes("eviction")) {
-      aiResponseText = `When facing an eviction, there's a legal process landlords must follow. Usually, it starts with a formal written notice (like a "Notice to Quit") specifying the reason (e.g., non-payment, lease violation) and a timeframe to resolve the issue or move. If you don't, the landlord typically needs to file an eviction lawsuit. You should then be served with court papers (a summons and complaint) and have the right to respond and attend a hearing. 
-Key things to check are:
-1. The Notice: Is it valid? Does it give the legally required time? Does it state clear reasons?
-2. Your Lease: What does it say about termination or eviction?
-3. Property Condition: If conditions are an issue, document them thoroughly.
-4. Court Filings: If you receive court papers, pay close attention to deadlines for responding.
-What specific part are you concerned about, like the notice you received, your tenant rights, or what to expect in court?`;
-    } else if (lowerCaseInput.includes("hearing")) {
-      aiResponseText = `A 'hearing' is a fundamental part of due process, providing a formal chance to present your case to a neutral decision-maker. The specifics vary greatly depending on the type of hearing:
-- Criminal Hearings: Can include arraignments (initial appearance), bail hearings, preliminary hearings (to determine if there's enough evidence for trial), motion hearings (to decide on legal issues before trial), and the trial itself.
-- Civil Hearings: Often involve motions (e.g., for summary judgment, to dismiss), pre-trial conferences, and the trial.
-- Administrative Hearings: These are before government agencies (e.g., for benefits, licenses, permits).
-Generally, for any hearing, you should receive proper notice beforehand detailing the date, time, location, and purpose. You often have the right to see evidence against you, present your own evidence, call witnesses, and question the other side's witnesses. Understanding the specific rules and procedures for *your* type of hearing is crucial. What kind of hearing are you preparing for or asking about?`;
-    } else if (lowerCaseInput.includes("notice")) {
-      aiResponseText = `Proper legal 'notice' is key to due process. It means being formally and adequately informed about something that could affect your rights, giving you a chance to respond. A good notice should typically:
-1. Be in writing.
-2. Clearly identify who it's from and who it's for.
-3. Explain the issue, proposed action, or allegations.
-4. Mention any relevant dates, deadlines, or hearing information.
-5. Inform you of your rights to respond, appeal, or seek legal counsel.
-Examples include a 'summons and complaint' if you're sued, a 'notice of proposed agency action' for benefits, or a 'notice to quit' in an eviction. The exact requirements depend on the situation and jurisdiction. If you've received a notice, what is it regarding? Knowing the context helps provide more relevant general information.`;
+    if ('error' in result) {
+        aiResponseText = `Error: ${result.error}. Please try rephrasing or ask a general question. Remember, I cannot provide legal advice.`;
+        toast({
+            title: "AI Assistant Error",
+            description: result.error,
+            variant: "destructive",
+        });
     } else {
-      aiResponseText = `I can provide general information about common legal terms or processes if you use keywords like 'eviction,' 'hearing,' or 'notice.' I'm still learning and my responses are based on pre-defined information for this prototype. If your question is very specific to your personal situation or involves complex legal analysis, I won't be able to provide a detailed answer. Trying to rephrase your question with clear keywords might help, or you can explore other features of the app.`;
+        aiResponseText = result.responseText;
     }
     
     const aiMessage: Message = {
@@ -113,11 +102,11 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
   };
   
   useEffect(() => {
-    let greetingText = "Hello! I'm a prototype Legal Assistant, an AI Co-litigator. I can help explain court processes, interpret general legal concepts (based on your keywords), and conceptually suggest next actions. ";
+    let greetingText = "Hello! I'm your AI Legal Assistant. I can help explain general legal concepts, court processes, and common terminology. ";
     if (storedCaseSummary) {
-        greetingText += "I see you have a case summary saved from Case Analysis; I can use that for context if your questions are general. ";
+        greetingText += "I see you have a case summary saved; I can use that for general context if your questions relate to it. ";
     }
-    greetingText += "How can I conceptually help you today?";
+    greetingText += "How can I help you today? Please remember, I cannot provide legal advice, and this information is for educational purposes. For specific advice, consult a qualified attorney.";
 
     setMessages([
       {
@@ -130,14 +119,14 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
   }, [storedCaseSummary]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)]"> {/* Adjust height as needed */}
+    <div className="flex flex-col h-[calc(100vh-10rem)]"> 
       <Card className="flex-grow flex flex-col shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Bot className="w-7 h-7 text-primary" /> Interactive Legal Assistant (AI Co-litigator)
+            <Bot className="w-7 h-7 text-primary" /> Interactive Legal Assistant
           </CardTitle>
           <CardDescription>
-            A natural language assistant to help explain court processes, interpret general legal concepts (based on your keywords), and conceptually suggest next actions. It uses your saved case context (from Case Analysis) for more relevant general information. This assistant is a prototype and offers informational responses only.
+            Ask questions about general legal concepts, court processes, or terminology. If you have a saved case summary, the AI can use it for context to provide more relevant general explanations. This assistant offers informational responses only and cannot give legal advice.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-grow overflow-hidden p-0">
@@ -205,7 +194,7 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
                       </AvatarFallback>
                   </Avatar>
                   <div className="max-w-[70%] rounded-lg px-3 py-2 text-sm shadow bg-muted text-muted-foreground">
-                    <p>Thinking...</p>
+                    <p className="whitespace-pre-wrap">Thinking...</p>
                   </div>
                 </div>
               )}
@@ -217,7 +206,7 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
             <Input
               id="user-question-input"
               type="text"
-              placeholder="Ask about 'eviction', 'hearing', 'notice'..."
+              placeholder="Ask a general legal question..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               className="flex-grow"
@@ -235,12 +224,9 @@ Examples include a 'summons and complaint' if you're sued, a 'notice of proposed
         <Bot className="h-5 w-5 text-accent" />
         <AlertTitle className="font-semibold text-accent">Important Disclaimer</AlertTitle>
         <AlertDescription>
-          This Interactive Legal Assistant is a conceptual prototype for demonstration purposes. The responses are general information and <strong>do not constitute legal advice</strong>. Always consult with a qualified legal professional for any legal concerns or specific advice regarding your situation.
+          This Interactive Legal Assistant is powered by AI and provides general information for educational purposes. <strong>It does not constitute legal advice</strong>. Always consult with a qualified legal professional for any legal concerns or specific advice regarding your situation.
         </AlertDescription>
       </Alert>
     </div>
   );
 }
-
-
-    
