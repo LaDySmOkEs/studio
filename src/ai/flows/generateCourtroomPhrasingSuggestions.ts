@@ -26,7 +26,7 @@ const StatementContextEnum = z.enum([
   "OTHER_COURTROOM_STATEMENT"
 ]);
 
-export const GenerateCourtroomPhrasingInputSchema = z.object({
+const GenerateCourtroomPhrasingInputSchema = z.object({
   userStatement: z.string().min(10, { message: "Please provide the statement you intend to make (at least 10 characters)." }).describe("The statement or question the user intends to say in court."),
   statementContext: StatementContextEnum.describe("The context in which the user will make this statement."),
   caseSummary: z.string().optional().describe("Optional summary of the user's case for better contextual suggestions."),
@@ -38,7 +38,7 @@ const SuggestedPhrasingSchema = z.object({
   rationale: z.string().optional().describe("A brief explanation for why this phrasing might be more effective or appropriate."),
 });
 
-export const GenerateCourtroomPhrasingOutputSchema = z.object({
+const GenerateCourtroomPhrasingOutputSchema = z.object({
   originalStatementCritique: z.string().describe("Brief feedback on the user's original statement (e.g., clarity, formality, potential misunderstandings)."),
   suggestedPhrasings: z.array(SuggestedPhrasingSchema).min(1).max(3).describe("1 to 3 alternative ways to phrase the statement, with optional rationale."),
   generalTips: z.array(z.string()).max(3).describe("Up to 3 general communication tips relevant to the chosen context (e.g., 'When addressing the judge, always say Your Honor')."),
