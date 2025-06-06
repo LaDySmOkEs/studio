@@ -27,10 +27,12 @@ const StatementContextEnum = z.enum([
 ]);
 
 // Input schema updated: userStatement changed to keyPointsOrTopic
+// Added optional caseCategory
 const GenerateCourtroomPhrasingInputSchema = z.object({
   keyPointsOrTopic: z.string().min(10, { message: "Please describe the key points you want to make or the topic of your statement (at least 10 characters)." }).describe("The key points the user wants to convey or the general topic of the statement to be made in court."),
   statementContext: StatementContextEnum.describe("The context in which the user will make this statement."),
   caseSummary: z.string().optional().describe("Optional summary of the user's case for better contextual suggestions."),
+  caseCategory: z.enum(["general", "criminal", "civil"]).optional().describe("Optional category of the case (general, criminal, civil) for better contextual suggestions."),
 });
 export type GenerateCourtroomPhrasingInput = z.infer<typeof GenerateCourtroomPhrasingInputSchema>;
 
@@ -50,7 +52,7 @@ export async function generateCourtroomPhrasingSuggestions(input: GenerateCourtr
   return generateCourtroomPhrasingSuggestionsFlow(input);
 }
 
-// Prompt updated to generate statements, not critique
+// Prompt updated to generate statements, not critique, and consider caseCategory
 const prompt = ai.definePrompt({
   name: 'generateCourtroomPhrasingSuggestionsPrompt',
   input: {schema: GenerateCourtroomPhrasingInputSchema},
@@ -65,6 +67,9 @@ This statement will be made in the following context: {{{statementContext}}}
 {{#if caseSummary}}
 For additional context, here is a summary of the user's case:
 "{{{caseSummary}}}"
+{{#if caseCategory}}
+The case category is: {{{caseCategory}}}. Please consider this category when crafting statements (e.g., statements in a criminal defense context might differ in tone or focus from a civil plaintiff context).
+{{/if}}
 {{/if}}
 
 Based on this, please provide:
@@ -81,8 +86,8 @@ For contexts like OPENING_STATEMENT or CLOSING_ARGUMENT, if the topic is broad, 
 const generateCourtroomPhrasingSuggestionsFlow = ai.defineFlow(
   {
     name: 'generateCourtroomPhrasingSuggestionsFlow',
-    inputSchema: GenerateCourtroomPhrasingInputSchema, // Using updated schema
-    outputSchema: GenerateCourtroomPhrasingOutputSchema, // Using updated schema
+    inputSchema: GenerateCourtroomPhrasingInputSchema, 
+    outputSchema: GenerateCourtroomPhrasingOutputSchema,
   },
   async (input) => {
     const {output} = await prompt(input);

@@ -38,7 +38,8 @@ const STATEMENT_CONTEXT_OPTIONS = [
 
 export default function CourtroomCommunicationCoachPage() {
   const [storedCaseSummary, setStoredCaseSummary] = useState<string | null>(null);
-  const [keyPointsOrTopic, setKeyPointsOrTopic] = useState(""); // Changed from userStatement
+  const [storedCaseCategory, setStoredCaseCategory] = useState<"general" | "criminal" | "civil" | null>(null);
+  const [keyPointsOrTopic, setKeyPointsOrTopic] = useState("");
   const [statementContext, setStatementContext] = useState<string>("");
   
   const [suggestionsOutput, setSuggestionsOutput] = useState<GenerateCourtroomPhrasingOutput | null>(null);
@@ -53,6 +54,7 @@ export default function CourtroomCommunicationCoachPage() {
       if (storedDataString) {
         const storedData: StoredCaseData = JSON.parse(storedDataString);
         setStoredCaseSummary(storedData.caseDetails);
+        setStoredCaseCategory(storedData.caseCategory);
       }
     } catch (e) {
       console.error("Failed to load or parse case data from localStorage", e);
@@ -62,7 +64,7 @@ export default function CourtroomCommunicationCoachPage() {
 
   const handleGenerateSuggestions = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!keyPointsOrTopic.trim()) { // Changed from userStatement
+    if (!keyPointsOrTopic.trim()) { 
       toast({ title: "Key Points/Topic Required", description: "Please enter the key points or topic for your statement.", variant: "destructive"});
       return;
     }
@@ -76,9 +78,10 @@ export default function CourtroomCommunicationCoachPage() {
     setError(null);
 
     const input: GenerateCourtroomPhrasingInput = {
-      keyPointsOrTopic, // Changed from userStatement
+      keyPointsOrTopic, 
       statementContext: statementContext as any, 
       caseSummary: storedCaseSummary || undefined,
+      caseCategory: storedCaseCategory || undefined,
     };
 
     const result = await handleGeneratePhrasingSuggestionsAction(input);
@@ -102,30 +105,42 @@ export default function CourtroomCommunicationCoachPage() {
           </CardTitle>
           <CardDescription>
             Describe the key points or topic for your statement and select the context. The AI will generate potential statements and offer communication tips. 
+            It uses your saved case summary and category (from Case Analysis) for better context.
             Practice saying the suggested phrasings aloud. Actual audio recording and feedback are conceptual future goals.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleGenerateSuggestions}>
           <CardContent className="space-y-6">
-            {storedCaseSummary && (
+            {(storedCaseSummary || storedCaseCategory) && (
               <Card className="bg-muted/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Case Context for AI</CardTitle>
-                  <CardDescription className="text-xs">This summary from Case Analysis can provide helpful context to the AI for more relevant suggestions.</CardDescription>
+                  <CardDescription className="text-xs">This information from Case Analysis can provide helpful context to the AI for more relevant suggestions.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Textarea value={storedCaseSummary} readOnly rows={2} className="text-sm bg-background cursor-default h-auto" aria-label="Stored case summary (context for AI)" />
+                <CardContent className="space-y-2">
+                  {storedCaseSummary && (
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Case Summary:</Label>
+                      <Textarea value={storedCaseSummary} readOnly rows={2} className="text-sm bg-background cursor-default h-auto" aria-label="Stored case summary (context for AI)" />
+                    </div>
+                  )}
+                  {storedCaseCategory && (
+                     <div>
+                      <Label className="text-xs text-muted-foreground">Case Category:</Label>
+                       <p className="text-sm p-2 bg-background rounded-md capitalize">{storedCaseCategory}</p>
+                     </div>
+                  )}
                 </CardContent>
               </Card>
             )}
 
             <div>
-              <Label htmlFor="key-points-topic-textarea">What key points do you want to make, or what is the topic of your statement?*</Label> {/* Changed label */}
+              <Label htmlFor="key-points-topic-textarea">What key points do you want to make, or what is the topic of your statement?*</Label> 
               <Textarea
                 id="key-points-topic-textarea"
-                value={keyPointsOrTopic} // Changed from userStatement
-                onChange={(e) => setKeyPointsOrTopic(e.target.value)} // Changed from setUserStatement
-                placeholder="e.g., 'Need to argue for dismissal due to lack of evidence,' or 'Question witness about their presence at the scene.'" // Changed placeholder
+                value={keyPointsOrTopic} 
+                onChange={(e) => setKeyPointsOrTopic(e.target.value)} 
+                placeholder="e.g., 'Need to argue for dismissal due to lack of evidence,' or 'Question witness about their presence at the scene.'" 
                 rows={5}
                 required
                 className="min-h-[100px]"
@@ -171,7 +186,7 @@ export default function CourtroomCommunicationCoachPage() {
             <CardDescription>Review the AI's generated statements, their rationales, and general tips for your chosen context.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* originalStatementCritique removed */}
+            
             <div>
               <h4 className="font-semibold text-md text-primary">AI-Generated Statements:</h4>
               <ScrollArea className="max-h-[300px] pr-3">
@@ -238,3 +253,4 @@ export default function CourtroomCommunicationCoachPage() {
     </div>
   );
 }
+
