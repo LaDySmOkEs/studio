@@ -4,10 +4,12 @@
 import { z } from 'zod';
 import { 
   generalLegalQuery, 
+} from '@/ai/flows/interactiveLegalAssistant';
+import {
   type InteractiveAssistantInput, 
   type InteractiveAssistantOutput,
   InteractiveAssistantInputSchema
-} from '@/ai/flows/interactiveLegalAssistant';
+} from '@/ai/schemas/interactiveAssistantSchemas';
 
 export async function getAIResponseAction(
   input: InteractiveAssistantInput
