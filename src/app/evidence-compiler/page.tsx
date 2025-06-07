@@ -13,11 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   UploadCloud, FileText as FileTextIcon, ImageIcon, YoutubeIcon, MicIcon as AudioLinesIcon, 
   VideoIcon, Trash2, AlertTriangle, SearchCheck, Loader2, MessageSquareQuote, 
-  AlertOctagon, ShieldCheck, Info, Lightbulb, Eye, Package // Added Package icon
+  AlertOctagon, ShieldCheck, Info, Lightbulb, Eye, Package, Brain // Added Brain
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge"; // For displaying tags
+import { Badge } from "@/components/ui/badge"; 
+import { handleAnalyzeDocumentContentAction } from "./actions";
+import type { DocumentEvidenceAnalysisOutput } from "@/ai/flows/analyzeDocumentContent";
+
 
 const LOCAL_STORAGE_KEY = "dueProcessAICaseAnalysisData";
 
@@ -26,7 +29,7 @@ interface StoredCaseData {
   caseCategory: "general" | "criminal" | "civil";
 }
 
-interface ConceptualAnalysis {
+interface AudioVideoAnalysis { // Renamed from ConceptualAnalysis for clarity
   transcriptionHighlights?: string;
   flaggedIrregularities?: string[];
   linkedPrinciples?: string[];
@@ -44,14 +47,19 @@ interface EvidenceItem {
   fileObject?: File;
   size?: number; 
   exhibitLabel?: string; 
-  status: 'Pending' | 'Analyzed (Conceptual)'; 
-  analysisTags?: string[]; 
+  status: 'Pending' | 'Analyzed (Audio/Video - Conceptual)' | 'Analyzed (Document - Conceptual)' | 'Analysis Failed'; 
+  analysisTags?: string[];
+  audioVideoAnalysis?: AudioVideoAnalysis; // For existing audio/video conceptual analysis
+  documentContentAnalysis?: DocumentEvidenceAnalysisOutput; // For new document content analysis
 }
 
+// Combined AnalysisDisplayState to handle both types
 interface AnalysisDisplayState {
   itemId: string;
   label: string;
-  analysis: ConceptualAnalysis;
+  analysisType: 'audioVideo' | 'documentContent';
+  audioVideoResults?: AudioVideoAnalysis;
+  documentContentResults?: DocumentEvidenceAnalysisOutput;
 }
 
 const getFileIcon = (type: EvidenceItem['type']) => {
@@ -123,7 +131,7 @@ export default function EvidenceCompilerPage() {
     if (type === 'image') return 'photo';
     if (type === 'audio') return 'audio';
     if (type === 'video') return 'video';
-    if (file.type === 'application/pdf' || file.type.includes('document') || file.type.includes('text')) return 'document';
+    if (file.type === 'application/pdf' || file.type.includes('document') || file.type.includes('text') || file.type.includes('presentation') || file.type.includes('sheet')) return 'document';
     return 'other';
   };
 
@@ -141,7 +149,7 @@ export default function EvidenceCompilerPage() {
     setIsSubmitting(true);
     setCurrentAnalysisDisplay(null); 
 
-    let newEvidenceItemBase: Omit<EvidenceItem, 'id' | 'addedDate'>;
+    let newEvidenceItemBase: Omit<EvidenceItem, 'id' | 'addedDate' | 'audioVideoAnalysis' | 'documentContentAnalysis' >;
     let previewUrl: string | undefined = undefined;
 
     if (inputType === 'file' && currentFile) {
@@ -209,54 +217,80 @@ export default function EvidenceCompilerPage() {
     toast({ title: "Evidence Removed", description: "The item has been removed from your collection.", variant: "default" });
   };
 
-  const handleConceptualAnalyze = async (item: EvidenceItem) => {
+  const handleAnalyzeItem = async (item: EvidenceItem) => {
     setAnalysisLoadingItemId(item.id);
-    setCurrentAnalysisDisplay(null); 
-    await new Promise(resolve => setTimeout(resolve, 1500)); 
+    setCurrentAnalysisDisplay(null);
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
 
-    let mockAnalysis: ConceptualAnalysis = {};
-    let conceptualTranscription = `Conceptual transcription placeholder for "${item.label}":\n\n`;
-
-    if (item.description) {
-        conceptualTranscription += `This recording appears to concern: "${item.description.substring(0, 70)}${item.description.length > 70 ? '...' : ''}".\n\n`;
-    } else {
-        conceptualTranscription += `No specific description was provided for this item.\n\n`;
-    }
-    
-    conceptualTranscription += `In a real system, the full audio/video content would be transcribed here by an AI. Key phrases, speaker identification, and timestamps would be extracted for detailed analysis against legal and procedural standards.`;
-
-    mockAnalysis.transcriptionHighlights = conceptualTranscription;
-    
     const mockTags = ["Keyword: " + item.type, "Context: " + (item.label.split(" ")[0] || "General")];
     if (item.description.toLowerCase().includes("important")) mockTags.push("Priority: High");
 
-
-    if (item.type === 'audio' || item.type === 'video' || item.type === 'youtube') {
-        mockAnalysis.flaggedIrregularities = [
+    if (item.type === 'document') {
+      const analysisInput = {
+        documentLabel: item.label,
+        documentDescription: item.description,
+        fileName: item.fileName,
+        caseContext: storedCaseSummary || undefined,
+      };
+      const result = await handleAnalyzeDocumentContentAction(analysisInput);
+      if ('error' in result) {
+        toast({ title: "Document Analysis Failed", description: result.error, variant: "destructive" });
+        setEvidenceItems(prevItems => prevItems.map(ev => ev.id === item.id ? { ...ev, status: 'Analysis Failed' } : ev));
+      } else {
+        setEvidenceItems(prevItems => 
+          prevItems.map(ev => 
+            ev.id === item.id 
+              ? { ...ev, status: 'Analyzed (Document - Conceptual)', documentContentAnalysis: result, analysisTags: [...(ev.analysisTags || []), ...result.keywords] }
+              : ev
+          )
+        );
+        setCurrentAnalysisDisplay({ 
+            itemId: item.id, 
+            label: item.label, 
+            analysisType: 'documentContent', 
+            documentContentResults: result 
+        });
+        toast({ title: "Document Content Analysis Complete", description: `Conceptual analysis for "${item.label}" is ready.`});
+      }
+    } else if (item.type === 'audio' || item.type === 'video' || item.type === 'youtube') {
+        let mockAudioVideoAnalysis: AudioVideoAnalysis = {};
+        let conceptualTranscription = `Conceptual transcription placeholder for "${item.label}":\n\n`;
+        if (item.description) {
+            conceptualTranscription += `This recording appears to concern: "${item.description.substring(0, 70)}${item.description.length > 70 ? '...' : ''}".\n\n`;
+        } else {
+            conceptualTranscription += `No specific description was provided for this item.\n\n`;
+        }
+        conceptualTranscription += `In a real system, the full audio/video content would be transcribed here by an AI. Key phrases, speaker identification, and timestamps would be extracted for detailed analysis against legal and procedural standards.`;
+        mockAudioVideoAnalysis.transcriptionHighlights = conceptualTranscription;
+        mockAudioVideoAnalysis.flaggedIrregularities = [
             "Example Irregularity: The reason for the interaction was not clearly stated at the outset (if applicable).",
             "Example Irregularity: Questions regarding rights or legal status (e.g., 'Am I free to go?', 'Do I need a lawyer?') were potentially ignored or deflected.",
-        ],
-        mockAnalysis.linkedPrinciples = [
+        ];
+        mockAudioVideoAnalysis.linkedPrinciples = [
             "Example Principle: Right to understand the nature of an official interaction.",
             "Example Principle: Right to counsel (Sixth Amendment, if applicable).",
-        ]
+        ];
+        
+        setEvidenceItems(prevItems => 
+          prevItems.map(ev => 
+            ev.id === item.id 
+              ? { ...ev, status: 'Analyzed (Audio/Video - Conceptual)', audioVideoAnalysis: mockAudioVideoAnalysis, analysisTags: mockTags } 
+              : ev
+          )
+        );
+        setCurrentAnalysisDisplay({ 
+            itemId: item.id, 
+            label: item.label, 
+            analysisType: 'audioVideo', 
+            audioVideoResults: mockAudioVideoAnalysis 
+        });
+        toast({ title: "Audio/Video Conceptual Analysis Complete", description: `Showing conceptual analysis for "${item.label}". Item status updated.` });
+    } else {
+        toast({ title: "Analysis Not Applicable", description: `Analysis is currently supported for Document, Audio, Video, or YouTube types.`, variant: "default" });
     }
-    
-    setEvidenceItems(prevItems => 
-      prevItems.map(ev => 
-        ev.id === item.id 
-          ? { ...ev, status: 'Analyzed (Conceptual)', analysisTags: mockTags } 
-          : ev
-      )
-    );
-
-    setCurrentAnalysisDisplay({ itemId: item.id, label: item.label, analysis: mockAnalysis });
     setAnalysisLoadingItemId(null);
-    toast({
-      title: "Conceptual Analysis Complete",
-      description: `Showing conceptual analysis for "${item.label}". The transcription is a placeholder. Item status updated.`,
-    });
   };
+
 
   const handlePreview = (item: EvidenceItem) => {
     if (item.type === 'photo' && item.previewUrl) {
@@ -296,8 +330,7 @@ export default function EvidenceCompilerPage() {
             </CardTitle>
             <CardDescription>
               Upload or link evidence (photos, videos, documents, YouTube URLs). Label it, add descriptions, and an exhibit label. 
-              You can perform a conceptual analysis on audio/video files. Uploaded files are handled locally in your browser.
-              A conceptual future enhancement could link compiled evidence to an "Evidence-to-Complaint Auto-Generator."
+              You can perform a conceptual AI analysis on document content (simulating OCR) or audio/video interactions. Uploaded files are handled locally in your browser.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -306,7 +339,7 @@ export default function EvidenceCompilerPage() {
                 <Card className="bg-muted/50 mb-4">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2"><Info className="w-5 h-5 text-muted-foreground" />Current Case Context</CardTitle>
-                    <CardDescription className="text-xs">This summary was entered in the Case Analysis section. Use it to help label and describe your evidence.</CardDescription>
+                    <CardDescription className="text-xs">This summary from Case Analysis can help contextualize your evidence and its AI analysis.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Textarea
@@ -326,8 +359,8 @@ export default function EvidenceCompilerPage() {
                     <SelectValue placeholder="Select source type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="file">Upload File</SelectItem>
-                    <SelectItem value="url">YouTube URL</SelectItem>
+                    <SelectItem value="file">Upload File (Document, Image, Audio, Video)</SelectItem>
+                    <SelectItem value="url">YouTube URL (Video/Audio)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -340,7 +373,7 @@ export default function EvidenceCompilerPage() {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
-                    accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
+                    accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx"
                     className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                     aria-label="Select file for evidence"
                   />
@@ -368,7 +401,7 @@ export default function EvidenceCompilerPage() {
                   id="evidenceLabelInput"
                   value={currentLabel}
                   onChange={(e) => setCurrentLabel(e.target.value)}
-                  placeholder="e.g., Photo of damaged fence, Dashcam footage May 5th"
+                  placeholder="e.g., Photo of damaged fence, Dashcam footage May 5th, Contract PDF"
                   required
                   aria-label="Evidence label"
                 />
@@ -410,7 +443,7 @@ export default function EvidenceCompilerPage() {
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle>Collected Evidence</CardTitle>
-              <CardDescription>Review and manage your compiled evidence items below. Audio/video items can be conceptually analyzed.</CardDescription>
+              <CardDescription>Review and manage your compiled evidence items below. Document, Audio, Video and YouTube items can be conceptually analyzed by AI.</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px] pr-3">
@@ -439,9 +472,9 @@ export default function EvidenceCompilerPage() {
                             {item.fileName && <p className="text-xs text-muted-foreground truncate">File: {item.fileName}</p>}
                             {item.url && <p className="text-xs text-muted-foreground truncate">URL: <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{item.url}</a></p>}
                             {item.size !== undefined && <p className="text-xs text-muted-foreground">Size: {formatFileSize(item.size)}</p>}
-                            <p className="text-xs text-muted-foreground">Status: <Badge variant={item.status === 'Analyzed (Conceptual)' ? 'default' : 'secondary'}>{item.status}</Badge></p>
+                            <p className="text-xs text-muted-foreground">Status: <Badge variant={item.status.startsWith('Analyzed') ? 'default' : 'secondary'}>{item.status}</Badge></p>
                             
-                            {item.status === 'Analyzed (Conceptual)' && item.analysisTags && item.analysisTags.length > 0 && (
+                            {item.status.startsWith('Analyzed') && item.analysisTags && item.analysisTags.length > 0 && (
                               <div className="mt-1">
                                 {item.analysisTags.map(tag => (
                                   <Badge key={tag} variant="outline" className="mr-1 mb-1 text-xs">{tag}</Badge>
@@ -459,17 +492,17 @@ export default function EvidenceCompilerPage() {
                               >
                                 <Eye className="mr-1 h-3 w-3" /> Preview
                               </Button>
-                              {(item.type === 'audio' || item.type === 'video' || item.type === 'youtube') && (
+                              {(item.type === 'audio' || item.type === 'video' || item.type === 'youtube' || item.type === 'document') && (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
                                   className="text-xs"
-                                  onClick={() => handleConceptualAnalyze(item)}
+                                  onClick={() => handleAnalyzeItem(item)}
                                   disabled={analysisLoadingItemId === item.id}
                                   aria-label={`Analyze evidence: ${item.label} (Conceptual)`}
                                 >
-                                  {analysisLoadingItemId === item.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <SearchCheck className="mr-1 h-3 w-3" />}
-                                  Analyze (Conceptual)
+                                  {analysisLoadingItemId === item.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Brain className="mr-1 h-3 w-3" />}
+                                  Analyze with AI
                                 </Button>
                               )}
                             </div>
@@ -492,52 +525,91 @@ export default function EvidenceCompilerPage() {
           <Card className="shadow-lg mt-6 border-primary">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
-                <SearchCheck className="w-6 h-6 text-primary" /> Conceptual Analysis for: <span className="font-normal">{currentAnalysisDisplay.label}</span>
+                <SearchCheck className="w-6 h-6 text-primary" /> Conceptual AI Analysis: <span className="font-normal">{currentAnalysisDisplay.label}</span>
               </CardTitle>
               <CardDescription>
-                This is a conceptual AI analysis. The "Transcription Highlights" section below is a placeholder representing what a full AI system would transcribe from the audio/video before further analysis. The flagged irregularities and principles are examples of what an AI might identify. This is for demonstration purposes only and is not legal advice.
+                This is a conceptual AI analysis. For documents, it simulates OCR and content understanding. For audio/video, it provides example insights. This is for demonstration and not legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {currentAnalysisDisplay.analysis.transcriptionHighlights && (
-                <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Transcription Highlights (Conceptual Placeholder)</h4>
-                  <Label htmlFor="transcriptionHighlightsTextarea" className="sr-only">Conceptual Transcription Placeholder</Label>
-                  <Textarea
-                    id="transcriptionHighlightsTextarea"
-                    value={currentAnalysisDisplay.analysis.transcriptionHighlights}
-                    readOnly
-                    rows={6}
-                    className="bg-muted/50 text-sm font-mono"
-                    aria-label="Conceptual Transcription Placeholder"
-                  />
-                </div>
+              {currentAnalysisDisplay.analysisType === 'audioVideo' && currentAnalysisDisplay.audioVideoResults && (
+                <>
+                  {currentAnalysisDisplay.audioVideoResults.transcriptionHighlights && (
+                    <div>
+                      <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><MessageSquareQuote className="w-4 h-4 text-muted-foreground"/>Audio/Video Transcription Highlights (Conceptual Placeholder)</h4>
+                      <Textarea
+                        value={currentAnalysisDisplay.audioVideoResults.transcriptionHighlights}
+                        readOnly
+                        rows={6}
+                        className="bg-muted/50 text-sm font-mono"
+                        aria-label="Conceptual Transcription Placeholder"
+                      />
+                    </div>
+                  )}
+                  {currentAnalysisDisplay.audioVideoResults.flaggedIrregularities && currentAnalysisDisplay.audioVideoResults.flaggedIrregularities.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Example Flagged Irregularities (Conceptual)</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                        {currentAnalysisDisplay.audioVideoResults.flaggedIrregularities.map((irregularity, index) => (
+                          <li key={index}>{irregularity}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {currentAnalysisDisplay.audioVideoResults.linkedPrinciples && currentAnalysisDisplay.audioVideoResults.linkedPrinciples.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><ShieldCheck className="w-4 h-4 text-muted-foreground"/>Example Linked Constitutional Principles (Conceptual)</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                        {currentAnalysisDisplay.audioVideoResults.linkedPrinciples.map((principle, index) => (
+                          <li key={index}>{principle}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
               )}
-              {currentAnalysisDisplay.analysis.flaggedIrregularities && currentAnalysisDisplay.analysis.flaggedIrregularities.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Example Flagged Irregularities (Conceptual)</h4>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                    {currentAnalysisDisplay.analysis.flaggedIrregularities.map((irregularity, index) => (
-                      <li key={index}>{irregularity}</li>
-                    ))}
-                  </ul>
-                </div>
+              {currentAnalysisDisplay.analysisType === 'documentContent' && currentAnalysisDisplay.documentContentResults && (
+                <>
+                  <div>
+                    <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><FileTextIcon className="w-4 h-4 text-muted-foreground"/>AI Document Summary (Conceptual)</h4>
+                    <p className="text-sm text-muted-foreground p-2 border rounded-md bg-muted/30 whitespace-pre-wrap">
+                        {currentAnalysisDisplay.documentContentResults.summary}
+                    </p>
+                  </div>
+                  {currentAnalysisDisplay.documentContentResults.potentialIssues.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><AlertOctagon className="w-4 h-4 text-muted-foreground"/>Potential Issues / Points to Note (Conceptual)</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                        {currentAnalysisDisplay.documentContentResults.potentialIssues.map((issue, index) => (
+                          <li key={index}>{issue}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                   {currentAnalysisDisplay.documentContentResults.keywords.length > 0 && (
+                     <div>
+                        <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><Info className="w-4 h-4 text-muted-foreground"/>Suggested Keywords (Conceptual)</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {currentAnalysisDisplay.documentContentResults.keywords.map(kw => (
+                            <Badge key={kw} variant="secondary">{kw}</Badge>
+                          ))}
+                        </div>
+                    </div>
+                  )}
+                  <Alert variant="default" className="mt-3 border-accent bg-accent/5">
+                    <AlertTriangle className="h-4 w-4 text-accent" />
+                    <AlertTitle className="font-semibold text-accent">Conceptual Analysis</AlertTitle>
+                    <AlertDescription className="text-xs">
+                      {currentAnalysisDisplay.documentContentResults.disclaimer}
+                    </AlertDescription>
+                  </Alert>
+                </>
               )}
-              {currentAnalysisDisplay.analysis.linkedPrinciples && currentAnalysisDisplay.analysis.linkedPrinciples.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-md flex items-center gap-1 mb-1"><ShieldCheck className="w-4 h-4 text-muted-foreground"/>Example Linked Constitutional Principles (Conceptual)</h4>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                    {currentAnalysisDisplay.analysis.linkedPrinciples.map((principle, index) => (
-                      <li key={index}>{principle}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <Alert variant="default" className="border-accent bg-accent/10 mt-3">
-                <AlertTriangle className="h-4 w-4 text-accent" />
-                <AlertTitle className="font-semibold text-accent">Not Legal Advice</AlertTitle>
+               <Alert variant="default" className="border-destructive bg-destructive/5 mt-3">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                <AlertTitle className="font-semibold text-destructive">Not Legal Advice</AlertTitle>
                 <AlertDescription>
-                  The analysis presented is illustrative. Always consult with a qualified legal professional for advice specific to your situation and to review any evidence.
+                  The analysis presented is illustrative. Always consult with a qualified legal professional for advice specific to your situation and to review any evidence. No actual file content was processed by AI in this prototype.
                 </AlertDescription>
               </Alert>
             </CardContent>
