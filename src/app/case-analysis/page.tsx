@@ -375,11 +375,11 @@ export default function CaseAnalysisPage() {
       setAnalysisResult(refinedResult);
       toast({
         title: "Analysis Refined (Phase 3 - Document Summary)",
-        description: `The case analysis has been updated with insights from your summary of '${selectedFileName}'. New strategy suggestions will be generated. The AI may also provide further clarifying questions.`,
+        description: `The case analysis has been updated with insights from '${selectedFileName}'. Suggested Document Types and Strategy Suggestions will be re-evaluated. The AI may also provide further clarifying questions.`,
       });
       
       await triggerStrategySuggestion(
-        `${form.getValues("caseDetails")}\n\n${combinedClarifications}`, // Pass the full narrative including the new summary
+        `${form.getValues("caseDetails")}\n\n${combinedClarifications}`, 
         form.getValues("caseCategory"),
         refinedResult.dueProcessViolationScore,
         refinedResult.relevantLaws
@@ -389,7 +389,6 @@ export default function CaseAnalysisPage() {
       setSelectedFileName(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       setIsFilePreparedForSummary(false);
-      // setClarifications(""); // Decide if Phase 2 clarifications should also be cleared here or kept separate. Let's keep them for now.
     }
     setIsRefiningAnalysis(false);
   };
@@ -439,7 +438,6 @@ export default function CaseAnalysisPage() {
         refinedResult.dueProcessViolationScore,
         refinedResult.relevantLaws
       );
-      // setClarifications(""); // User might want to add more clarifications based on new AI questions
     }
     setIsRefiningAnalysis(false);
   };
@@ -488,7 +486,7 @@ export default function CaseAnalysisPage() {
     setIsSummarizing(true);
     setAiCaseSummary(null);
     const input: SummarizeCaseInput = {
-      fullCaseNarrative: getCurrentFullNarrative(), // This now includes phase 2 clarifications if any
+      fullCaseNarrative: getCurrentFullNarrative(), 
       relevantLaws: analysisResult.relevantLaws,
       dueProcessViolationScore: analysisResult.dueProcessViolationScore,
     };
