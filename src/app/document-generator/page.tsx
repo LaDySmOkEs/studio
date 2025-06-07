@@ -700,19 +700,25 @@ export default function DocumentGeneratorPage() {
     if (suggestedTypesParam) {
       const typesFromURL = suggestedTypesParam.split(',') as DocumentType[];
       const validSuggestedTypes = typesFromURL.filter(
-        type => Object.keys(DOCUMENT_TEMPLATES).includes(type)
+        type => Object.keys(DOCUMENT_TEMPLATES).includes(type) && type !== ""
       );
 
       if (validSuggestedTypes.length > 0) {
         setSuggestedByAI(validSuggestedTypes);
         const firstValidType = validSuggestedTypes[0] as Exclude<DocumentType, "">;
         setSelectedDocument(firstValidType);
-        if (DOCUMENT_TEMPLATES[firstValidType]) { // Check if it's a valid key
+        if (DOCUMENT_TEMPLATES[firstValidType]) { 
           toast({
             title: "AI Suggestion Applied",
             description: `Pre-selected '${getDocumentDisplayName(firstValidType)}' based on your case analysis. You can change this selection.`,
           });
         }
+      } else if (suggestedTypesParam.trim() !== "") { // Only show if suggestedTypesParam was not empty
+         toast({
+          title: "AI Suggestion Not Applied",
+          description: `The suggested document type '${suggestedTypesParam}' could not be found or is not supported. Please select a document manually.`,
+          variant: "default" 
+        });
       }
     }
   }, [searchParams, toast]);
@@ -979,3 +985,4 @@ export default function DocumentGeneratorPage() {
     
 
     
+
