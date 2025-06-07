@@ -88,9 +88,9 @@ Based on this, please provide:
 3.  'generalTips': An array of up to 3 general communication tips specifically relevant to the 'statementContext'.
 {{else}}
 The user has not provided a draft. Based on the 'keyPointsOrTopic' and context, please provide:
-1.  'originalStatementCritique': This should be null or an empty string as no draft was provided.
-2.  'suggestedPhrasings': An array of 1 to 3 distinct, well-phrased statements that effectively convey the user's 'keyPointsOrTopic' within the given 'statementContext'. For each, provide the 'phrasing' and a 'rationale'.
-3.  'generalTips': An array of up to 3 general communication tips specifically relevant to the 'statementContext'.
+1.  'suggestedPhrasings': An array of 1 to 3 distinct, well-phrased statements that effectively convey the user's 'keyPointsOrTopic' within the given 'statementContext'. For each, provide the 'phrasing' and a 'rationale'.
+2.  'generalTips': An array of up to 3 general communication tips specifically relevant to the 'statementContext'.
+(Ensure the 'originalStatementCritique' field is NOT included in the output if no draft was provided.)
 {{/if}}
 
 Focus on creating practical, actionable statements and advice. Avoid legal advice on the merits of the case; concentrate solely on crafting clear and impactful communication.
@@ -114,23 +114,17 @@ const generateCourtroomPhrasingSuggestionsFlow = ai.defineFlow(
     if (!rawOutput) {
       throw new Error("AI failed to generate phrasing suggestions.");
     }
-
-    // Explicitly construct the return object to ensure it's plain data
-    let finalCritique: string | undefined = rawOutput.originalStatementCritique;
-
-    if (!input.userDraftStatement) {
-      // If no draft was provided, ensure critique is undefined,
-      // regardless of whether AI returned null or empty string.
-      finalCritique = undefined;
-    }
     
+    // If userDraftStatement was not provided, rawOutput.originalStatementCritique should be undefined 
+    // based on the updated prompt. This is compliant with z.string().optional().
+
     const result: GenerateCourtroomPhrasingOutput = {
-      originalStatementCritique: finalCritique,
-      suggestedPhrasings: rawOutput.suggestedPhrasings.map(p => ({
-        phrasing: p.phrasing,
-        rationale: p.rationale,
+      originalStatementCritique: rawOutput.originalStatementCritique, 
+      suggestedPhrasings: (rawOutput.suggestedPhrasings || []).map(p => ({
+        phrasing: p.phrasing || "", // Ensure phrasing is a string
+        rationale: p.rationale,     // Rationale is optional in schema, pass it through
       })),
-      generalTips: rawOutput.generalTips,
+      generalTips: rawOutput.generalTips || [], // Ensure generalTips is an array
     };
     
     return result;
