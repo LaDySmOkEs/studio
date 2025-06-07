@@ -83,8 +83,8 @@ export default function CourtroomCommunicationCoachPage() {
     setError(null);
 
     const input: GenerateCourtroomPhrasingInput = {
-      keyPointsOrTopic, 
-      userDraftStatement: userDraftStatement.trim() || undefined, // Send if not empty
+      keyPointsOrTopic: keyPointsOrTopic, // Changed from userStatement
+      userDraftStatement: userDraftStatement.trim() || undefined,
       statementContext: statementContext as any, 
       caseSummary: storedCaseSummary || undefined,
       caseCategory: storedCaseCategory || undefined,
