@@ -1,4 +1,3 @@
-
 // src/app/evidence-compiler/actions.ts
 'use server';
 
@@ -26,4 +25,3 @@ export async function handleAnalyzeDocumentContentAction(
     return { error: error instanceof Error ? error.message : "An unknown error occurred while analyzing document content." };
   }
 }
-

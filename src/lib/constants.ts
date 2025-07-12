@@ -1,4 +1,3 @@
-
 // src/lib/constants.ts
 import { Home, Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, Route, ClipboardList, MessageSquareQuote, FileEdit, GraduationCap, Users, FileSignature, type LucideIcon } from "lucide-react";
 

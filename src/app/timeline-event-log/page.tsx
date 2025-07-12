@@ -1,4 +1,3 @@
-
 // src/app/timeline-event-log/page.tsx
 "use client";
 
@@ -384,4 +383,3 @@ export default function TimelineEventLogPage() {
     </div>
   );
 }
-
