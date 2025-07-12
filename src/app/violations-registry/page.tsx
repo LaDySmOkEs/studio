@@ -1,3 +1,4 @@
+
 // src/app/violations-registry/page.tsx
 "use client";
 
@@ -11,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Scale, Loader2, Info, AlertTriangle, FileSignature, Brain, ShieldCheck, Tag } from "lucide-react";
+import { Scale, Loader2, Info, AlertTriangle, FileSignature, Brain, ShieldCheck, Tag, Handshake } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { handleViolationReportAction } from "./actions";
 import type { ViolationReportInput, ViolationAnalysisOutput } from "@/ai/schemas/violationReportSchemas";
@@ -110,75 +111,85 @@ export default function ViolationsRegistryPage() {
           </CardTitle>
           <CardDescription>
             Report alleged instances of due process violations or official misconduct. This information can be used to identify patterns and connect with others who have had similar experiences.
-             <strong className="block mt-1">This prototype does not store your report on a public or private database. The submission is only analyzed by the AI for your current session.</strong>
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="narrative">Narrative of Events*</Label>
-              <Textarea
-                id="narrative"
-                value={narrative}
-                onChange={(e) => setNarrative(e.target.value)}
-                placeholder="Describe the incident(s) in detail. What happened, who was involved, where and when did it occur?"
-                rows={8}
-                required
-              />
-            </div>
-             <div className="grid md:grid-cols-2 gap-4">
-               <div>
-                <Label htmlFor="involvedParties">Involved Parties/Agency (Optional)</Label>
-                <Input
-                  id="involvedParties"
-                  value={involvedParties}
-                  onChange={(e) => setInvolvedParties(e.target.value)}
-                  placeholder="e.g., Anytown Police Dept., Officer John Doe, County Clerk's Office"
+        <CardContent>
+            <Alert variant="default" className="mb-6 border-accent bg-accent/10">
+              <Handshake className="h-5 w-5 text-accent" />
+              <AlertTitle className="font-semibold text-accent">A Free Tool for Transparency</AlertTitle>
+              <AlertDescription>
+                This registry is a free feature for all users. We believe that providing a space for people to report alleged misconduct is a crucial step toward transparency and accountability. By documenting these events, we can help inform the public and challenge systems like qualified immunity that may shield misconduct from scrutiny.
+                <br/><strong>Note:</strong> In this prototype, reports are for your session only and are not stored in a public database.
+              </AlertDescription>
+            </Alert>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="narrative">Narrative of Events*</Label>
+                <Textarea
+                  id="narrative"
+                  value={narrative}
+                  onChange={(e) => setNarrative(e.target.value)}
+                  placeholder="Describe the incident(s) in detail. What happened, who was involved, where and when did it occur?"
+                  rows={8}
+                  required
                 />
               </div>
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="eventDate">Approximate Date of Main Event (Optional)</Label>
+                  <Label htmlFor="involvedParties">Involved Parties/Agency (Optional)</Label>
                   <Input
-                    id="eventDate"
-                    type="date"
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)}
+                    id="involvedParties"
+                    value={involvedParties}
+                    onChange={(e) => setInvolvedParties(e.target.value)}
+                    placeholder="e.g., Anytown Police Dept., Officer John Doe, County Clerk's Office"
                   />
                 </div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="violationCategory">Primary Violation Category*</Label>
-                    <Select onValueChange={setViolationCategory} value={violationCategory} required>
-                    <SelectTrigger id="violationCategory">
-                        <SelectValue placeholder="Select the main type of violation..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {VIOLATION_CATEGORIES.map(category => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                        ))}
-                    </SelectContent>
-                    </Select>
-                </div>
-                 <div>
-                    <Label htmlFor="jurisdiction">Jurisdiction (State, County, or City)*</Label>
+                  <div>
+                    <Label htmlFor="eventDate">Approximate Date of Main Event (Optional)</Label>
                     <Input
-                    id="jurisdiction"
-                    value={jurisdiction}
-                    onChange={(e) => setJurisdiction(e.target.value)}
-                    placeholder="e.g., State of California, Travis County TX, New York City"
-                    required
+                      id="eventDate"
+                      type="date"
+                      value={eventDate}
+                      onChange={(e) => setEventDate(e.target.value)}
                     />
-                </div>
+                  </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                      <Label htmlFor="violationCategory">Primary Violation Category*</Label>
+                      <Select onValueChange={setViolationCategory} value={violationCategory} required>
+                      <SelectTrigger id="violationCategory">
+                          <SelectValue placeholder="Select the main type of violation..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                          {VIOLATION_CATEGORIES.map(category => (
+                          <SelectItem key={category} value={category}>{category}</SelectItem>
+                          ))}
+                      </SelectContent>
+                      </Select>
+                  </div>
+                  <div>
+                      <Label htmlFor="jurisdiction">Jurisdiction (State, County, or City)*</Label>
+                      <Input
+                      id="jurisdiction"
+                      value={jurisdiction}
+                      onChange={(e) => setJurisdiction(e.target.value)}
+                      placeholder="e.g., State of California, Travis County TX, New York City"
+                      required
+                      />
+                  </div>
+              </div>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Brain className="mr-2 h-4 w-4" />}
-              Submit Report for AI Analysis
-            </Button>
-          </CardFooter>
-        </form>
+             <CardFooter className="px-0 pt-6">
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Brain className="mr-2 h-4 w-4" />}
+                Submit Report for AI Analysis
+              </Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+       
       </Card>
 
       {error && (

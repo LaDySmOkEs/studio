@@ -5,7 +5,8 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileSignature } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function HomePage() {
   return (
@@ -25,6 +26,15 @@ export default function HomePage() {
             Welcome to DUE PROCESS AI, the first tool of its kind designed to give power back to the people in the courtroom.
             Navigating the legal system can be daunting. Our mission is to make legal concepts more accessible, help you understand your rights, prepare your case, and identify potential areas of concern regarding due process.
           </p>
+          
+          <Alert variant="default" className="border-primary bg-primary/5">
+              <FileSignature className="h-5 w-5 text-primary" />
+              <AlertTitle className="font-semibold text-primary">A Tool for Transparency: The Violations Registry</AlertTitle>
+              <AlertDescription>
+                A core part of our mission is the <Link href="/violations-registry" className="font-bold hover:underline">Due Process Violations Registry</Link>. This is a free feature for everyone to report and bring light to alleged instances of official misconduct. By creating a public record, we aim to foster transparency and accountability where it's needed most.
+              </AlertDescription>
+          </Alert>
+
           <p>
             Whether you're representing yourself (Pro Se), working with an attorney, or simply trying to understand a complex legal situation, DUE PROCESS AI offers a suite of tools:
           </p>
@@ -35,9 +45,6 @@ export default function HomePage() {
             <li>Practice courtroom communication and prepare for negotiations.</li>
             <li>And much more...</li>
           </ul>
-          <p>
-            Our goal is to replace confusion with clarity, and powerlessness with preparedness. Explore our features to take control of your legal journey.
-          </p>
           <p className="font-semibold text-destructive">
             Disclaimer: DUE PROCESS AI is an informational tool and does not provide legal advice. All outputs and suggestions should be reviewed by a qualified legal professional.
           </p>
