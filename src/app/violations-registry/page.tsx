@@ -1,4 +1,3 @@
-
 // src/app/violations-registry/page.tsx
 "use client";
 
