@@ -18,7 +18,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverComponentsExternalPackages: ['handlebars'],
+  experimental: {
+    serverComponentsExternalPackages: ['handlebars'],
+  }
 };
 
 export default nextConfig;
