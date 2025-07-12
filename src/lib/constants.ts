@@ -1,6 +1,6 @@
 
 // src/lib/constants.ts
-import { Home, Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, Route, ClipboardList, MessageSquareQuote, FileEdit, GraduationCap, Users, type LucideIcon } from "lucide-react";
+import { Home, Scale, FileText, Mic, Paperclip, NotebookPen, CreditCard, LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, LibrarySquare, Gavel, Library, Route, ClipboardList, MessageSquareQuote, FileEdit, GraduationCap, Users, FileSignature, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -48,6 +48,11 @@ export const NAV_ITEMS: NavItem[] = [
     title: "Interactive Assistant",
     href: "/interactive-assistant",
     icon: Bot,
+  },
+  {
+    title: "Violations Registry",
+    href: "/violations-registry",
+    icon: FileSignature,
   },
   {
     title: "Document Analyzer",

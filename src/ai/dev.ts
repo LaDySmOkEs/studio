@@ -16,7 +16,9 @@ import '@/ai/flows/generateProceduralRoadmap.ts';
 import '@/ai/flows/generateCourtroomPhrasingSuggestions.ts';
 import '@/ai/flows/generateNegotiationAdvice.ts';
 import '@/ai/flows/interactiveLegalAssistant.ts';
-import '@/ai/flows/analyzeDocumentContent.ts'; // Added new flow
+import '@/ai/flows/analyzeDocumentContent.ts';
+import '@/ai/flows/analyzeViolationReport.ts'; // Added new flow
 
     
+
 
