@@ -4,13 +4,14 @@ import {
   LayoutDashboard, HelpCircle, Bot, ListChecks, FileScan, CalendarClock, 
   LibrarySquare, Gavel, Library, Route, ClipboardList, MessageSquareQuote, 
   FileEdit, GraduationCap, Users, FileSignature, type LucideIcon, 
-  Search, DraftingCompass, ShieldQuestion, Briefcase, Settings 
+  Search, DraftingCompass, ShieldQuestion, Briefcase, Settings, CheckCircle, XCircle 
 } from "lucide-react";
 
 export interface NavItem {
   title: string;
   href: string;
   icon: LucideIcon;
+  hidden?: boolean; // Add hidden property
 }
 
 export interface NavItemGroup {
@@ -175,9 +176,22 @@ export const NAV_ITEM_GROUPS: NavItemGroup[] = [
         href: "/help-faq",
         icon: HelpCircle,
       },
+      // Hidden routes for payment flow
+      {
+        title: "Payment Success",
+        href: "/subscription/success",
+        icon: CheckCircle,
+        hidden: true,
+      },
+      {
+        title: "Payment Canceled",
+        href: "/subscription/cancel",
+        icon: XCircle,
+        hidden: true,
+      }
     ]
   }
 ];
 
-// Flat list for simpler access elsewhere in the app if needed
-export const NAV_ITEMS: NavItem[] = NAV_ITEM_GROUPS.flatMap(group => group.items);
+// Flat list for simpler access elsewhere in the app if needed, filtering out hidden items
+export const NAV_ITEMS: NavItem[] = NAV_ITEM_GROUPS.flatMap(group => group.items.filter(item => !item.hidden));

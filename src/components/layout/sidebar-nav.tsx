@@ -25,7 +25,7 @@ export function SidebarNav() {
             {group.title}
           </SidebarGroupLabel>
           <SidebarMenu>
-            {group.items.map((item) => (
+            {group.items.filter(item => !item.hidden).map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
