@@ -1,42 +1,59 @@
 'use client';
 
-import { useEffect } from 'react';
-import Script from 'next/script';
+import { useEffect, useState } from 'react';
 
-export default function HomePage() {
+export default function Home() {
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.grecaptcha) {
-      window.grecaptcha.ready(() => {
-        window.grecaptcha
-          .execute('6Ley_YIrAAAAAE8lgRwA6FIn-kd9a7xvSvlTfnYR', { action: 'homepage' })
-          .then((token) => {
-            console.log('reCAPTCHA token:', token);
-
-            // Example: Send token to your backend API route
-            fetch('/api/verify-recaptcha', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token }),
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                console.log('reCAPTCHA verification response:', data);
-              });
-          });
-      });
+    const scriptId = 'recaptcha-script';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY`;
+      script.id = scriptId;
+      script.async = true;
+      script.onload = () => setRecaptchaReady(true);
+      document.body.appendChild(script);
+    } else {
+      setRecaptchaReady(true);
     }
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!recaptchaReady || !window.grecaptcha) {
+      alert('reCAPTCHA not ready yet. Please try again.');
+      return;
+    }
+
+    const token = await window.grecaptcha.execute('YOUR_SITE_KEY', { action: 'submit' });
+
+    const res = await fetch('/api/verify-recaptcha', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      alert('reCAPTCHA verified! Score: ' + result.score);
+    } else {
+      alert('Failed reCAPTCHA. Score: ' + result.score);
+    }
+  };
+
   return (
-    <>
-      <Script
-        src="https://www.google.com/recaptcha/api.js?render=6Ley_YIrAAAAAE8lgRwA6FIn-kd9a7xvSvlTfnYR"
-        strategy="afterInteractive"
-      />
-      <main className="p-8">
-        <h1 className="text-3xl font-bold">Welcome to Studio</h1>
-        <p>This page is protected by reCAPTCHA v3.</p>
-      </main>
-    </>
+    <main className="p-10">
+      <h1 className="text-xl mb-4">Contact Form</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input type="text" name="name" placeholder="Your Name" className="border p-2 w-full" />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Submit
+        </button>
+      </form>
+    </main>
   );
 }
