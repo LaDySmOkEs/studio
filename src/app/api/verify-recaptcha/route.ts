@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   const { token } = await req.json();
 
-  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  const secret = process.env.6LetrokrAAAAAMmF0514E5DS4LS-JvEQfr1XApdR;
 
   const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
     method: 'POST',
