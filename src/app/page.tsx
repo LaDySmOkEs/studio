@@ -9,7 +9,7 @@ export default function Home() {
     const scriptId = 'recaptcha-script';
     if (!document.getElementById(scriptId)) {
       const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY`;
+      script.src = `https://www.google.com/recaptcha/api.js?render=6LetrokrAAAAAMiyIf4iD9Me18GYqqOklqGsPpy5`;
       script.id = scriptId;
       script.async = true;
       script.onload = () => setRecaptchaReady(true);
@@ -27,7 +27,7 @@ export default function Home() {
       return;
     }
 
-    const token = await window.grecaptcha.execute('YOUR_SITE_KEY', { action: 'submit' });
+    const token = await window.grecaptcha.execute('6LetrokrAAAAAMiyIf4iD9Me18GYqqOklqGsPpy5', { action: 'submit' });
 
     const res = await fetch('/api/verify-recaptcha', {
       method: 'POST',
