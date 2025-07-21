@@ -820,7 +820,7 @@ export default function DocumentGeneratorPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Document Generator</CardTitle>
           <CardDescription>
-            Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA or Settlement Agreements). 
+           // Select your state, city/county, and court level to help tailor documents for the correct jurisdiction (not applicable for FOIA or Settlement Agreements). 
             Then, choose a document type to generate a template. The system uses AI-driven suggestions (from Case Analysis) and your saved case summary (if available) to provide context. 
             Conceptual future enhancements include AI-powered "Smart Form Filling" (extracting data from your case summary or uploads to populate templates, suggesting legal phrasing), "Evidence-to-Complaint" generation, and support for highly "Custom Pleadings."
             Remember, these templates are for guidance only, do not constitute legal advice, and may require significant modification and review by a legal professional to be suitable for your specific situation and jurisdiction.
