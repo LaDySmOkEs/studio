@@ -815,8 +815,6 @@ export default function DocumentGeneratorPage() {
 
 
   return ()              
-    <div className="space-y-6"> {/* This div was inside Suspense */}
-         <Card className="shadow-lg">
           <CardHeader>
            <CardTitle className="text-2xl">Document Generator</CardTitle>
         </CardHeader>
