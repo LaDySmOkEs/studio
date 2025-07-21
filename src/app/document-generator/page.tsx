@@ -819,8 +819,6 @@ export default function DocumentGeneratorPage() {
          <Card className="shadow-lg">
           <CardHeader>
            <CardTitle className="text-2xl">Document Generator</CardTitle>
-       </div> {/* Closing div for the content */}
- </Suspense> {/* Closing Suspense tag */} </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {suggestedByAI.length > 0 && (
