@@ -814,7 +814,7 @@ export default function DocumentGeneratorPage() {
   };
 
 
-  return (
+  return ()              
     <div className="space-y-6">
       <Card className="shadow-lg">
         <CardHeader>
