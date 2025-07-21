@@ -815,11 +815,7 @@ export default function DocumentGeneratorPage() {
 
 
   return ()              
-    <div className="space-y-6">
-      <Card className="shadow-lg">
-        // Not commenting out Suspense boundary anymore
-     <Suspense fallback={<div>Loading...</div>}>
-       <div className="space-y-6"> {/* This div was inside Suspense */}
+    <div className="space-y-6"> {/* This div was inside Suspense */}
          <Card className="shadow-lg">
           <CardHeader>
            <CardTitle className="text-2xl">Document Generator</CardTitle>
