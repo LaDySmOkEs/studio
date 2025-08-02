@@ -24,14 +24,14 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Type check
-        run: npm run typecheck
+        run: yarn run typecheck
 
       - name: Lint
-        run: npm run lint
+        run: yarn run lint
 
       - name: Build
-        run: npm run build
+        run: yarn run build
 
       - name: Run tests
-        run: npm test
+        run: yarn test
         # You can skip this if you haven't added tests yet
