@@ -1,3 +1,0 @@
-git add yarn.lock
-git commit -m "Add yarn.lock to fix CI dependency install"
-git push
