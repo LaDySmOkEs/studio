@@ -32,6 +32,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
 # Editor directories and files
 .vscode
 .idea
